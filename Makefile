@@ -5,23 +5,25 @@ FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
 all: aldl-ftdi
 
-aldl-ftdi: main.c aldl-io-ftdi configfile clean
+aldl-ftdi: main.c aldl-io-ftdi configfile_
 	gcc $(CFLAGS) -lftdi main.c -o aldl-ftdi $(OBJS) aldl-io/aldl-io-ftdi.a
 
-aldl-tty: main.c aldl-io-tty configfile clean
+aldl-tty: main.c aldl-io-tty configfile_
 	gcc $(CFLAGS) main.c -o aldl-tty $(OBJS) aldl-io/aldl-io-tty.a
 
-configfile:
+configfile_:
 	cd configfile ; make ; cd ..
 
 aldl-io-ftdi:
-	cd aldl-io ; make clean ; make ftdi ; cd ..
+	cd aldl-io ; make ftdi ; cd ..
 
 aldl-io-tty:
-	cd aldl-io ; make clean ; make tty ; cd ..
+	cd aldl-io ; make tty ; cd ..
 
 clean:
 	rm -f *.o aldl-ftdi aldl-tty
+	cd aldl-io ; make clean ; cd ..
+	cd configfile ; make clean ; cd ..
 
 stats:
-	wc -l *.c *.h
+	wc -l *.c *.h */*.c */*.h

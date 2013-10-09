@@ -22,6 +22,8 @@ dependancies: libftdi (reccommended), bison, flex
 build is now statically compiled with a particular i/o handler, and is no
 longer selectable at runtime.
 
+run following in root directory:
+
 make aldl-ftdi
 -or-
 make aldl-tty

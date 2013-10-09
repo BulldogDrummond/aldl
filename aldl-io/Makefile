@@ -8,6 +8,7 @@ serio-ftdi.o: serio-ftdi.c aldl-io.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
 
 serio-tty.o: serio-tty.c aldl-io.h
+	echo "WARNING!! the tty serial driver is broken, dont use it yet"
 	gcc $(CFLAGS) -c serio-tty.c -o serio-tty.o
 
 aldlcomm.o: serio-ftdi.o serio-tty.o
