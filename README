@@ -1,7 +1,9 @@
 
 ** in active development, not ready for use **
 
-for detailed project overview, see github.com/resfilter/aldl
+for detailed project overview, see:
+
+http://resfilter.github.io/aldl
 
 it has various serial interface methods, which it uses to place the ECM in
 diagnostic mode, so realtime data can be retrieved, calculated, and then
