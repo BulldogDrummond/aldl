@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+
+    <title>Aldl by resfilter</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Aldl</h1>
+        <h2>A handler for gm obd-i aldl serial diagnostic systems.</h2>
+
+        <section id="downloads">
+          <a href="https://github.com/resfilter/aldl/zipball/master" class="btn">Download as .zip</a>
+          <a href="https://github.com/resfilter/aldl/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/resfilter/aldl" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+        <p>This is a program designed to manage aldl datastreams from the 8192 baud series of OBD-I GM ECMs.</p>
+
+<p>The main goal is to turn small low-power linux devices such as the raspberry pi into a powerful auxiliary dashboard or perpetual datalogger:</p>
+
+<ul>
+<li>Maintain stable diagnostic mode, with methods that are adaptable to all GM ECMs.</li>
+<li>Low memory and CPU usage with pure optimized C</li>
+<li>Portable to at least x86 and ARM</li>
+<li>Parse multiple datastreams efficiently with maximum throughput allowable</li>
+<li>Accurate unit conversions for all known data that are transparent to plugins</li>
+<li>Stupid simple plug-in API that requires no knowledge of the datastream</li>
+<li>Parallel processing of output plugins with a single serial input</li>
+<li>Script to convert ADF format spec</li>
+</ul><p>Possible plugins and applications for target devices include:</p>
+
+<ul>
+<li>ncurses or GTK display interfaces for supplimental dashboards</li>
+<li>lightweight multi-format dataloggers</li>
+<li>warning buzzer or warning light widgets</li>
+<li>simple scripting engines, which, combined with a GPIO header, could allow this to become a fairly capable piggyback ECM for boost control, cutout actuation, or whatever</li>
+</ul><p>Right now it's in early stages, we're working on establishing reliable comms, but we're getting there, and would appreciate any help.</p>
+      </section>
+    </div>
+
+    
+  </body>
+</html>
