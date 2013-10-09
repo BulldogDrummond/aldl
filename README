@@ -1,5 +1,23 @@
-- will do cvs repos. later, for now this directory is snapshotted
-  nightly to /backup if you need rollback.
+
+** in active development, not ready for use **
+
+this is a handler for gm obd-i aldl serial diagnostic systems.
+
+it has various serial interface methods, which it uses to place the ECM in
+diagnostic mode, so realtime data can be retrieved, calculated, and then
+processed by a series of display or scripting modules.
+
+it uses a proprietery config format, which defines the location of various
+data sets, and conversion specifications per diagnostic commands, as well
+as ecm-specific strings and timing.
+
+a script will be provided to import some of the specs in a tunerpro ADF
+file.
+
+it is intended for use on low-power devices such as the raspberry pi, to
+construct digital secondary dashboard type devices.
+
+dependancies: libftdi (reccommended), bison, flex
 
 - build is now statically compiled with a particular i/o handler, and
   is no longer selectable at runtime.  make aldl-ftdi or aldl-tty.
