@@ -1,0 +1,25 @@
+- will do cvs repos. later, for now this directory is snapshotted
+  nightly to /backup if you need rollback.
+
+- build is now statically compiled with a particular i/o handler, and
+  is no longer selectable at runtime.  make aldl-ftdi or aldl-tty.
+
+./aldl-io - any code that does i/o with the aldl port or deals with
+  serial interfaces needs to be here.
+
+./consoleif - a console based dashboard display interface
+
+./configfile - parsing system for config files
+
+./error - global error handling routines.  interface-specific errors should
+  use their own error handlers.
+
+./misc - miscellaneous code and objects that aren't being used yet
+
+./examples - documentation etc
+
+ADX Files:
+
+nAst1 - the one I use the most for firechicken/fiero
+OSE 12p - planned to use with my truck
+TGP 8F - 2bar code used in my friend's truck
