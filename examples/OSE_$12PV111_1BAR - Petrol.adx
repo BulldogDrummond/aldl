@@ -1,0 +1,2050 @@
+<ADXFORMAT version="1.01">
+  <!-- Written 11/30/2011 17:42:30 -->
+  <ADXHEADER>
+    <guid>7b1b0aeb-bacd-467e-a060-467b79441385</guid>
+    <flags>0x00</flags>
+    <objectcount>119</objectcount>
+    <userversion>1.11</userversion>
+    <author>Jayme Turner, Antus, VL400</author>
+    <desc>For use with OSE 12P V1.11</desc>
+    <baud>8192</baud>
+    <DEFAULTS datasizeinbits="8" sigdigits="2" outputtype="3" baud="0" signed="0" lsbfirst="0" float="0" />
+    <connectcmd>connecitonmacr</connectcmd>
+    <monitorcmd>monitormacro</monitorcmd>
+  </ADXHEADER>
+
+  <ADXBITMASK id="C9" idhash="0xDE6B7930" title="Pin C9 Input (Active High)">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <truestring>Active</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x17</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="D11" idhash="0xCD784F7B" title="Pin D11 Input">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <truestring>Clear</truestring>
+    <falsestring>Active</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x17</packetoffset>
+    <operand>0x00000040</operand>
+    <bitop>AND</bitop>
+    <result>0x00000040</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="C15" idhash="0xCD6D5FBB" title="Pin C15 Input">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <truestring>Clear</truestring>
+    <falsestring>Active</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x09</packetoffset>
+    <operand>0x00000080</operand>
+    <bitop>AND</bitop>
+    <result>0x00000080</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="C8" idhash="0xDE6B6E70" title="Pin C8 Input">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <truestring>Clear</truestring>
+    <falsestring>Active</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x09</packetoffset>
+    <operand>0x00000040</operand>
+    <bitop>AND</bitop>
+    <result>0x00000040</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="MS" idhash="0xDE6BC030" title="Map Switch">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <truestring>Map A</truestring>
+    <falsestring>Map B</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x09</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXHISTOGRAM id="400" idhash="0xCD4C893B" title="BLM table">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <rows>47</rows>
+    <cols>9</cols>
+    <xmin>20.000000</xmin>
+    <xmax>200.000000</xmax>
+    <ymin>400.000000</ymin>
+    <ymax>9600.000000</ymax>
+    <rowval index="0" val="400.000000" />
+    <rowval index="1" val="600.000000" />
+    <rowval index="2" val="800.000000" />
+    <rowval index="3" val="1000.000000" />
+    <rowval index="4" val="1200.000000" />
+    <rowval index="5" val="1400.000000" />
+    <rowval index="6" val="1600.000000" />
+    <rowval index="7" val="1800.000000" />
+    <rowval index="8" val="2000.000000" />
+    <rowval index="9" val="2200.000000" />
+    <rowval index="10" val="2400.000000" />
+    <rowval index="11" val="2600.000000" />
+    <rowval index="12" val="2800.000000" />
+    <rowval index="13" val="3000.000000" />
+    <rowval index="14" val="3200.000000" />
+    <rowval index="15" val="3400.000000" />
+    <rowval index="16" val="3600.000000" />
+    <rowval index="17" val="3800.000000" />
+    <rowval index="18" val="4000.000000" />
+    <rowval index="19" val="4200.000000" />
+    <rowval index="20" val="4400.000000" />
+    <rowval index="21" val="4600.000000" />
+    <rowval index="22" val="4800.000000" />
+    <rowval index="23" val="5000.000000" />
+    <rowval index="24" val="5200.000000" />
+    <rowval index="25" val="5400.000000" />
+    <rowval index="26" val="5600.000000" />
+    <rowval index="27" val="5800.000000" />
+    <rowval index="28" val="6000.000000" />
+    <rowval index="29" val="6200.000000" />
+    <rowval index="30" val="6400.000000" />
+    <rowval index="31" val="6600.000000" />
+    <rowval index="32" val="6800.000000" />
+    <rowval index="33" val="7000.000000" />
+    <rowval index="34" val="7200.000000" />
+    <rowval index="35" val="7400.000000" />
+    <rowval index="36" val="7600.000000" />
+    <rowval index="37" val="7800.000000" />
+    <rowval index="38" val="8000.000000" />
+    <rowval index="39" val="8200.000000" />
+    <rowval index="40" val="8400.000000" />
+    <rowval index="41" val="8600.000000" />
+    <rowval index="42" val="8800.000000" />
+    <rowval index="43" val="9000.000000" />
+    <rowval index="44" val="9200.000000" />
+    <rowval index="45" val="9400.000000" />
+    <rowval index="46" val="9600.000000" />
+    <colval index="0" val="20.000000" />
+    <colval index="1" val="30.000000" />
+    <colval index="2" val="40.000000" />
+    <colval index="3" val="50.000000" />
+    <colval index="4" val="60.000000" />
+    <colval index="5" val="70.000000" />
+    <colval index="6" val="80.000000" />
+    <colval index="7" val="90.000000" />
+    <colval index="8" val="100.000000" />
+    <historysize>100</historysize>
+    <xidhash>0xADA0CD10</xidhash>
+    <yidhash>0x86F3549B</yidhash>
+    <zidhash>0xDE6A8D70</zidhash>
+  </ADXHISTOGRAM>
+
+  <ADXHISTOGRAM id="401" idhash="0xCD4C877B" title="Knock Counts">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <rows>47</rows>
+    <cols>9</cols>
+    <xmin>20.000000</xmin>
+    <xmax>200.000000</xmax>
+    <ymin>400.000000</ymin>
+    <ymax>9600.000000</ymax>
+    <rowval index="0" val="400.000000" />
+    <rowval index="1" val="600.000000" />
+    <rowval index="2" val="800.000000" />
+    <rowval index="3" val="1000.000000" />
+    <rowval index="4" val="1200.000000" />
+    <rowval index="5" val="1400.000000" />
+    <rowval index="6" val="1600.000000" />
+    <rowval index="7" val="1800.000000" />
+    <rowval index="8" val="2000.000000" />
+    <rowval index="9" val="2200.000000" />
+    <rowval index="10" val="2400.000000" />
+    <rowval index="11" val="2600.000000" />
+    <rowval index="12" val="2800.000000" />
+    <rowval index="13" val="3000.000000" />
+    <rowval index="14" val="3200.000000" />
+    <rowval index="15" val="3400.000000" />
+    <rowval index="16" val="3600.000000" />
+    <rowval index="17" val="3800.000000" />
+    <rowval index="18" val="4000.000000" />
+    <rowval index="19" val="4200.000000" />
+    <rowval index="20" val="4400.000000" />
+    <rowval index="21" val="4600.000000" />
+    <rowval index="22" val="4800.000000" />
+    <rowval index="23" val="5000.000000" />
+    <rowval index="24" val="5200.000000" />
+    <rowval index="25" val="5400.000000" />
+    <rowval index="26" val="5600.000000" />
+    <rowval index="27" val="5800.000000" />
+    <rowval index="28" val="6000.000000" />
+    <rowval index="29" val="6200.000000" />
+    <rowval index="30" val="6400.000000" />
+    <rowval index="31" val="6600.000000" />
+    <rowval index="32" val="6800.000000" />
+    <rowval index="33" val="7000.000000" />
+    <rowval index="34" val="7200.000000" />
+    <rowval index="35" val="7400.000000" />
+    <rowval index="36" val="7600.000000" />
+    <rowval index="37" val="7800.000000" />
+    <rowval index="38" val="8000.000000" />
+    <rowval index="39" val="8200.000000" />
+    <rowval index="40" val="8400.000000" />
+    <rowval index="41" val="8600.000000" />
+    <rowval index="42" val="8800.000000" />
+    <rowval index="43" val="9000.000000" />
+    <rowval index="44" val="9200.000000" />
+    <rowval index="45" val="9400.000000" />
+    <rowval index="46" val="9600.000000" />
+    <colval index="0" val="20.000000" />
+    <colval index="1" val="30.000000" />
+    <colval index="2" val="40.000000" />
+    <colval index="3" val="50.000000" />
+    <colval index="4" val="60.000000" />
+    <colval index="5" val="70.000000" />
+    <colval index="6" val="80.000000" />
+    <colval index="7" val="90.000000" />
+    <colval index="8" val="100.000000" />
+    <historysize>10</historysize>
+    <xidhash>0xADA0CD10</xidhash>
+    <yidhash>0x86F3549B</yidhash>
+    <zidhash>0xDE69D970</zidhash>
+  </ADXHISTOGRAM>
+
+  <ADXHISTOGRAM id="402" idhash="0xCD4C9DDB" title="o2 volts">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <rows>47</rows>
+    <cols>9</cols>
+    <xmin>20.000000</xmin>
+    <xmax>200.000000</xmax>
+    <ymin>400.000000</ymin>
+    <ymax>9600.000000</ymax>
+    <rowval index="0" val="400.000000" />
+    <rowval index="1" val="600.000000" />
+    <rowval index="2" val="800.000000" />
+    <rowval index="3" val="1000.000000" />
+    <rowval index="4" val="1200.000000" />
+    <rowval index="5" val="1400.000000" />
+    <rowval index="6" val="1600.000000" />
+    <rowval index="7" val="1800.000000" />
+    <rowval index="8" val="2000.000000" />
+    <rowval index="9" val="2200.000000" />
+    <rowval index="10" val="2400.000000" />
+    <rowval index="11" val="2600.000000" />
+    <rowval index="12" val="2800.000000" />
+    <rowval index="13" val="3000.000000" />
+    <rowval index="14" val="3200.000000" />
+    <rowval index="15" val="3400.000000" />
+    <rowval index="16" val="3600.000000" />
+    <rowval index="17" val="3800.000000" />
+    <rowval index="18" val="4000.000000" />
+    <rowval index="19" val="4200.000000" />
+    <rowval index="20" val="4400.000000" />
+    <rowval index="21" val="4600.000000" />
+    <rowval index="22" val="4800.000000" />
+    <rowval index="23" val="5000.000000" />
+    <rowval index="24" val="5200.000000" />
+    <rowval index="25" val="5400.000000" />
+    <rowval index="26" val="5600.000000" />
+    <rowval index="27" val="5800.000000" />
+    <rowval index="28" val="6000.000000" />
+    <rowval index="29" val="6200.000000" />
+    <rowval index="30" val="6400.000000" />
+    <rowval index="31" val="6600.000000" />
+    <rowval index="32" val="6800.000000" />
+    <rowval index="33" val="7000.000000" />
+    <rowval index="34" val="7200.000000" />
+    <rowval index="35" val="7400.000000" />
+    <rowval index="36" val="7600.000000" />
+    <rowval index="37" val="7800.000000" />
+    <rowval index="38" val="8000.000000" />
+    <rowval index="39" val="8200.000000" />
+    <rowval index="40" val="8400.000000" />
+    <rowval index="41" val="8600.000000" />
+    <rowval index="42" val="8800.000000" />
+    <rowval index="43" val="9000.000000" />
+    <rowval index="44" val="9200.000000" />
+    <rowval index="45" val="9400.000000" />
+    <rowval index="46" val="9600.000000" />
+    <colval index="0" val="20.000000" />
+    <colval index="1" val="30.000000" />
+    <colval index="2" val="40.000000" />
+    <colval index="3" val="50.000000" />
+    <colval index="4" val="60.000000" />
+    <colval index="5" val="70.000000" />
+    <colval index="6" val="80.000000" />
+    <colval index="7" val="90.000000" />
+    <colval index="8" val="100.000000" />
+    <historysize>10</historysize>
+    <xidhash>0xADA0CD10</xidhash>
+    <yidhash>0x86F3549B</yidhash>
+    <zidhash>0xDE6A84B0</zidhash>
+  </ADXHISTOGRAM>
+
+  <ADXHISTOGRAM id="widebandhigh" idhash="0xF8CDCC1D" title="wideband">
+    <rows>47</rows>
+    <cols>9</cols>
+    <xmin>20.000000</xmin>
+    <xmax>200.000000</xmax>
+    <ymin>400.000000</ymin>
+    <ymax>9600.000000</ymax>
+    <rowval index="0" val="400.000000" />
+    <rowval index="1" val="600.000000" />
+    <rowval index="2" val="800.000000" />
+    <rowval index="3" val="1000.000000" />
+    <rowval index="4" val="1200.000000" />
+    <rowval index="5" val="1400.000000" />
+    <rowval index="6" val="1600.000000" />
+    <rowval index="7" val="1800.000000" />
+    <rowval index="8" val="2000.000000" />
+    <rowval index="9" val="2200.000000" />
+    <rowval index="10" val="2400.000000" />
+    <rowval index="11" val="2600.000000" />
+    <rowval index="12" val="2800.000000" />
+    <rowval index="13" val="3000.000000" />
+    <rowval index="14" val="3200.000000" />
+    <rowval index="15" val="3400.000000" />
+    <rowval index="16" val="3600.000000" />
+    <rowval index="17" val="3800.000000" />
+    <rowval index="18" val="4000.000000" />
+    <rowval index="19" val="4200.000000" />
+    <rowval index="20" val="4400.000000" />
+    <rowval index="21" val="4600.000000" />
+    <rowval index="22" val="4800.000000" />
+    <rowval index="23" val="5000.000000" />
+    <rowval index="24" val="5200.000000" />
+    <rowval index="25" val="5400.000000" />
+    <rowval index="26" val="5600.000000" />
+    <rowval index="27" val="5800.000000" />
+    <rowval index="28" val="6000.000000" />
+    <rowval index="29" val="6200.000000" />
+    <rowval index="30" val="6400.000000" />
+    <rowval index="31" val="6600.000000" />
+    <rowval index="32" val="6800.000000" />
+    <rowval index="33" val="7000.000000" />
+    <rowval index="34" val="7200.000000" />
+    <rowval index="35" val="7400.000000" />
+    <rowval index="36" val="7600.000000" />
+    <rowval index="37" val="7800.000000" />
+    <rowval index="38" val="8000.000000" />
+    <rowval index="39" val="8200.000000" />
+    <rowval index="40" val="8400.000000" />
+    <rowval index="41" val="8600.000000" />
+    <rowval index="42" val="8800.000000" />
+    <rowval index="43" val="9000.000000" />
+    <rowval index="44" val="9200.000000" />
+    <rowval index="45" val="9400.000000" />
+    <rowval index="46" val="9600.000000" />
+    <colval index="0" val="20.000000" />
+    <colval index="1" val="30.000000" />
+    <colval index="2" val="40.000000" />
+    <colval index="3" val="50.000000" />
+    <colval index="4" val="60.000000" />
+    <colval index="5" val="70.000000" />
+    <colval index="6" val="80.000000" />
+    <colval index="7" val="90.000000" />
+    <colval index="8" val="100.000000" />
+    <historysize>100</historysize>
+    <xidhash>0xADA0CD10</xidhash>
+    <yidhash>0x86F3549B</yidhash>
+    <zidhash>0x34C57F0D</zidhash>
+  </ADXHISTOGRAM>
+
+  <ADXHISTOGRAM id="404" idhash="0xCD4C80DB" title="Spark Advance">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <rows>47</rows>
+    <cols>9</cols>
+    <xmin>20.000000</xmin>
+    <xmax>200.000000</xmax>
+    <ymin>400.000000</ymin>
+    <ymax>9600.000000</ymax>
+    <rowval index="0" val="400.000000" />
+    <rowval index="1" val="600.000000" />
+    <rowval index="2" val="800.000000" />
+    <rowval index="3" val="1000.000000" />
+    <rowval index="4" val="1200.000000" />
+    <rowval index="5" val="1400.000000" />
+    <rowval index="6" val="1600.000000" />
+    <rowval index="7" val="1800.000000" />
+    <rowval index="8" val="2000.000000" />
+    <rowval index="9" val="2200.000000" />
+    <rowval index="10" val="2400.000000" />
+    <rowval index="11" val="2600.000000" />
+    <rowval index="12" val="2800.000000" />
+    <rowval index="13" val="3000.000000" />
+    <rowval index="14" val="3200.000000" />
+    <rowval index="15" val="3400.000000" />
+    <rowval index="16" val="3600.000000" />
+    <rowval index="17" val="3800.000000" />
+    <rowval index="18" val="4000.000000" />
+    <rowval index="19" val="4200.000000" />
+    <rowval index="20" val="4400.000000" />
+    <rowval index="21" val="4600.000000" />
+    <rowval index="22" val="4800.000000" />
+    <rowval index="23" val="5000.000000" />
+    <rowval index="24" val="5200.000000" />
+    <rowval index="25" val="5400.000000" />
+    <rowval index="26" val="5600.000000" />
+    <rowval index="27" val="5800.000000" />
+    <rowval index="28" val="6000.000000" />
+    <rowval index="29" val="6200.000000" />
+    <rowval index="30" val="6400.000000" />
+    <rowval index="31" val="6600.000000" />
+    <rowval index="32" val="6800.000000" />
+    <rowval index="33" val="7000.000000" />
+    <rowval index="34" val="7200.000000" />
+    <rowval index="35" val="7400.000000" />
+    <rowval index="36" val="7600.000000" />
+    <rowval index="37" val="7800.000000" />
+    <rowval index="38" val="8000.000000" />
+    <rowval index="39" val="8200.000000" />
+    <rowval index="40" val="8400.000000" />
+    <rowval index="41" val="8600.000000" />
+    <rowval index="42" val="8800.000000" />
+    <rowval index="43" val="9000.000000" />
+    <rowval index="44" val="9200.000000" />
+    <rowval index="45" val="9400.000000" />
+    <rowval index="46" val="9600.000000" />
+    <colval index="0" val="20.000000" />
+    <colval index="1" val="30.000000" />
+    <colval index="2" val="40.000000" />
+    <colval index="3" val="50.000000" />
+    <colval index="4" val="60.000000" />
+    <colval index="5" val="70.000000" />
+    <colval index="6" val="80.000000" />
+    <colval index="7" val="90.000000" />
+    <colval index="8" val="100.000000" />
+    <historysize>100</historysize>
+    <xidhash>0xADA0CD10</xidhash>
+    <yidhash>0x86F3549B</yidhash>
+    <zidhash>0xDE69D0B0</zidhash>
+  </ADXHISTOGRAM>
+
+  <ADXHISTOGRAM id="405" idhash="0xCD4C97BB" title="Injector DC %">
+    <rows>47</rows>
+    <cols>17</cols>
+    <xmin>0.000000</xmin>
+    <xmax>3.622000</xmax>
+    <ymin>400.000000</ymin>
+    <ymax>9600.000000</ymax>
+    <rowval index="0" val="400.000000" />
+    <rowval index="1" val="600.000000" />
+    <rowval index="2" val="800.000000" />
+    <rowval index="3" val="1000.000000" />
+    <rowval index="4" val="1200.000000" />
+    <rowval index="5" val="1400.000000" />
+    <rowval index="6" val="1600.000000" />
+    <rowval index="7" val="1800.000000" />
+    <rowval index="8" val="2000.000000" />
+    <rowval index="9" val="2200.000000" />
+    <rowval index="10" val="2400.000000" />
+    <rowval index="11" val="2600.000000" />
+    <rowval index="12" val="2800.000000" />
+    <rowval index="13" val="3000.000000" />
+    <rowval index="14" val="3200.000000" />
+    <rowval index="15" val="3400.000000" />
+    <rowval index="16" val="3600.000000" />
+    <rowval index="17" val="3800.000000" />
+    <rowval index="18" val="4000.000000" />
+    <rowval index="19" val="4200.000000" />
+    <rowval index="20" val="4400.000000" />
+    <rowval index="21" val="4600.000000" />
+    <rowval index="22" val="4800.000000" />
+    <rowval index="23" val="5000.000000" />
+    <rowval index="24" val="5200.000000" />
+    <rowval index="25" val="5400.000000" />
+    <rowval index="26" val="5600.000000" />
+    <rowval index="27" val="5800.000000" />
+    <rowval index="28" val="6000.000000" />
+    <rowval index="29" val="6200.000000" />
+    <rowval index="30" val="6400.000000" />
+    <rowval index="31" val="6600.000000" />
+    <rowval index="32" val="6800.000000" />
+    <rowval index="33" val="7000.000000" />
+    <rowval index="34" val="7200.000000" />
+    <rowval index="35" val="7400.000000" />
+    <rowval index="36" val="7600.000000" />
+    <rowval index="37" val="7800.000000" />
+    <rowval index="38" val="8000.000000" />
+    <rowval index="39" val="8200.000000" />
+    <rowval index="40" val="8400.000000" />
+    <rowval index="41" val="8600.000000" />
+    <rowval index="42" val="8800.000000" />
+    <rowval index="43" val="9000.000000" />
+    <rowval index="44" val="9200.000000" />
+    <rowval index="45" val="9400.000000" />
+    <rowval index="46" val="9600.000000" />
+    <colval index="0" val="0.000000" />
+    <colval index="1" val="0.226000" />
+    <colval index="2" val="0.453000" />
+    <colval index="3" val="0.679000" />
+    <colval index="4" val="0.905000" />
+    <colval index="5" val="1.132000" />
+    <colval index="6" val="1.358000" />
+    <colval index="7" val="1.585000" />
+    <colval index="8" val="1.811000" />
+    <colval index="9" val="2.037000" />
+    <colval index="10" val="2.264000" />
+    <colval index="11" val="2.490000" />
+    <colval index="12" val="2.717000" />
+    <colval index="13" val="2.943000" />
+    <colval index="14" val="3.169000" />
+    <colval index="15" val="3.396000" />
+    <colval index="16" val="3.622000" />
+    <historysize>100</historysize>
+    <xidhash>0xDE6A99B0</xidhash>
+    <yidhash>0x86F3549B</yidhash>
+    <zidhash>0xDE6A8D70</zidhash>
+  </ADXHISTOGRAM>
+
+  <ADXMACRO id="monitormacro" idhash="0xDC8A0B2D" title="Monitor Macro" repeatcount="1">
+    <NODE commandID="mode1message00" repeatcount="1" />
+    <NODE commandID="Mode1Message0" repeatcount="1" />
+  </ADXMACRO>
+
+  <ADXMONITOR id="monitor1" idhash="0xCEC4CE52" title="Monitor1">
+    <mainbkgcolor>0x00FFFFFF</mainbkgcolor>
+    <plotbkgcolor>0x00F0F0F0</plotbkgcolor>
+    <plotoutlinecolor>0x00000000</plotoutlinecolor>
+    <titlecolor>0x00000000</titlecolor>
+    <timeaxiscolor>0x00000000</timeaxiscolor>
+    <entrycount>5</entrycount>
+    <ADXMONSERIES linecolor="0x0000FF" axiscolor="0x0000FF" itemidhash="0x86F3549B" />
+    <ADXMONSERIES linecolor="0x00FF80" axiscolor="0x00FF80" itemidhash="0xADA0CD10" />
+    <ADXMONSERIES linecolor="0xFF0000" axiscolor="0xFF0000" itemidhash="0xDE6A9E10" />
+    <ADXMONSERIES linecolor="0xFF8080" axiscolor="0xFF8080" itemidhash="0xDE69D970" />
+    <ADXMONSERIES linecolor="0xC8C800" axiscolor="0xC8C800" itemidhash="0xDE6A8D70" />
+  </ADXMONITOR>
+
+  <ADXMONITOR id="monitor2" idhash="0xCEC4D4F2" title="Monitor 2">
+    <mainbkgcolor>0x00FFFFFF</mainbkgcolor>
+    <plotbkgcolor>0x00F0F0F0</plotbkgcolor>
+    <plotoutlinecolor>0x00000000</plotoutlinecolor>
+    <titlecolor>0x00000000</titlecolor>
+    <timeaxiscolor>0x00000000</timeaxiscolor>
+    <entrycount>4</entrycount>
+    <ADXMONSERIES linecolor="0xFF0000" axiscolor="0xFF0000" itemidhash="0xDE6A84B0" />
+    <ADXMONSERIES linecolor="0xFF8080" axiscolor="0xFF8080" itemidhash="0xDE6A9A70" />
+    <ADXMONSERIES linecolor="0xFF8080" axiscolor="0xFF8080" itemidhash="0xDE69D0B0" />
+    <ADXMONSERIES linecolor="0xFF8080" axiscolor="0xFF8080" itemidhash="0xDE69CDB0" />
+  </ADXMONITOR>
+
+  <ADXVALUE id="1" idhash="0x86F3549B" title="Engine RPM">
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>RPM</units>
+    <packetoffset>0x00</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="0.000000" high="9600.000000" />
+    <alarms low="0.000000" high="5000.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>6</datatype>
+    <unittype>4</unittype>
+    <MATH equation="X">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="2" idhash="0x86F34E3B" title="Desired Idle RPM">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Desired Idle RPM</units>
+    <packetoffset>0x02</packetoffset>
+    <range low="400.000000" high="1600.000000" />
+    <alarms low="400.000000" high="1500.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <datatype>37</datatype>
+    <unittype>4</unittype>
+    <MATH equation="x*6.25">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="3" idhash="0x86F3513B" title="CTS Voltage">
+    <desc>A/D</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Coolant Volts</units>
+    <packetoffset>0x04</packetoffset>
+    <range low="0.000000" high="5.000000" />
+    <alarms low="0.000000" high="5.500000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>13</datatype>
+    <unittype>32</unittype>
+    <MATH equation="x * .019608">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="4" idhash="0x86F3533B" title="Engine Coolant">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Coolant Degrees C</units>
+    <packetoffset>0x05</packetoffset>
+    <range low="0.000000" high="130.000000" />
+    <alarms low="-5.000000" high="110.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>13</datatype>
+    <unittype>15</unittype>
+    <MATH equation="(x * .75) - 40">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="6" idhash="0x86F347FB" title="Manifold Air Temp">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>MAT Degrees C</units>
+    <packetoffset>0x07</packetoffset>
+    <range low="0.000000" high="130.000000" />
+    <alarms low="-5.000000" high="120.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>18</datatype>
+    <unittype>15</unittype>
+    <MATH equation="(x * .75) - 40">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="ChargeTemp" idhash="0x651658DE" title="Charge Temp">
+    <units>Charge Temp Degrees C</units>
+    <packetoffset>0x37</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>19</datatype>
+    <unittype>15</unittype>
+    <MATH equation="(x * .75) - 40">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="7" idhash="0x86F35DBB" title="Scaled MAP Voltage">
+    <desc>Scaled MAP VoltageTo Derive Scaled MAP LV</desc>
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Scaled Map Volts</units>
+    <packetoffset>0x08</packetoffset>
+    <range low="0.000000" high="5.000000" />
+    <alarms low="0.000000" high="5.500000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>24</datatype>
+    <unittype>32</unittype>
+    <MATH equation="x * .019608">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="ActMAPkPa" idhash="0xADA0CD10" title="MAP">
+    <desc>Actual MAP Sensor Voltage Displayed as kPa</desc>
+    <units>MAP kPA</units>
+    <packetoffset>0x25</packetoffset>
+    <range low="10.000000" high="105.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>24</datatype>
+    <unittype>17</unittype>
+    <MATH equation="(X * 0.369) + 10.354">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="9" idhash="0x86F347BB" title="Baro">
+    <desc>A/D</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Baro kPA</units>
+    <packetoffset>0x0A</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>27</datatype>
+    <unittype>17</unittype>
+    <MATH equation="(X * 0.369) + 10.354">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="10" idhash="0xDE6A9050" title="TPS Voltage">
+    <desc>A/D</desc>
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>TPS Volts</units>
+    <packetoffset>0x0B</packetoffset>
+    <range low="0.000000" high="5.000000" />
+    <alarms low="0.000000" high="5.500000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>57</datatype>
+    <unittype>32</unittype>
+    <MATH equation="x * .019608">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="11" idhash="0xDE6A9E10" title="TPS">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>TPS %</units>
+    <packetoffset>0x0D</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>57</datatype>
+    <unittype>67</unittype>
+    <MATH equation="x * .390625">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="12" idhash="0xDE6A84B0" title="o2 Voltage">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>O2 Millivolts</units>
+    <packetoffset>0x0E</packetoffset>
+    <range low="0.000000" high="1000.000000" />
+    <alarms low="150.000000" high="850.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <datatype>58</datatype>
+    <unittype>32</unittype>
+    <MATH equation="X * 4.424">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="13" idhash="0xDE6A9BB0" title="o2 Cross Counts">
+    <desc>Per 2 Seconds</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>O2 Cross Counts</units>
+    <packetoffset>0x0F</packetoffset>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <MATH equation="X">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="14" idhash="0xDE6A99B0" title="Injector BPW">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Injector BPW mS</units>
+    <packetoffset>0x10</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="0.000000" high="15.000000" />
+    <alarms low="0.000000" high="15.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>52</datatype>
+    <unittype>85</unittype>
+    <MATH equation="x * .007629">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="24" idhash="0xDE69CDB0" title="Injector Async PW">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Injector Async PW mSec</units>
+    <packetoffset>0x22</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="0.000000" high="1000.000000" />
+    <alarms low="0.000000" high="1000.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <MATH equation="x * .007629">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="DE" idhash="0xDE6BD030" title="Decel Enleanment Applied To BPW">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Decel Enleanment %</units>
+    <packetoffset>0x03</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <MATH equation="X/2.55">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="InjDC" idhash="0x98151DF5" title="Injector Duty Cycle">
+    <desc>Injector Duty Cycle</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Injector Duty Cycle %</units>
+    <packetoffset>0x10</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>51</datatype>
+    <unittype>67</unittype>
+    <MATH equation="((x * .007629) / (1000 * (1/(Y/60)))) * 100">
+      <VAR varID="x" type="native" />
+      <VAR varID="Y" type="link" linkIDHash="0x86F3549B" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="BstMult" idhash="0xC472B9C5" title="Boost Multiplier">
+    <units>Boost Multiplier</units>
+    <packetoffset>0x19</packetoffset>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <MATH equation="X/2.56">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="Wideband" idhash="0x34C57F0D" title="Wideband">
+    <desc>Wideband Value, range is set in the cal</desc>
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Wideband AFR</units>
+    <packetoffset>0x12</packetoffset>
+    <range low="7.350000" high="22.400000" />
+    <alarms low="11.000000" high="16.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>61</datatype>
+    <unittype>21</unittype>
+    <MATH equation="X/10">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="5" idhash="0x86F3445B" title="Pin B2 - 0-25.5v">
+    <desc>A/D</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>B2 Volts</units>
+    <packetoffset>0x06</packetoffset>
+    <range low="0.000000" high="25.500000" />
+    <alarms low="0.000000" high="25.500000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <unittype>32</unittype>
+    <MATH equation="X / 10">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="PinB12" idhash="0x8690DD58" title="Pin B12 - 0-5v Input">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>B12 Volts</units>
+    <packetoffset>0x24</packetoffset>
+    <range low="0.000000" high="5.000000" />
+    <alarms low="0.000000" high="5.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <unittype>32</unittype>
+    <MATH equation="X / 51">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="15" idhash="0xDE6A8ED0" title="INT (STFT)">
+    <desc>Short Term Fuel Trim Correction</desc>
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Integrator (STFT) %</units>
+    <packetoffset>0x13</packetoffset>
+    <range low="-20.000000" high="20.000000" />
+    <alarms low="-10.000000" high="10.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <datatype>50</datatype>
+    <MATH equation="(x * .7815) - 100.032">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="16" idhash="0xDE6A8D70" title="BLM (LTFT)">
+    <desc>Long Term Fuel Correction</desc>
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>BLM (LTFT) %</units>
+    <packetoffset>0x14</packetoffset>
+    <range low="80.000000" high="120.000000" />
+    <alarms low="90.000000" high="110.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <datatype>49</datatype>
+    <MATH equation="(x * .7815) - .032">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="17" idhash="0xDE6A9730" title="BLM Cell">
+    <desc>Long Term Fuel Correction Cell #&#013;&#010;</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>BLM Cell</units>
+    <packetoffset>0x15</packetoffset>
+    <range low="0.000000" high="25.000000" />
+    <alarms low="0.000000" high="25.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <MATH equation="X">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="18" idhash="0xDE6A9A70" title="Target AFR">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Target AFR</units>
+    <packetoffset>0x16</packetoffset>
+    <range low="3.000000" high="19.000000" />
+    <alarms low="3.000000" high="8.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>29</datatype>
+    <unittype>21</unittype>
+    <MATH equation="X * .1">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="19" idhash="0xDE6A8D30" title="Battery Voltage">
+    <desc>A/D</desc>
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Battery Volts</units>
+    <packetoffset>0x18</packetoffset>
+    <range low="8.000000" high="18.000000" />
+    <alarms low="11.000000" high="15.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>66</datatype>
+    <unittype>32</unittype>
+    <MATH equation="X * .1">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="20" idhash="0xDE69C450" title="Idle RPM Variation">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Idle RPM Variation</units>
+    <packetoffset>0x1C</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>6</datatype>
+    <unittype>4</unittype>
+    <MATH equation="x * .05">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="21" idhash="0xDE69CA10" title="Current IAC Position">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>IAC Steps</units>
+    <packetoffset>0x1E</packetoffset>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <datatype>36</datatype>
+    <unittype>27</unittype>
+    <MATH equation="X">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="22" idhash="0xDE69D0B0" title="Spark Advance">
+    <flags>0x0000000D</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Spark Advance Degrees</units>
+    <packetoffset>0x1F</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="-20.000000" high="50.000000" />
+    <alarms low="-10.000000" high="45.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>38</datatype>
+    <unittype>23</unittype>
+    <MATH equation="x * .351565">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="23" idhash="0xDE69CFB0" title="Road Speed">
+    <desc>VSS - Filtered</desc>
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>KpH</units>
+    <packetoffset>0x21</packetoffset>
+    <range low="0.000000" high="200.000000" />
+    <alarms low="0.000000" high="110.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>5</datatype>
+    <unittype>6</unittype>
+    <MATH equation="X">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="25" idhash="0xDE69DAD0" title="Cranking Time Counter">
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Cranking Seconds</units>
+    <packetoffset>0x24</packetoffset>
+    <range low="0.000000" high="10.000000" />
+    <alarms low="0.000000" high="11.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <unittype>84</unittype>
+    <MATH equation="x * .1">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="26" idhash="0xDE69D970" title="Knock Retard Value">
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Knock Retard Degrees</units>
+    <packetoffset>0x26</packetoffset>
+    <range low="0.000000" high="10.000000" />
+    <alarms low="0.000000" high="5.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <datatype>35</datatype>
+    <unittype>23</unittype>
+    <MATH equation="X * .351565">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="KnockCounts" idhash="0x34F87561" title="Knock Counts">
+    <desc>Instant Knock Counts</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Knock Counts</units>
+    <packetoffset>0x2C</packetoffset>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>2</digcount>
+    <outputtype>1</outputtype>
+    <datatype>34</datatype>
+    <MATH equation="X">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXBITMASK id="300" idhash="0xCD44893B" title="o2 Status">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Ready</truestring>
+    <falsestring>Not Ready</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x0C</packetoffset>
+    <operand>0x00000001</operand>
+    <bitop>AND</bitop>
+    <result>0x00000001</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="301" idhash="0xCD44877B" title="Fueling Mode">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Closed Loop</truestring>
+    <falsestring>Open Loop</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x0C</packetoffset>
+    <operand>0x00000002</operand>
+    <bitop>AND</bitop>
+    <result>0x00000002</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="302" idhash="0xCD449DDB" title="Learn Control">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Enabled</truestring>
+    <falsestring>Disabled</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x0C</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="303" idhash="0xCD4482DB" title="Fuel Pump Enabled">
+    <desc>Not In The Code</desc>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x0C</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="304" idhash="0xCD4480DB" title="Set While Cranking">
+    <desc>V6 App Only</desc>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x0C</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="305" idhash="0xCD4497BB" title="Cam Present">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x0C</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXVALUE id="CurrentVE" idhash="0x34F35208" title="Current VE">
+    <desc>The Current Volumetric Efficiency</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>VE Percent</units>
+    <packetoffset>0x2D</packetoffset>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>1</digcount>
+    <outputtype>3</outputtype>
+    <MATH equation="X / 2.56">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="L/100" idhash="0x4C6D8815" title="Instant L/100Km">
+    <desc>Instantaneous L/100Km Fuel Economy</desc>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Liters/100Km</units>
+    <packetoffset>0x2E</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <datatype>54</datatype>
+    <unittype>78</unittype>
+    <MATH equation="X / 256">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="27" idhash="0xDE69C330" title="Engine Run Time">
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Engine Run Time Seconds</units>
+    <packetoffset>0x31</packetoffset>
+    <sizeinbits>16</sizeinbits>
+    <range low="0.000000" high="1800.000000" />
+    <alarms low="0.000000" high="65535.000000" />
+    <digcount>0</digcount>
+    <outputtype>3</outputtype>
+    <unittype>84</unittype>
+    <MATH equation="X">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="Row Portion" idhash="0x7602678A" title="RAW Wideband Counts">
+    <parentcmdidhash>0x55C678F5</parentcmdidhash>
+    <units>Raw Wideband</units>
+    <packetoffset>0x12</packetoffset>
+    <range low="0.000000" high="255.000000" />
+    <alarms low="0.000000" high="255.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <MATH equation="x">
+      <VAR varID="x" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="FlexA" idhash="0x326B1A75" title="Flexible A DC %">
+    <units>Flex A - A4 %</units>
+    <packetoffset>0x33</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <unittype>68</unittype>
+    <MATH equation="(X/256)*100">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="FlexB" idhash="0x326B0015" title="Flexible B DC %">
+    <units>Flex B - A3 %</units>
+    <packetoffset>0x34</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <unittype>68</unittype>
+    <MATH equation="(X/256)*100">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="FlexC" idhash="0x326B05F5" title="Flexible C DC %">
+    <units>Flex C - D12 %</units>
+    <packetoffset>0x35</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <unittype>68</unittype>
+    <MATH equation="(X/256)*100">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXVALUE id="FlexD" idhash="0x326B00B5" title="Flexible D DC %">
+    <units>Flex D - D7 %</units>
+    <packetoffset>0x36</packetoffset>
+    <range low="0.000000" high="100.000000" />
+    <alarms low="0.000000" high="100.000000" />
+    <digcount>2</digcount>
+    <outputtype>3</outputtype>
+    <unittype>68</unittype>
+    <MATH equation="(X/256)*100">
+      <VAR varID="X" type="native" />
+    </MATH>
+  </ADXVALUE>
+
+  <ADXBITMASK id="306" idhash="0xCD44941B" title="Synchnonous Fuel Flag">
+    <desc>MAT Sensor or Circuit - Voltage Too High</desc>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x0C</packetoffset>
+    <operand>0x00000040</operand>
+    <bitop>AND</bitop>
+    <result>0x00000040</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="VELearn" idhash="0xB7F3B210" title="VE Learn">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Active</truestring>
+    <falsestring>Disabled</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x17</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="307" idhash="0xCD448E5B" title="Decel Fuel Cut">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1A</packetoffset>
+    <operand>0x00000001</operand>
+    <bitop>AND</bitop>
+    <result>0x00000001</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="308" idhash="0xCD44831B" title="Ignition Timing Mode">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>EST Mode</truestring>
+    <falsestring>Bypass</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1A</packetoffset>
+    <operand>0x00000002</operand>
+    <bitop>AND</bitop>
+    <result>0x00000002</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="309" idhash="0xCD44945B" title="Knock Detected">
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1A</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="310" idhash="0xCD45413B" title="TCC/Shift Light">
+    <desc>Locked/On When Set</desc>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Locked</truestring>
+    <falsestring>Unlocked</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1A</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="311" idhash="0xCD454F7B" title="A/C Request">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1A</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="312" idhash="0xCD4555DB" title="A/C Clutch">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Engaged</truestring>
+    <falsestring>Disengaged</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1A</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="314" idhash="0xCD4548DB" title="Transmission">
+    <desc>Set when auto trans.</desc>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Automatic</truestring>
+    <falsestring>Manual</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1A</packetoffset>
+    <operand>0x00000080</operand>
+    <bitop>AND</bitop>
+    <result>0x00000080</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="315" idhash="0xCD455FBB" title="High Speed Fan">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>On</truestring>
+    <falsestring>Off</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x00000001</operand>
+    <bitop>AND</bitop>
+    <result>0x00000001</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="317" idhash="0xCD45465B" title="Closed Loop Idle">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="4Cyl" idhash="0xA996FC59" title="4 Cyl Mode">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Selected</truestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x00000030</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="6Cyl" idhash="0xA3F6FC59" title="6 Cyl Mode">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Selected</truestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x00000030</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="8Cyl" idhash="0xA876FC59" title="8 Cyl Mode">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Selected</truestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x00000030</operand>
+    <bitop>AND</bitop>
+    <result>0x00000030</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="4CylMemcal" idhash="0xEF20CC38" title="4 Cyl Memcal">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Detected</truestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x000000C0</operand>
+    <bitop>AND</bitop>
+    <result>0x00000080</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="6CylMemcal" idhash="0xEDB8CC38" title="6 Cyl Memcal">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Detected</truestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x000000C0</operand>
+    <bitop>AND</bitop>
+    <result>0x00000040</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="8CylMemcal" idhash="0xEF58CC38" title="8 Cyl Memcal">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Detected</truestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x1B</packetoffset>
+    <operand>0x000000C0</operand>
+    <bitop>AND</bitop>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="318" idhash="0xCD454B1B" title="Fuel Cut Active">
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x30</packetoffset>
+    <operand>0x00000001</operand>
+    <bitop>AND</bitop>
+    <result>0x00000001</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="319" idhash="0xCD455C5B" title="Single Fire Option">
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x30</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="320" idhash="0xCD46153B" title="Sync PW &lt; Min Flag">
+    <desc>Double Fire Changes to Single Fire When Set</desc>
+    <flags>0x00000004</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Single Fire</truestring>
+    <falsestring>Double Fire</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x30</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="321" idhash="0xCD461B7B" title="Engine Revolution Flag">
+    <desc>Used Single Fire Mode, Toggles Each Rev</desc>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x30</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="322" idhash="0xCD4601DB" title="Vats Ok Flag">
+    <desc>When Clear Disables Fuel</desc>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x30</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="323" idhash="0xCD461EDB" title="DTC 21 - TPS Voltage High">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x27</packetoffset>
+    <operand>0x00000001</operand>
+    <bitop>AND</bitop>
+    <result>0x00000001</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="324" idhash="0xCD461CDB" title="DTC 19 - TPS Stuck">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x27</packetoffset>
+    <operand>0x00000002</operand>
+    <bitop>AND</bitop>
+    <result>0x00000002</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="325" idhash="0xCD460BBB" title="DTC 17 - ECM ECT Circuit">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x27</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="326" idhash="0xCD46081B" title="DTC 16 - ECT Unstable">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x27</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="327" idhash="0xCD46125B" title="DTC 15 - ECT Voltage High">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x27</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="328" idhash="0xCD461F1B" title="DTC 14 - ECT Voltage  Low">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x27</packetoffset>
+    <operand>0x00000040</operand>
+    <bitop>AND</bitop>
+    <result>0x00000040</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="329" idhash="0xCD46085B" title="DTC 13 - No Oxygen Sensor Signal">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x27</packetoffset>
+    <operand>0x00000080</operand>
+    <bitop>AND</bitop>
+    <result>0x00000080</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="330" idhash="0xCD45F53B" title="DTC 26 - IAT Signal Unstable">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x28</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="331" idhash="0xCD45FB7B" title="DTC 25 - IAT Signal Low">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x28</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="332" idhash="0xCD45E1DB" title="DTC 24 - No Vehicle Speed Sensor">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x28</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="333" idhash="0xCD45FEDB" title="DTC 23 - IAT Signal High">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x28</packetoffset>
+    <operand>0x00000040</operand>
+    <bitop>AND</bitop>
+    <result>0x00000040</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="334" idhash="0xCD45FCDB" title="DTC 22 - TPS Voltage Low">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x28</packetoffset>
+    <operand>0x00000080</operand>
+    <bitop>AND</bitop>
+    <result>0x00000080</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="335" idhash="0xCD45EBBB" title="DTC 36 - Vacuum Leak">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x29</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="336" idhash="0xCD45E81B" title="DTC 35 - Idle Speed Error">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x29</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="337" idhash="0xCD45F25B" title="DTC 34 - MAP Signal Low">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x29</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="338" idhash="0xCD45FF1B" title="DTC 33 - MAP Signal High">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x29</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="339" idhash="0xCD45E85B" title="DTC 31 - Anti-Theft Signal Not Received">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x29</packetoffset>
+    <operand>0x00000080</operand>
+    <bitop>AND</bitop>
+    <result>0x00000080</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="340" idhash="0xCD45B53B" title="DTC 46 - No REF Pulses">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2A</packetoffset>
+    <operand>0x00000002</operand>
+    <bitop>AND</bitop>
+    <result>0x00000002</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="341" idhash="0xCD45BB7B" title="DTC 45 - Rich Exhaust">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2A</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="342" idhash="0xCD45A1DB" title="DTC 44 - Lean Exhaust">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2A</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="343" idhash="0xCD45BEDB" title="DTC 43 - Knock Sensor Circuit">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2A</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="344" idhash="0xCD45BCDB" title="DTC 42 - IGN Bypass Circuit">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2A</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="345" idhash="0xCD45ABBB" title="DTC 41 - IGN EST Circuit">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2A</packetoffset>
+    <operand>0x00000040</operand>
+    <bitop>AND</bitop>
+    <result>0x00000040</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="346" idhash="0xCD45A81B" title="DTC 56 - Lean Under Load">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2B</packetoffset>
+    <operand>0x00000001</operand>
+    <bitop>AND</bitop>
+    <result>0x00000001</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="347" idhash="0xCD45B25B" title="DTC 55 - ECM A/D Conversion Error">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2B</packetoffset>
+    <operand>0x00000002</operand>
+    <bitop>AND</bitop>
+    <result>0x00000002</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="348" idhash="0xCD45BF1B" title="DTC 54 - Batt Voltage Unstable">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2B</packetoffset>
+    <operand>0x00000004</operand>
+    <bitop>AND</bitop>
+    <result>0x00000004</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="349" idhash="0xCD45A85B" title="DTC 53 - Batt Voltage too High">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2B</packetoffset>
+    <operand>0x00000008</operand>
+    <bitop>AND</bitop>
+    <result>0x00000008</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="350" idhash="0xCD47593B" title="DTC 52 - Batt Voltage too High- too Long">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2B</packetoffset>
+    <operand>0x00000010</operand>
+    <bitop>AND</bitop>
+    <result>0x00000010</result>
+  </ADXBITMASK>
+
+  <ADXBITMASK id="351" idhash="0xCD47577B" title="DTC 51 - Memcal Error">
+    <flags>0x0000000C</flags>
+    <parentcmdidhash>0x00000000</parentcmdidhash>
+    <truestring>Set</truestring>
+    <falsestring>Clear</falsestring>
+    <ALARMONSET color="0x000000FF" />
+    <ALARMONNOTSET color="0x0000FF00" />
+    <packetoffset>0x2B</packetoffset>
+    <operand>0x00000020</operand>
+    <bitop>AND</bitop>
+    <result>0x00000020</result>
+  </ADXBITMASK>
+
+  <ADXLISTVIEW id="M1M0" idhash="0xAF28B859" title="Mode1Message0">
+    <entrycount>103</entrycount>
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F3549B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F34E3B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F3513B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F3533B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F3445B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F347FB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F35DBB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x651658DE" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xADA0CD10" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x86F347BB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A9050" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A9E10" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A84B0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A9BB0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A99B0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6BD030" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69CDB0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x98151DF5" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xC472B9C5" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x34C57F0D" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A8ED0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A8D70" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A9730" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A9A70" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6A8D30" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69C450" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69CA10" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69D0B0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69CFB0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69DAD0" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69D970" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x34F87561" />
+    <ADXLVENTRY entrytype="1" flags="0x00000001" title="Flags" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD455FBB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45465B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xA996FC59" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xA3F6FC59" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xA876FC59" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xEF20CC38" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xEDB8CC38" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xEF58CC38" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD454B1B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD455C5B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD46153B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD461B7B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD4601DB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6BC030" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6B6E70" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD6D5FBB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD784F7B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE6B7930" />
+    <ADXLVENTRY entrytype="1" flags="0x00000001" title="Malfs" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD461EDB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD461CDB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD460BBB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD46081B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD46125B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD461F1B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD46085B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45F53B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45FB7B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45E1DB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45FEDB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45FCDB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45EBBB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45E81B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45F25B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45FF1B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45E85B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45B53B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45BB7B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45A1DB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45BEDB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45BCDB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45ABBB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45A81B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45B25B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45BF1B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45A85B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD47593B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD47577B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x34F35208" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x4C6D8815" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xDE69C330" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x7602678A" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x326B1A75" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x326B0015" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x326B05F5" />
+    <ADXLVENTRY entrytype="0" itemidhash="0x326B00B5" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD44893B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD44877B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD449DDB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD4482DB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD4480DB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD4497BB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD44941B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD448E5B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD44831B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD44945B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD45413B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD454F7B" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD4555DB" />
+    <ADXLVENTRY entrytype="0" itemidhash="0xCD4548DB" />
+  </ADXLISTVIEW>
+
+  <ADXDASHBOARD id="100" idhash="0xCD52093B" title="Complete Dash">
+    <entrycount>36</entrycount>
+    <ADXDGENTRY gaugetype="0" itemidhash="0xDE69CFB0" left="0" top="0" right="27" bottom="35" arcmax="300" />
+    <ADXDGENTRY gaugetype="0" itemidhash="0xADA0CD10" left="0" top="35" right="27" bottom="70" arcmax="300" />
+    <ADXDGENTRY gaugetype="0" itemidhash="0x86F3549B" left="27" top="0" right="52" bottom="35" arcmax="300" />
+    <ADXDGENTRY gaugetype="0" itemidhash="0xDE6A9E10" left="27" top="35" right="52" bottom="70" arcmax="300" />
+    <ADXDGENTRY gaugetype="0" itemidhash="0xDE69D0B0" left="52" top="0" right="80" bottom="35" arcmax="300" />
+    <ADXDGENTRY gaugetype="0" itemidhash="0x34C57F0D" left="52" top="35" right="80" bottom="70" arcmax="300" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x86F34E3B" left="0" top="70" right="10" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x86F3533B" left="10" top="70" right="20" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x86F347FB" left="20" top="70" right="30" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A8D70" left="30" top="70" right="40" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A8ED0" left="40" top="70" right="50" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A9A70" left="50" top="70" right="60" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A84B0" left="60" top="70" right="70" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x86F347BB" left="70" top="70" right="80" bottom="85" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE69C450" left="0" top="85" right="10" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x34F35208" left="10" top="85" right="20" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x98151DF5" left="20" top="85" right="30" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A9730" left="30" top="85" right="40" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A99B0" left="40" top="85" right="50" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE69CA10" left="50" top="85" right="60" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A9BB0" left="60" top="85" right="70" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE6A8D30" left="70" top="85" right="80" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE69D970" left="80" top="0" right="90" bottom="15" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x8690DD58" left="80" top="15" right="90" bottom="30" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0xDE69C330" left="80" top="30" right="90" bottom="45" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x4C6D8815" left="80" top="45" right="90" bottom="60" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x651658DE" left="80" top="60" right="90" bottom="75" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="2" itemidhash="0xCD455FBB" left="80" top="75" right="90" bottom="88" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x326B1A75" left="90" top="0" right="100" bottom="15" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x326B0015" left="90" top="15" right="100" bottom="30" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x326B05F5" left="90" top="30" right="100" bottom="45" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="1" itemidhash="0x326B00B5" left="90" top="45" right="100" bottom="60" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="2" itemidhash="0xCD44877B" left="90" top="60" right="100" bottom="75" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="2" itemidhash="0xCD45465B" left="90" top="75" right="100" bottom="88" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="2" itemidhash="0xDE6BC030" left="80" top="88" right="90" bottom="100" bordercolor="0x00000000" />
+    <ADXDGENTRY gaugetype="2" itemidhash="0xB7F3B210" left="90" top="88" right="100" bottom="100" bordercolor="0x00000000" />
+  </ADXDASHBOARD>
+
+  <ADXCSENDCOMMAND id="disablechatter" idhash="0x06BEBB97" title="Disable Chatter">
+    <desc>disables chatter</desc>
+    <bytestring size="0x4">F45608AE</bytestring>
+  </ADXCSENDCOMMAND>
+
+  <ADXCLISTENSILENCE id="listensilence" idhash="0xC40E7264" title="Listen for Silence">
+    <silencelen>50</silencelen>
+    <totaltimeout>50</totaltimeout>
+  </ADXCLISTENSILENCE>
+
+  <ADXMACRO id="connecitonmacr" idhash="0x9C868BC3" title="Conection Macro" repeatcount="1">
+    <NODE commandID="listensilence" repeatcount="1" />
+    <NODE commandID="disablechatter" repeatcount="1" />
+  </ADXMACRO>
+
+  <ADXCSENDCOMMAND id="mode1message00" idhash="0xB8D62F8A" title="Tx Mode1 Message0">
+    <desc>sends command to grab a data packet</desc>
+    <bytestring size="0x5">F4570100B4</bytestring>
+  </ADXCSENDCOMMAND>
+
+  <ADXCLISTENPACKET id="Mode1Message0" idhash="0x55C678F5" title="Rx Mode1 Message0" flags="0x00000005">
+    <listentimeout>500</listentimeout>
+    <packetbodylength>60</packetbodylength>
+    <packetoffsetinbody>3</packetoffsetinbody>
+    <packetsize>57</packetsize>
+  </ADXCLISTENPACKET>
+</ADXFORMAT>
