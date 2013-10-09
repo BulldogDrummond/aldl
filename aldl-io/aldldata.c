@@ -16,7 +16,7 @@
 #include "../configfile/configfile.h"
 
 aldl_record_t *get_next_record(aldl_record_t *r) {
-  while(r->next == NULL) usleep(ALDL_SLEEPYTIME);
+  while(r->next == NULL);
   return r->next;
 }
 

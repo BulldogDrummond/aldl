@@ -19,22 +19,12 @@ construct digital secondary dashboard type devices.
 
 dependancies: libftdi (reccommended), bison, flex
 
-- build is now statically compiled with a particular i/o handler, and
-  is no longer selectable at runtime.  make aldl-ftdi or aldl-tty.
+build is now statically compiled with a particular i/o handler, and is no
+longer selectable at runtime.
 
-./aldl-io - any code that does i/o with the aldl port or deals with
-  serial interfaces needs to be here.
-
-./consoleif - a console based dashboard display interface
-
-./configfile - parsing system for config files
-
-./error - global error handling routines.  interface-specific errors should
-  use their own error handlers.
-
-./misc - miscellaneous code and objects that aren't being used yet
-
-./examples - documentation etc
+make aldl-ftdi
+-or-
+make aldl-tty
 
 ADX Files:
 
