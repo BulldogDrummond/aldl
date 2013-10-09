@@ -1,9 +1,0 @@
-* list of shit that needs to get done in the short term *
-
-- testing of generic tty serial mode (steve)
-- thread scheduling routines for plugins (steve)
-- debug mode aldl stream output plugin (need plugin api spec first) ...
-- error handling api, design in tandem with plugin API.  we need plugins
-  to be able to deal with non-fatal or temporary error conditions ..
-- server status api (might be part of error handling lib)
-
