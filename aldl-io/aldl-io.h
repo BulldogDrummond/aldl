@@ -66,17 +66,6 @@ typedef struct aldl_record {
   aldl_data_t *data;   /* pointer to the first data record. */
 } aldl_record_t;
 
-/* an info structure defining aldl communications. */
-
-typedef struct aldl_conf {
-  char ecmtype; /* the type of ecm being read */
-  int n;        /* static number of definitions */
-  int bufsize;  /* the minimum number of records to maintain */
-  aldl_define_t *def; /* link to the definition set */
-  aldl_record_t *r; /* link to the latest record */
-  /* -- will be lots more here ... */
-} aldl_conf_t;
-
 /* defines each packet of data and how to retrieve it */
 
 typedef struct aldl_packetdef {
@@ -126,7 +115,17 @@ typedef struct aldl_commdef {
   aldl_packetdef_t *packet;  /* the actual packet definitions */
 } aldl_commdef_t;
 
+/* an info structure defining aldl communications and data mgmt */
 
+typedef struct aldl_conf {
+  char ecmtype; /* the type of ecm being read */
+  int n;        /* static number of definitions */
+  int bufsize;  /* the minimum number of records to maintain */
+  aldl_define_t *def; /* link to the definition set */
+  aldl_record_t *r; /* link to the latest record */
+  aldl_commdef_t *comm; /* link back to the communication spec */
+  /* -- will be lots more here ... */
+} aldl_conf_t;
 
 /* functions ------------------------------------------- */
 

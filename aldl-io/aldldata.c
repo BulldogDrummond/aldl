@@ -54,6 +54,13 @@ void link_record(aldl_conf_t *c, aldl_record_t *r) {
   //unset_record_lock(r);
 }
 
-/* unlink the last record from the stream. this should only be used by garbage
-   collection routines.  this fails if the record is locked, and returns NULL */
+/* prepare an unlinked record to later be filled with parsed data */
 
+aldl_record_t *prepare_record(aldl_conf_t *c) {
+  /* allocate record header */
+  aldl_record_t *r = malloc(sizeof(aldl_record_t)); 
+  size_t data_size = 0;
+  int x = 0;
+  /* allocate data space */
+  return r;
+};

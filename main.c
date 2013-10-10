@@ -12,7 +12,7 @@
 /* ------- GLOBAL----------------------- */
 
 aldl_conf_t *aldl; /* aldl data structure */
-aldl_commdef_t *comm; /* communication config structure */
+aldl_commdef_t *comm; /* comm specs */
 
 /* ------- LOCAL FUNCTIONS ------------- */
 
@@ -21,6 +21,9 @@ int aldl_acq();
 
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
+
+/* allocate all base data structures */
+int aldl_alloc();
 
 /* load all config data */
 int load_config(char *filename);
@@ -45,9 +48,7 @@ int main() {
   serial_init(port);
 
   /* allocation ------*/
-  aldl = malloc(sizeof(aldl_conf_t));
-  comm = malloc(sizeof(aldl_commdef_t));
-  if(aldl == NULL || comm == NULL) tmperror("out of memory 1055"); /* FIXME */
+  aldl_alloc(); 
 
   /* configuration ---*/
   //load_config("/project/lt1.conf");
@@ -61,6 +62,14 @@ int main() {
   /* program dies here ... */
   aldl_finish(comm);
   return 0;
+}
+
+int aldl_alloc() {
+  aldl = malloc(sizeof(aldl_conf_t));
+  if(aldl == NULL) tmperror("out of memory 1055"); /* FIXME */
+  comm = malloc(sizeof(aldl_commdef_t));
+  if(comm == NULL) tmperror("out of memory 1055"); /* FIXME */
+  aldl->comm = comm; /* link */
 }
 
 int load_config(char *filename) {
