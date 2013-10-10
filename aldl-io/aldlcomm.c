@@ -28,11 +28,6 @@ int aldl_waitforchatter(); /* waits forever for a byte, then bails */
 
 /************ FUNCTIONS **********************/
 
-int aldl_comm_init(aldl_commdef_t *c) {
-
-  return 0;
-}
-
 int aldl_reconnect(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("attempting to place ecm in diagnostic mode.\n");

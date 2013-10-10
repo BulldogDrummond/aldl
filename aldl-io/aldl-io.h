@@ -131,7 +131,6 @@ typedef struct aldl_conf {
 
 /* diagnostic comms ------------------------------*/
 
-int aldl_comm_init(aldl_commdef_t *c); /* initialize aldl structures */
 int aldl_reconnect(); /* go into diagnostic mode, returns 1 on success */
 int aldl_waitforchatter(); /* waits forever for a byte, then bails */
 

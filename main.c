@@ -25,8 +25,11 @@ int aldl_finish();
 /* allocate all base data structures */
 int aldl_alloc();
 
-/* load all config data */
-int load_config(char *filename);
+/* load all base config data, but no packet definitions. */
+int load_config_a(char *filename);
+
+/* load all packet definitions, and allocate as needed */
+int load_config_b(char *filename);
 
 #ifdef PREPRODUCTION
 /* debug-only fallback config */
@@ -47,12 +50,11 @@ int main() {
   char *port = "d:001/004"; /* FIXME need to get from config */
   serial_init(port);
 
-  /* allocation ------*/
   aldl_alloc(); 
 
-  /* configuration ---*/
-  //load_config("/project/lt1.conf");
-  fallback_config();
+  load_config_a("/project/lt1.conf");
+  fallback_config(); /* REMOVE ME */
+  load_config_b("/project/lt1.conf");
 
   /* ------- EVENT LOOP STUFF ------------------------*/
 
@@ -70,10 +72,27 @@ int aldl_alloc() {
   comm = malloc(sizeof(aldl_commdef_t));
   if(comm == NULL) tmperror("out of memory 1055"); /* FIXME */
   aldl->comm = comm; /* link */
+  return 0;
 }
 
-int load_config(char *filename) {
+int load_config_a(char *filename) {
 
+  return 0;
+}
+
+int load_config_b(char *filename) {
+  /* FIXME this mallocs a bunch of shit without checking ret val */
+  /* allocate space to store packet definitions */
+  comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
+  /* !! get packet definitions here, or this flunks */
+  int x = 0;
+  for(x=0;x<comm->n_packets;x++) {
+    comm->packet[x].data = malloc(comm->packet[x].length);
+  };
+  aldl->def = malloc(sizeof(aldl_define_t) * aldl->n);
+  /* get data definitions here !! */
+
+  /* allocate space for records */
   return 0;
 }
 
