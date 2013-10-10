@@ -3,3 +3,5 @@
 *.o
 aldl-ftdi
 aldl-tty
+newtest
+newtest.old
