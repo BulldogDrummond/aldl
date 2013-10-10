@@ -13,6 +13,7 @@
 
 aldl_conf_t *aldl; /* aldl data structure */
 aldl_commdef_t *comm; /* comm specs */
+char *config_file; /* path to config file */
 
 /* ------- LOCAL FUNCTIONS ------------- */
 
@@ -40,33 +41,42 @@ void tmperror(char *str);
 #endif
 
 int main() {
+
   #ifdef VERBLOSITY
   printf("verblosity routine enabled in main\n");
   printf("base aldl structure: %i bytes\n",(int)sizeof(aldl_conf_t));
   printf("base comm structure: %i bytes\n",(int)sizeof(aldl_commdef_t));
   #endif
 
-  /* ------- INITIALIZE ------------------------------*/
-  char *port = "d:001/004"; /* FIXME need to get from config */
-  serial_init(port);
+  /* ------- SETUP AND LOAD CONFIG -------------------*/
 
-  aldl_alloc(); 
+  aldl_alloc(); /* perform initial allocations */
 
-  load_config_a("/project/lt1.conf");
+  load_config_a("/project/lt1.conf"); /* load 1st stage config */
+
   fallback_config(); /* REMOVE ME */
-  load_config_b("/project/lt1.conf");
+
+  load_config_b("/project/lt1.conf"); /* allocate and load stage b conf */
+
+  comm->serialport = "d:001/004"; /* REMOVE ME needs to come from load_config */
+
+  serial_init(comm->serialport); /* init serial port */
 
   /* ------- EVENT LOOP STUFF ------------------------*/
 
-  /* start main event loop -- this should be threaded out */
-  aldl_acq();
+  aldl_acq(); /* start main event loop */
 
-  /* program dies here ... */
+  /* ------- CLEANUP ----------------------------------*/
+
   aldl_finish(comm);
+
   return 0;
 }
 
 int aldl_alloc() {
+#ifdef VERBLOSITY
+  printf("performing initial allocation\n");
+#endif
   aldl = malloc(sizeof(aldl_conf_t));
   if(aldl == NULL) tmperror("out of memory 1055"); /* FIXME */
   comm = malloc(sizeof(aldl_commdef_t));
@@ -76,11 +86,17 @@ int aldl_alloc() {
 }
 
 int load_config_a(char *filename) {
+#ifdef VERBLOSITY
+  printf("load stage a config\n");
+#endif
 
   return 0;
 }
 
 int load_config_b(char *filename) {
+#ifdef VERBLOSITY
+  printf("load stage b config\n");
+#endif
   /* FIXME this mallocs a bunch of shit without checking ret val */
   /* allocate space to store packet definitions */
   comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);

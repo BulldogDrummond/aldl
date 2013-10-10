@@ -88,6 +88,7 @@ typedef struct aldl_packetdef {
 /* master definition of a communication spec for an ECM. */
 
 typedef struct aldl_commdef {
+  char *serialport;        /* serial port init string */
   /* ------- config stuff ---------------- */
   char ecmstring[4];       /* a unique identifying string for the platform */
   int checksum_enable;     /* set to 1 to enable checksum verification */
@@ -124,7 +125,6 @@ typedef struct aldl_conf {
   aldl_define_t *def; /* link to the definition set */
   aldl_record_t *r; /* link to the latest record */
   aldl_commdef_t *comm; /* link back to the communication spec */
-  /* -- will be lots more here ... */
 } aldl_conf_t;
 
 /* functions ------------------------------------------- */
