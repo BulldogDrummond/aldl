@@ -9,6 +9,9 @@
 #include "configfile/varstore.h"
 #include "configfile/configfile.h"
 
+/* plugins */
+#include "debugif/debugif.o"
+
 /* ------- GLOBAL----------------------- */
 
 aldl_conf_t *aldl; /* aldl data structure */
