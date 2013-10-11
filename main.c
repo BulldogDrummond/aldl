@@ -54,6 +54,8 @@ int main() {
 
   aldl_alloc(); /* perform initial allocations */
 
+  aldl->state = ALDL_CONNECTING;
+
   load_config_a("/project/lt1.conf"); /* load 1st stage config */
 
   fallback_config(); /* REMOVE ME */
@@ -102,9 +104,10 @@ int load_config_b(char *filename) {
   /* FIXME this mallocs a bunch of shit without checking ret val */
   /* allocate space to store packet definitions */
   comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
+  printf("got %i pkt defs\n",comm->n_packets); /* REMOVE ME */
   /* !! get packet definitions here, or this flunks */
   int x = 0;
-  for(x=0;x<comm->n_packets;x++) {
+  for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
     comm->packet[x].data = malloc(comm->packet[x].length);
   };
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n);
@@ -119,6 +122,7 @@ int aldl_acq() {
   int npkt = 0;
   aldl_packetdef_t *pkt = NULL;
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
+  aldl->state = ALDL_CONNECTED;
   printf("connection successful, bailing !\n");
   exit(1);
   /* PERFORM ACQ ROUTINE HERE */
@@ -158,8 +162,7 @@ void fallback_config() {
   comm->shutupcharlimit = 20;
   comm->shutuprepeat = 3;
   comm->shutuprepeatdelay = 75;
-  comm->n_packets = 0;
-  comm->packet = NULL;
+  comm->n_packets = 1;
 }
 #endif
 

@@ -32,17 +32,14 @@ int aldl_reconnect(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("attempting to place ecm in diagnostic mode.\n");
   #endif
-//  while(1) { /* connection attempt loop */
-    if(c->chatterwait == 1) {
-      /* in chatter wait mode, we simply wait till the ECM says something.
-         that way we know it's ready to recieve a shutup request */
-      aldl_waitforchatter(c);
-    } else {
-      /* without chatter wait mode, just wait 10x chatter delay */
-      usleep(c->idledelay * 10000);
-    };
-    if(aldl_shutup(c) == 1) return 1;
-//  };
+  if(c->chatterwait == 1) {
+    /* FIXME chatter wait spec is not completely implemented.. */
+    aldl_waitforchatter(c);
+  } else {
+    /* without chatter wait mode, just wait 10x chatter delay */
+    usleep(c->idledelay * 10000);
+  };
+  if(aldl_shutup(c) == 1) return 1;
   return 0;
 }
 
