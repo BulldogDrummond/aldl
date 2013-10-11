@@ -30,5 +30,8 @@ void serial_chatterwait();
 /* clears any i/o buffers */
 int serial_purge();
 
+/* sleep for ms milliseconds */
+inline void msleep(int ms);
+
 #endif
 

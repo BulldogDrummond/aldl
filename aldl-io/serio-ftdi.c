@@ -54,9 +54,6 @@ void fatalerror(int errno, int errloc, char *errnotes);
 299 - ftdi error
 */
 
-/* sleep for ms milliseconds */
-inline void msleep(int ms);
-
 /* inits the ftdi driver by a special port description:
    d:devicenode (usually at /proc/bus/usb)
    i:vendor:product

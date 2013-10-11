@@ -60,7 +60,6 @@ aldl_record_t *prepare_record(aldl_conf_t *c) {
   /* allocate record header */
   aldl_record_t *r = malloc(sizeof(aldl_record_t)); 
   size_t data_size = 0;
-  int x = 0;
   /* allocate data space */
   return r;
 };

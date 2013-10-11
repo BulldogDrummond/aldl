@@ -53,9 +53,6 @@ void fatalerror(int errno, int errloc, char *errnotes);
 299 - ftdi error
 */
 
-/* sleep for ms milliseconds */
-inline void msleep(int ms);
-
 /****************FUNCTIONS**************************************/
 
 inline void msleep(int ms) {

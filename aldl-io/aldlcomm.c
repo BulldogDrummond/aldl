@@ -96,3 +96,25 @@ int aldl_recv_shutup(aldl_commdef_t *c){
   #endif
   return result;
 }
+
+char *aldl_get_packet(aldl_packetdef_t *p) {
+  serial_purge();
+  msleep(p->delay_recv);
+  serial_f_write(p->command, p->commandlength);
+  msleep(p->delay_send);
+  /* skip header offset */
+  if(serial_skip_bytes(p->offset, p->timeout) == 0) {
+    /* failed to get header, zero out packet */
+    memset(p->data,0,p->length);
+    return NULL;
+  }
+  /* get actual data */
+  if(serial_read_bytes(p->data, p->length, p->timeout) == 1) {
+    /* success */
+  } else {
+    /* failed to get data */
+    memset(p->data,0,p->length);
+    return NULL;
+  }
+  return p->data;
+}

@@ -113,10 +113,17 @@ int load_config_b(char *filename) {
 }
 
 int aldl_acq() {
+  int npkt = 0;
+  aldl_packetdef_t *pkt = NULL;
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   printf("connection successful, bailing !\n");
   exit(1);
   /* PERFORM ACQ ROUTINE HERE */
+  for(npkt=0;npkt < comm->n_packets;npkt++) {
+    printf("acquiring packet %i\n",npkt);
+    pkt = &comm->packet[npkt];
+    aldl_get_packet(pkt);
+  };
   return 0;
 }
 

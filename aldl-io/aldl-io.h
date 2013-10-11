@@ -75,6 +75,8 @@ typedef struct aldl_packetdef {
                      with data definitions. */
   int length;     /* how long the packet is, overall, not including the first
                      three bytes, which are header. */
+  int timeout;    /* the max time to try to recv a packet before it's
+                     considered a failure */
   char *command;  /* the command string sent to retrieve the packet */
   int commandlength; /* length of the command string in bytes */
   int offset;        /* the offset of the actual data in bytes */
@@ -132,7 +134,12 @@ typedef struct aldl_conf {
 /* diagnostic comms ------------------------------*/
 
 int aldl_reconnect(); /* go into diagnostic mode, returns 1 on success */
-int aldl_waitforchatter(); /* waits forever for a byte, then bails */
+
+int aldl_waitforchatter(); /* waits forever for a byte, then bails.  this is
+                              generally for autodetection of 'key on' or
+                              'key off' conditions. */
+
+char *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
 
 /* serial comms-----------------------------------*/
 
