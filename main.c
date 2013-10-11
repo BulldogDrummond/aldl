@@ -101,16 +101,19 @@ int load_config_b(char *filename) {
 #ifdef VERBLOSITY
   printf("load stage b config\n");
 #endif
-  /* FIXME this mallocs a bunch of shit without checking ret val */
   /* allocate space to store packet definitions */
   comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
-  printf("got %i pkt defs\n",comm->n_packets); /* REMOVE ME */
-  /* !! get packet definitions here, or this flunks */
+  if(comm->packet == NULL) tmperror("out of memory 1055"); /* FIXME */
+
+  /* !! get packet definitions here, or this flunks due to missing length */
+
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
     comm->packet[x].data = malloc(comm->packet[x].length);
+    if(comm->packet[x].data == NULL) tmperror("out of memory 1055"); /* FIXME */
   };
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n);
+  if(aldl->def == NULL) tmperror("out of memory 1055"); /* FIXME */
   /* get data definitions here !! */
 
   /* allocate space for records */
