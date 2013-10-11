@@ -141,6 +141,8 @@ int aldl_waitforchatter(); /* waits forever for a byte, then bails.  this is
 
 char *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
 
+void printhexstring(char *str, int length);
+
 /* serial comms-----------------------------------*/
 
 int serial_init(char *port); /* initalize the serial if by port spec */

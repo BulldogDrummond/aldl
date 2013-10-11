@@ -63,3 +63,13 @@ aldl_record_t *prepare_record(aldl_conf_t *c) {
   /* allocate data space */
   return r;
 };
+
+/* a debug output function ... */
+void printhexstring(char *str, int length) {
+  int x;
+  for(x=0;x<length;x++) {
+    printf("0x%X ",(unsigned int)str[x]);
+  };
+  printf("\n");
+};
+

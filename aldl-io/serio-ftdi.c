@@ -140,6 +140,10 @@ inline int serial_f_write(char *str, int len) {
     #endif
     return 1;
   };
+  #ifdef SERIAL_VERBOSE
+  printf("WRITE: ");
+  printhexstring(str,len);
+  #endif
 
   ftdierror(6,ftdi_write_data(ftdi,(unsigned char *)str,len));
   return 0;
@@ -150,10 +154,20 @@ inline int serial_read_bytes(char *str, int bytes, int timeout) {
   int timespent = 0;
   do {
     bytes_read += serial_read(str + bytes_read, bytes - bytes_read);
-    if(bytes_read >= bytes) return 1;
+    if(bytes_read >= bytes) {
+      #ifdef SERIAL_VERBOSE
+      printf("READ: ");
+      printhexstring(str,bytes);
+      #endif
+      return 1;
+    }
     msleep(timing.sleepy);
     timespent += timing.sleepy + timing.adder; 
   } while (timespent <= timeout);
+  #ifdef SERIAL_VERBOSE
+  printf("TIMEOUT TRYING TO READ %i BYTES, GOT: ",bytes);
+  printhexstring(str,bytes_read);
+  #endif
   return 0;
 }
 
@@ -167,6 +181,10 @@ inline int serial_skip_bytes(int bytes, int timeout) {
   do {
     bytes_read += serial_read(buf, bytes - bytes_read);
     if(bytes_read >= bytes) {
+      #ifdef SERIAL_VERBOSE
+      printf("SKIP: ");
+      printhexstring(buf,bytes);
+      #endif
       free(buf);
       return 1;
     };
@@ -174,6 +192,9 @@ inline int serial_skip_bytes(int bytes, int timeout) {
     timespent += timing.sleepy + timing.adder;
   } while (timespent <= timeout);
   free(buf);
+  #ifdef SERIAL_VERBOSE
+  printf("TIMEOUT TRYING TO SKIP %i BYTES\n",bytes);
+  #endif
   return 0;
 }
 
@@ -188,6 +209,11 @@ inline int serial_read(char *str, int len) {
   int resp = 0; /* to store response from whatever read */
   resp = ftdi_read_data(ftdi,(unsigned char *)str,len);
   ftdierror(22,resp); /* this will break if resp<0 */
+  #ifdef SERIAL_VERBOSE
+  printf("READ: ");
+  printhexstring(str,len);
+  #endif
+
   return resp; /* return number of bytes read, or zero */
 }
 
@@ -197,6 +223,10 @@ int serial_listen(char *str, int len, int max, int timeout) {
   int timespent = 0; /* estimation of time spent */
   char *buf = malloc(max); /* buffer for incoming data */
   memset(buf,0,max);
+  #ifdef SERIAL_VERBOSE
+  printf("LISTEN: ");
+  printhexstring(str,len);
+  #endif
   while(chars_read < max) {
     chars_in = serial_read(buf + chars_read,max - chars_read);
     if(chars_in > 0) {

@@ -10,7 +10,7 @@
 #include "configfile/configfile.h"
 
 /* plugins */
-#include "debugif/debugif.o"
+#include "debugif/debugif.h"
 
 /* ------- GLOBAL----------------------- */
 
@@ -44,7 +44,6 @@ void tmperror(char *str);
 #endif
 
 int main() {
-
   #ifdef VERBLOSITY
   printf("verblosity routine enabled in main\n");
   printf("base aldl structure: %i bytes\n",(int)sizeof(aldl_conf_t));
@@ -116,16 +115,20 @@ int load_config_b(char *filename) {
 }
 
 int aldl_acq() {
+  /* this is a broken routine that should be used for testing only. */
   int npkt = 0;
   aldl_packetdef_t *pkt = NULL;
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   printf("connection successful, bailing !\n");
   exit(1);
   /* PERFORM ACQ ROUTINE HERE */
+  while(1) {
   for(npkt=0;npkt < comm->n_packets;npkt++) {
     printf("acquiring packet %i\n",npkt);
     pkt = &comm->packet[npkt];
     aldl_get_packet(pkt);
+  };
+  debugif_iterate(aldl);
   };
   return 0;
 }
