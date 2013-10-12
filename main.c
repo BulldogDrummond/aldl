@@ -62,7 +62,8 @@ int main() {
 
   load_config_b("/project/lt1.conf"); /* allocate and load stage b conf */
 
-  comm->serialport = "d:001/004"; /* REMOVE ME needs to come from load_config */
+  /* FIXME this needs to come from load_config or switch to autodetct */
+  comm->serialport = "d:002/002";
 
   serial_init(comm->serialport); /* init serial port */
 
@@ -106,12 +107,21 @@ int load_config_b(char *filename) {
   if(comm->packet == NULL) tmperror("out of memory 1055"); /* FIXME */
 
   /* !! get packet definitions here, or this flunks due to missing length */
+  comm->packet[0].length = 146; /* fill temporarily */
+  comm->packet[0].enable = 1;
+  comm->packet[0].command = "\xF4\x57\x01\x00\xB4";
+  comm->packet[0].id = 0;
+  comm->packet[0].commandlength = 5;
+  comm->packet[0].offset = 3;
+  comm->packet[0].delay_send = 50;
+  comm->packet[0].delay_recv = 50;
 
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
     comm->packet[x].data = malloc(comm->packet[x].length);
     if(comm->packet[x].data == NULL) tmperror("out of memory 1055"); /* FIXME */
   };
+
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n);
   if(aldl->def == NULL) tmperror("out of memory 1055"); /* FIXME */
   /* get data definitions here !! */
@@ -126,8 +136,8 @@ int aldl_acq() {
   aldl_packetdef_t *pkt = NULL;
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   aldl->state = ALDL_CONNECTED;
-  printf("connection successful, bailing !\n");
-  exit(1);
+  printf("connection successful?... !\n");
+//  exit(1);
   /* PERFORM ACQ ROUTINE HERE */
   while(1) {
   for(npkt=0;npkt < comm->n_packets;npkt++) {
