@@ -1,13 +1,7 @@
 there will be multiple aldl i/o methods, so far just these two:
 
 tty serial i/o:
-  * 'compatibility mode'
-  * just opens a file descriptor to a tty, does some basic config for
-    blocking and xon/xoff type shit, and uses it.
-  * requires pre-configuration of baud rate, due to differences in kernel
-    capabilities and userland tools.  setserial can usually do it with a
-    divisor.  aldl uses such a weird baud rate, this makes using direct tty
-    a real bitch
+  * removed for now
 
 ftdilib:
   * this is a super-portable userspace ftdi chipset driver.  most usb aldl
@@ -24,15 +18,12 @@ string to identify your ftdi interface (pick one):
    i:vendor:product:index
    s:vendor:product:serial
 
-we should provide auto-detection, but it's not done yet.
+autodetection is activated if the string isn't present.  this is untested, and
+simply picks the first available ftdi interface on the bus.
 
 these interfaces are compile-time selected.  object files for each method are
 available with an identical api for each method.
 
 Notes on Timing:
-the 'timeout' field is imprecise, and is a garunteed minimum timeout only,
-the time to actually deal with the driver and reiceve a packet is added to it.
-i've added rough compensations so it's a bit more accurate.  this could use
-more work, but portability in millisecond timestamps sucks, and the pi has a
-very poor sense of time in general.
+the 'timeout' fields are imprecise, and are a minimum timeout only.
 
