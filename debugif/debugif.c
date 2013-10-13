@@ -19,7 +19,7 @@ void debugif_iterate(aldl_conf_t *c) {
   for(x=0;x<comm->n_packets;x++) {
     pkt = &comm->packet[x];
     if(pkt->enable == 1) {
-      printf("packet id=%i length=%i -----------\n",pkt->id,pkt->length);
+      printf("COMPLETED PKT id=%i length=%i: ",pkt->id,pkt->length);
       printhexstring(pkt->data,pkt->length);
       /* print raw data here */
     } else {
