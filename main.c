@@ -122,7 +122,7 @@ int load_config_b(char *filename) {
   comm->packet[1].id = 2;
   comm->packet[1].commandlength = 5;
   comm->packet[1].offset = 3;
-  comm->packet[1].delay_send = 50;
+  comm->packet[1].timer = 50;
   /* a placeholder packet, lt1 msg 4 */
   comm->packet[2].length = 49;
   comm->packet[2].enable = 0;
@@ -130,7 +130,7 @@ int load_config_b(char *filename) {
   comm->packet[2].id = 4;
   comm->packet[2].commandlength = 5;
   comm->packet[2].offset = 3;
-  comm->packet[2].delay_send = 50;
+  comm->packet[2].timer = 50;
 
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
