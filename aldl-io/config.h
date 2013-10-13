@@ -1,3 +1,5 @@
+#ifndef _ALDL_CONFIG_H
+#define _ALDL_CONFIG_H
 
 /*------ DEBUG STUFF --------------------------------------*/
 
@@ -8,3 +10,4 @@
    an actual display interface */
 #define SERIAL_VERBOSE
 
+#endif

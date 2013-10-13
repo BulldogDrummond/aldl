@@ -75,7 +75,7 @@ int aldl_send_shutup(aldl_commdef_t *c) {
     #ifdef ALDL_VERBOSE
       printf("sending shutup request %i\n",x + 1);
     #endif
-    serial_f_write(c->shutupcommand,c->shutuplength);
+    serial_write(c->shutupcommand,c->shutuplength);
     msleep(c->shutuprepeatdelay);
   };
   return 1;
@@ -95,9 +95,9 @@ int aldl_recv_shutup(aldl_commdef_t *c){
   return result;
 }
 
-char *aldl_get_packet(aldl_packetdef_t *p) {
+byte *aldl_get_packet(aldl_packetdef_t *p) {
   serial_purge_rx();
-  serial_f_write(p->command, p->commandlength);
+  serial_write(p->command, p->commandlength);
   msleep(p->timer); /* wait for packet generation */
   /* get actual data */
   /* note that this may theoretically take timer * 2 msec to actually fail,

@@ -65,7 +65,7 @@ aldl_record_t *prepare_record(aldl_conf_t *c) {
 };
 
 /* a debug output function ... */
-void printhexstring(char *str, int length) {
+void printhexstring(byte *str, int length) {
   int x;
   for(x=0;x<length;x++) {
     printf("%X.2 ",(unsigned int)str[x]);

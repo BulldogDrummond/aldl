@@ -15,7 +15,7 @@ typedef enum aldl_state {
 
 /* 8-bit chunk of data */
 
-typedef char octet;
+typedef unsigned char byte;
 
 /* type for sequence numbers of records, etc */
 
@@ -36,19 +36,19 @@ typedef struct aldl_define {
   char name[35];        /* name of the definition */
   aldl_datatype_t type; /* the OUTPUT type */
   unsigned int uom;     /* unit of measure */
-  octet precision;       /* floating point display precision */
+  byte precision;       /* floating point display precision */
   float min, max;       /* the low and high range of OUTPUT value */
   /* ----- conversion ----------------------------------*/
   float adder;          /*  ... */
   float multiplier;     /*  ... */
   /* ----- input definition --------------------------- */
-  octet packet; /* selects which packet unique id the data comes from */
-  octet offset; /* offset within packet in bytes */
-  octet size;   /* size in bits.  8,16,32 only... */
-  octet sig;    /* 1 if signed */
+  byte packet; /* selects which packet unique id the data comes from */
+  byte offset; /* offset within packet in bytes */
+  byte size;   /* size in bits.  8,16,32 only... */
+  byte sig;    /* 1 if signed */
   /* binary stuff only */
-  octet binary; /* offset in bits.  only works for 1 bit fields */
-  octet invert; /* invert (0 means set) */
+  byte binary; /* offset in bits.  only works for 1 bit fields */
+  byte invert; /* invert (0 means set) */
 } aldl_define_t;
 
 /* definition of a single multi-type data array member. */
@@ -82,10 +82,10 @@ typedef struct aldl_packetdef {
                      theoretical time that it takes, in total, for the request
                      to be processed, and the ecm to become ready for the next
                      request. */
-  char *command;  /* the command string sent to retrieve the packet */
+  byte *command;  /* the command string sent to retrieve the packet */
   int commandlength; /* length of the command string in bytes */
   int offset;        /* the offset of the data in bytes, aka header size */
-  char *data;     /* pointer to the raw data buffer */
+  byte *data;     /* pointer to the raw data buffer */
 } aldl_packetdef_t;
 
 /* master definition of a communication spec for an ECM. */
@@ -97,16 +97,16 @@ typedef struct aldl_commdef {
   int checksum_enable;     /* set to 1 to enable checksum verification of
                               packet data.  checksums of commands are not
                               generated, and must be calculated manually */
-  char pcm_address;        /* the address of the PCM */
+  byte pcm_address;        /* the address of the PCM */
   /* ------- idle traffic stuff ---------- */
   int chatterwait;         /* 1 enables chatter checking.  if this is
                               disabled, it'll immediately and constanty
                               send shutup requests. */
-  char *idletraffic;       /* a known portion of idle traffic, or NULL */
+  byte *idletraffic;       /* a known portion of idle traffic, or NULL */
   int idledelay;           /* a ms delay at the end of idle traffic, before
                               sending shutup requests, or 0 */
   /* ------- shutup related stuff -------- */
-  char *shutupcommand;     /* the shutup (disable comms) command */
+  byte *shutupcommand;     /* the shutup (disable comms) command */
   int shutuplength;        /* length of the shutup string */
   int shutupfailwait;      /* how long to wait for shutup reply before fail */
   int shutuptime;          /* time that a shutup lasts, in seconds.  if a
@@ -143,9 +143,9 @@ int aldl_waitforchatter(); /* waits forever for a byte, then bails.  this is
                               generally for autodetection of 'key on' or
                               'key off' conditions. */
 
-char *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
+byte *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
 
-void printhexstring(char *str, int length);
+void printhexstring(byte *str, int length);
 
 /* serial comms-----------------------------------*/
 

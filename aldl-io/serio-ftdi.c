@@ -47,6 +47,8 @@ void fatalerror(int errno, int errloc, char *errnotes);
 102 - failed to set attributes, perhaps specified an invalid attribute
 104 - unsupported connection method
 299 - ftdi error
+301 - autodetection failed no devices found
+302 - autodetection failed for some reason
 */
 
 /* inits the ftdi driver by a special port description:
@@ -64,7 +66,7 @@ void ftdierror(int loc,int errno);
 
 inline void msleep(int ms) {
   usleep(ms * 1000); /* just use usleep and convert from ms in unix */
-}
+};
 
 void serial_set_timing() {
   /* FIXME should actually import some stuff here. */
@@ -143,12 +145,7 @@ void serial_purge_tx() {
   #endif
 }
 
-int serial_write(char *str) {
-  serial_f_write(str,strlen(str));
-  return 0;
-}
-
-inline int serial_f_write(char *str, int len) {
+int serial_write(byte *str, int len) {
   /* check for 0 length or null string */
   if(str == NULL || len == 0) {
     #ifdef SERIAL_VERBOSE
@@ -165,7 +162,7 @@ inline int serial_f_write(char *str, int len) {
   return 0;
 }
 
-inline int serial_read_bytes(char *str, int bytes, int timeout) {
+inline int serial_read_bytes(byte *str, int bytes, int timeout) {
   int bytes_read = 0;
   int timespent = 0;
   #ifdef SERIAL_VERBOSE
@@ -193,7 +190,7 @@ inline int serial_read_bytes(char *str, int bytes, int timeout) {
 }
 
 inline int serial_skip_bytes(int bytes, int timeout) {
-  char *buf = malloc(bytes);
+  byte *buf = malloc(bytes);
   int bytes_read = serial_read_bytes(buf,bytes,timeout);
   #ifdef SERIAL_VERBOSE
   printf("SKIP_BYTES: Discarded %i bytes.\n",bytes_read);
@@ -202,7 +199,7 @@ inline int serial_skip_bytes(int bytes, int timeout) {
   return bytes_read;
 }
 
-inline int serial_read(char *str, int len) {
+inline int serial_read(byte *str, int len) {
   /* check for null string or 0 length */
   if(str == NULL || len == 0) {
     #ifdef SERIAL_VERBOSE
@@ -225,11 +222,13 @@ inline int serial_read(char *str, int len) {
   return resp; /* return number of bytes read, or zero */
 }
 
-int serial_listen(char *str, int len, int max, int timeout) {
+int serial_listen(byte *str, int len, int max, int timeout) {
   int chars_read = 0; /* functions as cursor */
   int chars_in = 0;
   int timespent = 0; /* estimation of time spent */
-  char *buf = malloc(max); /* buffer for incoming data */
+  int matched = 0; /* how many chars have matched */
+  int cursor = 0; /* position of match cursor */
+  byte *buf = malloc(max); /* buffer for incoming data */
   memset(buf,0,max);
   #ifdef SERIAL_VERBOSE
   printf("LISTEN: ");
@@ -238,16 +237,22 @@ int serial_listen(char *str, int len, int max, int timeout) {
   while(chars_read < max) {
     chars_in = serial_read(buf + chars_read,max - chars_read);
     if(chars_in > 0) {
-      if(strstr(buf,str) != NULL) {
-        #ifdef SERIAL_VERBOSE
-        printf("STRING FOUND !!\n");
-        #endif
-        free(buf);
-        return 1;
+      while(cursor <= chars_read) {
+        cursor++;
+        if(str[matched] == buf[cursor]) { /* this is a match */
+           matched++;
+           if(matched == len) { /* matched all chars */
+             #ifdef SERIAL_VERBOSE
+             printf("STRING FOUND !!\n");
+             #endif
+             free(buf);
+             return(1);
+           };
+        } else { /* char didn't match, reset counter */
+          matched = 0; 
+        };
       };
       chars_read += chars_in; /* mv cursor */
-    } else { /* no chars were read */
-      buf[chars_read] = 0; /* might not be necessary */
     };
     /* timeout and throttling routine */
     msleep(timing.sleepy); /* timing delay */
