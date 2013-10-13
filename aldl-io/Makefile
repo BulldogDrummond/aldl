@@ -7,7 +7,7 @@ all: ftdi
 serio-ftdi.o: serio-ftdi.c aldl-io.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
 
-aldlcomm.o: serio-ftdi.o serio-tty.o
+aldlcomm.o: serio-ftdi.o
 	gcc $(CFLAGS) -c aldlcomm.c -o aldlcomm.o
 
 aldldata.o: aldldata.c
