@@ -75,8 +75,8 @@ void serial_set_timing() {
   /* FIXME should actually import some stuff here. */
   /* these are just some sane defaults */
   timing.sleepy = 3;
-  timing.adder = 9;
-  timing.chatterwait = 650;
+  timing.adder = 5;
+  timing.chatterwait = 100;
 };
 
 int serial_init(char *port) {
@@ -89,21 +89,13 @@ int serial_init(char *port) {
 
   serial_set_timing();
   serial_init_ftdi(port,8192);
+  ftdi_set_latency_timer(ftdi,2);
   return 0;
 }
 
 void serial_close() {
   if(fcon != 0) ftdi_usb_close(ftdi);
   ftdi_free(ftdi);
-}
-
-void serial_chatterwait() {
-  /* FIXME this sucks, it's just a placeholder.  it waits for  single
-     byte ... */
-  while(serial_skip_bytes(1,50) == 0) {
-    msleep(timing.chatterwait);
-  };
-  return;
 }
 
 int serial_init_ftdi(char *port, int baud) {
@@ -122,9 +114,25 @@ int serial_init_ftdi(char *port, int baud) {
   return 0;
 };
 
-int serial_purge() {
+void serial_purge() {
   ftdierror(88,ftdi_usb_purge_buffers(ftdi));
-  return 0;
+  #ifdef SERIAL_VERBOSE
+  printf("SERIAL PURGE RX/TX\n");
+  #endif
+}
+
+void serial_purge_rx() {
+  ftdierror(88,ftdi_usb_purge_rx_buffer(ftdi));
+  #ifdef SERIAL_VERBOSE
+  printf("SERIAL PURGE RX\n");
+  #endif
+}
+
+void serial_purge_tx() {
+  ftdierror(88,ftdi_usb_purge_tx_buffer(ftdi));
+  #ifdef SERIAL_VERBOSE
+  printf("SERIAL PURGE TX\n");
+  #endif
 }
 
 int serial_write(char *str) {
@@ -152,11 +160,16 @@ inline int serial_f_write(char *str, int len) {
 inline int serial_read_bytes(char *str, int bytes, int timeout) {
   int bytes_read = 0;
   int timespent = 0;
+  #ifdef SERIAL_VERBOSE
+  printf("**START READ_BYTES %i bytes %i timeout ",bytes,timeout);
+  printhexstring(str,bytes);
+  #endif
+
   do {
     bytes_read += serial_read(str + bytes_read, bytes - bytes_read);
     if(bytes_read >= bytes) {
       #ifdef SERIAL_VERBOSE
-      printf("READ: ");
+      printf("**END READ_BYTES: ");
       printhexstring(str,bytes);
       #endif
       return 1;
@@ -182,7 +195,7 @@ inline int serial_skip_bytes(int bytes, int timeout) {
     bytes_read += serial_read(buf, bytes - bytes_read);
     if(bytes_read >= bytes) {
       #ifdef SERIAL_VERBOSE
-      printf("SKIP: ");
+      printf("SKIPED: ");
       printhexstring(buf,bytes);
       #endif
       free(buf);
@@ -210,8 +223,12 @@ inline int serial_read(char *str, int len) {
   resp = ftdi_read_data(ftdi,(unsigned char *)str,len);
   ftdierror(22,resp); /* this will break if resp<0 */
   #ifdef SERIAL_VERBOSE
-  printf("READ: ");
-  printhexstring(str,len);
+  if(resp > 0) {
+    printf("READ %i of %i bytes: ",resp,len);
+    printhexstring(str,resp);
+  } else {
+    printf("EMPTY\n");
+  };
   #endif
 
   return resp; /* return number of bytes read, or zero */
@@ -231,6 +248,9 @@ int serial_listen(char *str, int len, int max, int timeout) {
     chars_in = serial_read(buf + chars_read,max - chars_read);
     if(chars_in > 0) {
       if(strstr(buf,str) != NULL) {
+        #ifdef SERIAL_VERBOSE
+        printf("STRING FOUND !!\n");
+        #endif
         free(buf);
         return 1;
       };
@@ -243,11 +263,18 @@ int serial_listen(char *str, int len, int max, int timeout) {
     if(timeout > 0) { /* timeout is enabled, we arent waiting forever */
       timespent += timing.sleepy + timing.adder; /* increment est. time */
       if(timespent >= timeout) { /* timeout exceeded */
+        #ifdef SERIAL_VERBOSE
+        printf("LISTEN TIMEOUT\n");
+        #endif
         free(buf);
         return 0;
       };
     };
   };
+  #ifdef SERIAL_VERBOSE
+  printf("STRING NOT FOUND, GOT: ");
+  printhexstring(buf,chars_read);
+  #endif
   free(buf);
   return 0; /* got max chars with no result */
 }
