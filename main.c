@@ -126,14 +126,14 @@ int load_config_b(char *filename) {
   comm->packet[1].delay_send = 50;
   comm->packet[1].delay_recv = 50;
   /* a placeholder packet, lt1 msg 4 */
-  comm->packet[1].length = 49;
-  comm->packet[1].enable = 0;
-  comm->packet[1].command = "\xF4\x57\x01\x04\xB4";
-  comm->packet[1].id = 4;
-  comm->packet[1].commandlength = 5;
-  comm->packet[1].offset = 3;
-  comm->packet[1].delay_send = 50;
-  comm->packet[1].delay_recv = 50;
+  comm->packet[2].length = 49;
+  comm->packet[2].enable = 0;
+  comm->packet[2].command = "\xF4\x57\x01\x04\xB4";
+  comm->packet[2].id = 4;
+  comm->packet[2].commandlength = 5;
+  comm->packet[2].offset = 3;
+  comm->packet[2].delay_send = 50;
+  comm->packet[2].delay_recv = 50;
 
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
@@ -194,7 +194,7 @@ void fallback_config() {
   comm->shutupcharlimit = 20;
   comm->shutuprepeat = 3;
   comm->shutuprepeatdelay = 75;
-  comm->n_packets = 1;
+  comm->n_packets = 3;
 }
 #endif
 
