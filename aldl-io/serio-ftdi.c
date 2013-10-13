@@ -103,7 +103,22 @@ int serial_init_ftdi(char *port, int baud) {
   if((ftdi = ftdi_new()) == NULL) {
     fatalerror(299,1,"ftdi_new failed");
   };
-  ftdierror(2,ftdi_usb_open_string(ftdi,port)); /* trap error */
+
+  if(port != NULL) { /* static device config */
+    ftdierror(2,ftdi_usb_open_string(ftdi,port)); /* trap error */
+  } else { /* autodetect mode */
+    struct ftdi_device_list **devlist = NULL;
+    int n_devices = ftdi_usb_find_all(ftdi,devlist,0,0);
+    if(n_devices > 0) { /* device found */
+      /* right now this just grabs the first available ftdi device .. */
+      ftdierror(2,ftdi_usb_open_dev(ftdi,devlist[0]->dev));
+      ftdi_list_free(devlist);
+    } else if(n_devices == 0) { /* nothing found */
+      fatalerror(301,1,"no devices found, please connect your serial cable");
+    } else {
+      fatalerror(302,1,"ftdi detection failed for some reason.");
+    };
+  };
 
   #ifdef SERIAL_VERBOSE
   printf("init ftdi userland driver appears sucessful...\n");
