@@ -78,15 +78,13 @@ typedef struct aldl_packetdef {
   int id;         /* a unique id for the packet of data, used for associations
                      with data definitions. */
   int length;     /* how long the packet is, overall, including the header */
-  int timeout;    /* the max time to try to recv a packet before it's
-                     considered a failure */
+  int timer;      /* a value in milliseconds.  this should specify a maximum
+                     theoretical time that it takes, in total, for the request
+                     to be processed, and the ecm to become ready for the next
+                     request. */
   char *command;  /* the command string sent to retrieve the packet */
   int commandlength; /* length of the command string in bytes */
   int offset;        /* the offset of the data in bytes, aka header size */
-  int delay_send; /* wait this long after sending a retrieve request before
-                     attempting to get the data.  or 0 works too.. */
-  int delay_recv; /* wait this long after recieving data to send a new request,
-                     this allows the pcm time to 'get ready'. */
   char *data;     /* pointer to the raw data buffer */
 } aldl_packetdef_t;
 

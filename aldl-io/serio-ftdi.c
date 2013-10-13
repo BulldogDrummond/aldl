@@ -74,8 +74,8 @@ inline void msleep(int ms) {
 void serial_set_timing() {
   /* FIXME should actually import some stuff here. */
   /* these are just some sane defaults */
-  timing.sleepy = 3;
-  timing.adder = 5;
+  timing.sleepy = 2;
+  timing.adder = 1;
   timing.chatterwait = 100;
 };
 
@@ -200,30 +200,13 @@ inline int serial_read_bytes(char *str, int bytes, int timeout) {
 }
 
 inline int serial_skip_bytes(int bytes, int timeout) {
-  int bytes_read = 0;
-  int timespent = 0;
-  /* it would seem the only way to do this in a driver-independant way is
-     to just read into a buffer, and discard it.  basically just costs us
-     a malloc. */
-  char *buf = malloc(sizeof(char) * bytes);
-  do {
-    bytes_read += serial_read(buf, bytes - bytes_read);
-    if(bytes_read >= bytes) {
-      #ifdef SERIAL_VERBOSE
-      printf("SKIPED: ");
-      printhexstring(buf,bytes);
-      #endif
-      free(buf);
-      return 1;
-    };
-    msleep(timing.sleepy);
-    timespent += timing.sleepy + timing.adder;
-  } while (timespent <= timeout);
-  free(buf);
+  char *buf = malloc(bytes);
+  int bytes_read = serial_read_bytes(buf,bytes,timeout);
   #ifdef SERIAL_VERBOSE
-  printf("TIMEOUT TRYING TO SKIP %i BYTES\n",bytes);
+  printf("SKIP_BYTES: Discarded %i bytes.\n",bytes_read);
   #endif
-  return 0;
+  free(buf);
+  return bytes_read;
 }
 
 inline int serial_read(char *str, int len) {

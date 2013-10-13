@@ -95,12 +95,13 @@ int aldl_recv_shutup(aldl_commdef_t *c){
 }
 
 char *aldl_get_packet(aldl_packetdef_t *p) {
-  msleep(p->delay_recv);
   serial_purge_rx();
   serial_f_write(p->command, p->commandlength);
-  msleep(p->delay_send);
+  msleep(p->timer); /* wait for packet generation */
   /* get actual data */
-  if(serial_read_bytes(p->data, p->length, p->timeout) == 0) {
+  /* note that this may theoretically take timer * 2 msec to actually get
+     the packet, but that isn't a big deal. */
+  if(serial_read_bytes(p->data, p->length, p->timer) == 0) {
     /* failed to get data */
     memset(p->data,0,p->length);
     return NULL;
