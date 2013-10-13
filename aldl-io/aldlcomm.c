@@ -100,8 +100,8 @@ char *aldl_get_packet(aldl_packetdef_t *p) {
   serial_f_write(p->command, p->commandlength);
   msleep(p->timer); /* wait for packet generation */
   /* get actual data */
-  /* note that this may theoretically take timer * 2 msec to actually get
-     the packet, but that isn't a big deal. */
+  /* note that this may theoretically take timer * 2 msec to actually fail,
+     if the packet isn't actually complete.  that's ok, though. */
   if(serial_read_bytes(p->data, p->length, p->timer) == 0) {
     /* failed to get data */
     memset(p->data,0,p->length);
