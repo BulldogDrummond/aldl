@@ -88,15 +88,6 @@ void serial_close() {
   close(fd);
 }
 
-void serial_chatterwait() {
-  /* FIXME this sucks, it's just a placeholder.  it waits for  single
-     byte ... */
-  while(serial_skip_bytes(1,50) == 0) {
-    msleep(timing.chatterwait);
-  };
-  return;
-}
-
 int serial_config_attrib(int fd) {
   #ifdef SERIAL_DEBUG
     if(fd <=0) fatalerror(99,1,"passed a null file descriptor to sca");

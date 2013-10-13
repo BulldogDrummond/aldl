@@ -107,7 +107,8 @@ int load_config_b(char *filename) {
   if(comm->packet == NULL) tmperror("out of memory 1055"); /* FIXME */
 
   /* !! get packet definitions here, or this flunks due to missing length */
-  comm->packet[0].length = 146; /* fill temporarily */
+  /* a placeholder packet, lt1 msg 0 */
+  comm->packet[0].length = 64;
   comm->packet[0].enable = 1;
   comm->packet[0].command = "\xF4\x57\x01\x00\xB4";
   comm->packet[0].id = 0;
@@ -115,6 +116,24 @@ int load_config_b(char *filename) {
   comm->packet[0].offset = 3;
   comm->packet[0].delay_send = 50;
   comm->packet[0].delay_recv = 50;
+  /* a placeholder packet, lt1 msg 2 */
+  comm->packet[1].length = 57;
+  comm->packet[1].enable = 0;
+  comm->packet[1].command = "\xF4\x57\x01\x02\xB4";
+  comm->packet[1].id = 2;
+  comm->packet[1].commandlength = 5;
+  comm->packet[1].offset = 3;
+  comm->packet[1].delay_send = 50;
+  comm->packet[1].delay_recv = 50;
+  /* a placeholder packet, lt1 msg 4 */
+  comm->packet[1].length = 49;
+  comm->packet[1].enable = 0;
+  comm->packet[1].command = "\xF4\x57\x01\x04\xB4";
+  comm->packet[1].id = 4;
+  comm->packet[1].commandlength = 5;
+  comm->packet[1].offset = 3;
+  comm->packet[1].delay_send = 50;
+  comm->packet[1].delay_recv = 50;
 
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
