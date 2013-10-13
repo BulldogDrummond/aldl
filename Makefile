@@ -8,8 +8,8 @@ all: aldl-ftdi
 aldl-ftdi: main.c aldl-io-ftdi configfile_ debugif_
 	gcc $(CFLAGS) -lftdi main.c -o aldl-ftdi $(OBJS) aldl-io/aldl-io-ftdi.a
 
-aldl-tty: main.c aldl-io-tty configfile_
-	gcc $(CFLAGS) main.c -o aldl-tty $(OBJS) aldl-io/aldl-io-tty.a
+#aldl-tty: main.c aldl-io-tty configfile_
+#	gcc $(CFLAGS) main.c -o aldl-tty $(OBJS) aldl-io/aldl-io-tty.a
 
 configfile_:
 	cd configfile ; make ; cd ..
@@ -17,8 +17,8 @@ configfile_:
 aldl-io-ftdi:
 	cd aldl-io ; make ftdi ; cd ..
 
-aldl-io-tty:
-	cd aldl-io ; make tty ; cd ..
+#aldl-io-tty:
+#	cd aldl-io ; make tty ; cd ..
 
 debugif_:
 	cd debugif ; make ; cd ..
