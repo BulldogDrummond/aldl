@@ -94,7 +94,9 @@ typedef struct aldl_commdef {
   char *serialport;        /* serial port init string */
   /* ------- config stuff ---------------- */
   char ecmstring[4];       /* a unique identifying string for the platform */
-  int checksum_enable;     /* set to 1 to enable checksum verification */
+  int checksum_enable;     /* set to 1 to enable checksum verification of
+                              packet data.  checksums of commands are not
+                              generated, and must be calculated manually */
   char pcm_address;        /* the address of the PCM */
   /* ------- idle traffic stuff ---------- */
   int chatterwait;         /* 1 enables chatter checking.  if this is
