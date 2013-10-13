@@ -26,8 +26,6 @@ struct ftdi_context *ftdi;
 /* a structure containing runtime-configurable timing specifications */
 struct timing_t {
   int sleepy; /* the delay between most other polls, and the timeout divisor */
-  int adder; /* an adder to help calculate some instructional time */
-  int chatterwait;
 };
 struct timing_t timing;
 
@@ -71,9 +69,7 @@ inline void msleep(int ms) {
 void serial_set_timing() {
   /* FIXME should actually import some stuff here. */
   /* these are just some sane defaults */
-  timing.sleepy = 2;
-  timing.adder = 1;
-  timing.chatterwait = 100;
+  timing.sleepy = 2; /* 2ms between iterations, and to make timeouts work */
 };
 
 int serial_init(char *port) {
@@ -187,7 +183,7 @@ inline int serial_read_bytes(char *str, int bytes, int timeout) {
       return 1;
     }
     msleep(timing.sleepy);
-    timespent += timing.sleepy + timing.adder; 
+    timespent += timing.sleepy; 
   } while (timespent <= timeout);
   #ifdef SERIAL_VERBOSE
   printf("TIMEOUT TRYING TO READ %i BYTES, GOT: ",bytes);
@@ -256,7 +252,7 @@ int serial_listen(char *str, int len, int max, int timeout) {
     /* timeout and throttling routine */
     msleep(timing.sleepy); /* timing delay */
     if(timeout > 0) { /* timeout is enabled, we arent waiting forever */
-      timespent += timing.sleepy + timing.adder; /* increment est. time */
+      timespent += timing.sleepy; /* increment est. time */
       if(timespent >= timeout) { /* timeout exceeded */
         #ifdef SERIAL_VERBOSE
         printf("LISTEN TIMEOUT\n");
