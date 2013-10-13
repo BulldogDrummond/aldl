@@ -7,7 +7,8 @@ http://resfilter.github.io/aldl
 
 it has various serial interface methods, which it uses to place the ECM in
 diagnostic mode, so realtime data can be retrieved, calculated, and then
-processed by a series of display or scripting modules.
+processed by a series of display or scripting modules.  right now the ftdi
+driver is the only one in active development, the others have been removed.
 
 it uses a proprietery config format, which defines the location of various
 data sets, and conversion specifications per diagnostic commands, as well
@@ -19,7 +20,7 @@ file.
 it is intended for use on low-power devices such as the raspberry pi, to
 construct digital secondary dashboard type devices.
 
-dependancies: libftdi (reccommended), bison, flex
+dependancies: libftdi, bison, flex
 
 build is now statically compiled with a particular i/o handler, and is no
 longer selectable at runtime.
@@ -27,11 +28,4 @@ longer selectable at runtime.
 run following in root directory:
 
 make aldl-ftdi
-   -or-
-make aldl-tty
 
-ADX Files:
-
-nAst1 - the one I use the most for firechicken/fiero
-OSE 12p - planned to use with my truck
-TGP 8F - 2bar code used in my friend's truck
