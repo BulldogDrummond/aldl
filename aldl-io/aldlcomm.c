@@ -37,7 +37,7 @@ int aldl_reconnect(aldl_commdef_t *c) {
     aldl_waitforchatter(c);
   } else {
     /* without chatter wait mode, just wait 10x chatter delay */
-    usleep(c->idledelay * 10000);
+    msleep(c->idledelay * 10);
   };
   if(aldl_shutup(c) == 1) return 1;
   return 0;
@@ -47,11 +47,12 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("waiting for idle chatter to confirm key is on..\n");
   #endif
-  while(serial_skip_bytes(1,50) == 0) usleep(10000);
+  /* FIXME this should be tuneable */
+  while(serial_skip_bytes(1,50) == 0) msleep(500);
   #ifdef ALDL_VERBOSE
     printf("got idle chatter or something.\n");
   #endif
-  usleep(c->idledelay * 1000);
+  msleep(c->idledelay);
   return 1;
 }
 
@@ -75,7 +76,7 @@ int aldl_send_shutup(aldl_commdef_t *c) {
       printf("sending shutup request %i\n",x + 1);
     #endif
     serial_f_write(c->shutupcommand,c->shutuplength);
-    usleep(c->shutuprepeatdelay);
+    msleep(c->shutuprepeatdelay);
   };
   return 1;
 }

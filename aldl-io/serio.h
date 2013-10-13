@@ -2,8 +2,11 @@
 #ifndef _SERIO_H
 #define _SERIO_H
 
-/* write functions.  _f is faster if you know the length in advance. */
+/* write function for a null terminated string.  use f_write if you know the
+   length, or there is no terminator. */
 int serial_write(char *str);
+
+/* write buffer *str to the serial port, up to len bytes */
 inline int serial_f_write(char *str, int len);
 
 /* read data from the serial port to buf, returns number of bytes read.
@@ -24,10 +27,10 @@ inline int serial_skip_bytes(int bytes, int timeout);
    len is the length of str if it is known, or not null terminated. */
 int serial_listen(char *str, int len, int max, int timeout);
 
-/* clears any i/o buffers */
-void serial_purge();
-void serial_purge_rx();
-void serial_purge_tx();
+/* clears any i/o buffers ... */
+void serial_purge(); /* both buffers */
+void serial_purge_rx(); /* rx only */
+void serial_purge_tx(); /* tx only */
 
 /* sleep for ms milliseconds */
 inline void msleep(int ms);

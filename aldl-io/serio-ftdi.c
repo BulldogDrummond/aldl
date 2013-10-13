@@ -20,9 +20,6 @@
 
 /****************GLOBALSn'STRUCTURES*****************************/
 
-/* a connection flag.  useage depends on method. */
-int fcon;
-
 /* global ftdi context pointer */
 struct ftdi_context *ftdi;
 
@@ -85,8 +82,6 @@ int serial_init(char *port) {
   printf("serial_init opening port @ %s with method ftdi\n",port);
   #endif
 
-  fcon = 0;
-
   serial_set_timing();
   serial_init_ftdi(port,8192);
   ftdi_set_latency_timer(ftdi,2);
@@ -94,7 +89,7 @@ int serial_init(char *port) {
 }
 
 void serial_close() {
-  if(fcon != 0) ftdi_usb_close(ftdi);
+  ftdi_usb_close(ftdi);
   ftdi_free(ftdi);
 }
 
@@ -125,7 +120,9 @@ int serial_init_ftdi(char *port, int baud) {
   #endif
 
   ftdierror(3,ftdi_set_baudrate(ftdi,baud));
-  fcon = 1; /* set only on successful connection */
+
+  /* put connection state tracking here .*/
+
   return 0;
 };
 
