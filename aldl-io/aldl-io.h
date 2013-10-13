@@ -77,13 +77,12 @@ typedef struct aldl_packetdef {
                      placed into the dataset, but filled with NULL. */
   int id;         /* a unique id for the packet of data, used for associations
                      with data definitions. */
-  int length;     /* how long the packet is, overall, not including the first
-                     three bytes, which are header. */
+  int length;     /* how long the packet is, overall, including the header */
   int timeout;    /* the max time to try to recv a packet before it's
                      considered a failure */
   char *command;  /* the command string sent to retrieve the packet */
   int commandlength; /* length of the command string in bytes */
-  int offset;        /* the offset of the actual data in bytes */
+  int offset;        /* the offset of the data in bytes, aka header size */
   int delay_send; /* wait this long after sending a retrieve request before
                      attempting to get the data.  or 0 works too.. */
   int delay_recv; /* wait this long after recieving data to send a new request,
