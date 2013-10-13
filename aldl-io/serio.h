@@ -24,11 +24,10 @@ inline int serial_skip_bytes(int bytes, int timeout);
    len is the length of str if it is known, or not null terminated. */
 int serial_listen(char *str, int len, int max, int timeout);
 
-/* wait forever with delay scaling for any packet */
-void serial_chatterwait();
-
 /* clears any i/o buffers */
-int serial_purge();
+void serial_purge();
+void serial_purge_rx();
+void serial_purge_tx();
 
 /* sleep for ms milliseconds */
 inline void msleep(int ms);
