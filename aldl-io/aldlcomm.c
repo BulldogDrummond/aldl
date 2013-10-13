@@ -47,7 +47,7 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("waiting for idle chatter to confirm key is on..\n");
   #endif
-  serial_chatterwait(c);
+  while(serial_skip_bytes(1,50) == 0) usleep(10000);
   #ifdef ALDL_VERBOSE
     printf("got idle chatter or something.\n");
   #endif
@@ -56,7 +56,7 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
 }
 
 int aldl_shutup(aldl_commdef_t *c) {
-  serial_purge(); /* pre-clear read buffer */
+  serial_purge_rx(); /* pre-clear read buffer */
   shutup_attempts = 1;
   while(1) {
     aldl_send_shutup(c);
@@ -95,23 +95,17 @@ int aldl_recv_shutup(aldl_commdef_t *c){
 }
 
 char *aldl_get_packet(aldl_packetdef_t *p) {
-  serial_purge();
   msleep(p->delay_recv);
+  serial_purge_rx();
   serial_f_write(p->command, p->commandlength);
   msleep(p->delay_send);
-  /* skip header offset */
-  if(serial_skip_bytes(p->offset, p->timeout) == 0) {
-    /* failed to get header, zero out packet */
-    memset(p->data,0,p->length);
-    return NULL;
-  }
   /* get actual data */
-  if(serial_read_bytes(p->data, p->length, p->timeout) == 1) {
-    /* success */
-  } else {
+  if(serial_read_bytes(p->data, p->length, p->timeout) == 0) {
     /* failed to get data */
     memset(p->data,0,p->length);
     return NULL;
   }
+  /* got data */
   return p->data;
 }
+
