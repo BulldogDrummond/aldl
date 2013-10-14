@@ -11,6 +11,10 @@ int aldl_waitforchatter(); /* returns when idle traffic is detected */
 
 byte *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
 
+/* generate request strings */
+byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm);
+byte *generate_shutup(byte len, byte mode, aldl_commdef_t *comm);
+
 /* serial comms-----------------------------------*/
 
 int serial_init(char *port); /* initalize the serial handler */

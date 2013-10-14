@@ -72,8 +72,9 @@ typedef struct aldl_record {
 typedef struct aldl_packetdef {
   int enable;     /* actually get data for the packet.  if disabled, it's still
                      placed into the dataset, but filled with NULL. */
-  int id;         /* a unique id for the packet of data, used for associations
-                     with data definitions. */
+  byte id;         /* message number */
+  byte msg_len;    /* message length byte */
+  byte msg_mode;   /* message mode */
   int length;     /* how long the packet is, overall, including the header */
   int timer;      /* a value in milliseconds.  this should specify a maximum
                      theoretical time that it takes, in total, for the request
@@ -103,11 +104,7 @@ typedef struct aldl_commdef {
                               sending shutup requests, or 0 */
   /* ------- shutup related stuff -------- */
   byte *shutupcommand;     /* the shutup (disable comms) command */
-  int shutuplength;        /* length of the shutup string */
   int shutupfailwait;      /* how long to wait for shutup reply before fail */
-  int shutuptime;          /* time that a shutup lasts, in seconds.  if a
-                              request has not been sent in this time, the
-                              connection is considered back @ idle */
   int shutupcharlimit;     /* after recieving this many chars, the shutup
                               request has obviously failed. */
   int shutuprepeat;        /* how many times to repeat a shutup request */

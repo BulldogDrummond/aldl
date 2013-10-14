@@ -16,6 +16,8 @@
 /* number of attempts to shut up the ecm */
 int shutup_attempts;
 
+typedef unsigned int sum_t;
+
 /* local functions -----*/
 int aldl_shutup(); /* repeatedly attempt to make the ecm shut up */
 int aldl_send_shutup(); /* send shutup requests, returns 1 all the time */
@@ -82,13 +84,12 @@ int aldl_shutup(aldl_commdef_t *c) {
 
 int aldl_send_shutup(aldl_commdef_t *c) {
   int x;
-  /* cram the shutup string into the stream.  this could be optimized, but
-     it does work. */
+  /* FIXME doesnt entirely match all options of spec */
   for(x=0;x<c->shutuprepeat;x++) {
     #ifdef ALDL_VERBOSE
       printf("sending shutup request %i\n",x + 1);
     #endif
-    serial_write(c->shutupcommand,c->shutuplength);
+    serial_write(c->shutupcommand,SHUTUP_LENGTH);
     msleep(c->shutuprepeatdelay);
   };
   return 1;
@@ -99,7 +100,7 @@ int aldl_recv_shutup(aldl_commdef_t *c){
   #ifdef ALDL_VERBOSE
     printf("waiting for response...\n");
   #endif
-  int result = listen_bytes(c->shutupcommand,c->shutuplength,
+  int result = listen_bytes(c->shutupcommand,SHUTUP_LENGTH,
                c->shutupcharlimit,
                c->shutupfailwait);
   #ifdef ALDL_VERBOSE
@@ -226,18 +227,38 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
 
 byte checksum_generate(byte *buf, int len) {
   int x = 0;
-  unsigned int sum = 0;
+  sum_t sum = 0;
   for(x=0;x<len;x++) sum += buf[x];
   return ( 256 - ( sum % 256 ) );
 };
 
 int checksum_test(byte *buf, int len) {
   int x = 0;
-  unsigned int sum = 0;
+  sum_t sum = 0;
   for(x=0;x<len;x++) sum += buf[x];
   if(( sum & 0xFF ) == 0) return 1;
   return 0;
 };
+
+byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
+  packet->command = malloc(5);
+  packet->command[0] = comm->pcm_address;
+  packet->command[1] = packet->msg_len;
+  packet->command[2] = packet->msg_mode;
+  packet->command[3] = packet->id;
+  packet->command[4] = checksum_generate(packet->command,4);
+  return packet->command;
+}
+
+byte *generate_shutup(byte len, byte mode, aldl_commdef_t *comm) {
+  byte *tmp = malloc(SHUTUP_LENGTH);
+  tmp[0] = comm->pcm_address;
+  tmp[1] = len;
+  tmp[2] = mode;
+  tmp[3] = checksum_generate(tmp,SHUTUP_LENGTH - 1);
+  return tmp;
+};
+
 
 inline void msleep(int ms) {
   usleep(ms * 1000); /* just use usleep and convert from ms in unix */

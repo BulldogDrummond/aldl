@@ -5,6 +5,7 @@
 
 /* local objects */
 #include "config.h"
+#include "aldl-io/config.h"
 #include "aldl-io/aldl-io.h"
 #include "configfile/varstore.h"
 #include "configfile/configfile.h"
@@ -110,27 +111,13 @@ int load_config_b(char *filename) {
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
   comm->packet[0].enable = 1;
-  comm->packet[0].command = "\xF4\x57\x01\x00\xB4";
-  comm->packet[0].id = 0;
+  comm->packet[0].id = 0x00;
+  comm->packet[0].msg_len = 0x57;
+  comm->packet[0].msg_mode = 0x01;
   comm->packet[0].commandlength = 5;
   comm->packet[0].offset = 3;
   comm->packet[0].timer = 50;
-  /* a placeholder packet, lt1 msg 2 */
-  comm->packet[1].length = 57;
-  comm->packet[1].enable = 0;
-  comm->packet[1].command = "\xF4\x57\x01\x02\xB4";
-  comm->packet[1].id = 2;
-  comm->packet[1].commandlength = 5;
-  comm->packet[1].offset = 3;
-  comm->packet[1].timer = 50;
-  /* a placeholder packet, lt1 msg 4 */
-  comm->packet[2].length = 49;
-  comm->packet[2].enable = 0;
-  comm->packet[2].command = "\xF4\x57\x01\x04\xB4";
-  comm->packet[2].id = 4;
-  comm->packet[2].commandlength = 5;
-  comm->packet[2].offset = 3;
-  comm->packet[2].timer = 50;
+  generate_pktcommand(&comm->packet[0],comm);
 
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
@@ -184,18 +171,12 @@ void fallback_config() {
   comm->idletraffic = 0x00;
   comm->idledelay = 10;
   comm->chatterwait = 1;
-  byte *tmp = malloc(4);
-  tmp[0] = comm->pcm_address;
-  tmp[1] = 0x56; tmp[2] = 0x08;
-  tmp[3] = checksum_generate(tmp,3);
-  comm->shutupcommand = tmp;
-  comm->shutuplength = 4;
-  comm->shutuptime = 3000;
+  comm->shutupcommand = generate_shutup(0x56,0x08,comm);
   comm->shutupfailwait = 500;
   comm->shutupcharlimit = 20;
   comm->shutuprepeat = 3;
   comm->shutuprepeatdelay = 75;
-  comm->n_packets = 3;
+  comm->n_packets = 1;
 }
 #endif
 

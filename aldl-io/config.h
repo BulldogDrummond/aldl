@@ -21,4 +21,7 @@
 /* the baud rate to set for the ftdi usb userland driver.  reccommend 8192. */
 #define FTDI_BAUD 8192
 
+/* length of an aldl mode change request string */
+#define SHUTUP_LENGTH 4
+
 #endif
