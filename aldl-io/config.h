@@ -22,6 +22,7 @@
 #define FTDI_BAUD 8192
 
 /* length of an aldl mode change request string */
+/* FIXME this might not be good for other ECMS */
 #define SHUTUP_LENGTH 4
 
 #endif

@@ -3,8 +3,6 @@
 
 /* --------- datatypes ----------------------------------------*/
 
-/* datatypes for OUTPUT conversion only. */
-
 typedef enum aldl_datatype {
   ALDL_INT, ALDL_UINT, ALDL_FLOAT, ALDL_BOOL
 } aldl_datatype_t;
@@ -22,14 +20,12 @@ typedef unsigned char byte;
    the converted data. */
 
 typedef struct aldl_define {
-  char id[12];           /* unique identifier for each definition.  spaces are
-                            forbidden. */
-  char description[32];  /* description of each definition */
+  char id[8];           /* unique identifier for each definition */
+  char *description;  /* description of each definition */
   int enable;        /* any plugin using the item must set enable=1.
                         under no circumstances should a plugin set this
                         to 0. */
   /* ----- output definition -------------------------- */
-  char name[35];        /* name of the definition */
   aldl_datatype_t type; /* the OUTPUT type */
   unsigned int uom;     /* unit of measure */
   byte precision;       /* floating point display precision */

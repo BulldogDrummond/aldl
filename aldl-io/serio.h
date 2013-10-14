@@ -2,7 +2,7 @@
 #ifndef _SERIO_H
 #define _SERIO_H
 
-typedef unsigned char byte;
+#include "aldl-types.h"
 
 /* these are generic driver-specific abstractions only. */
 
