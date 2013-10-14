@@ -20,11 +20,9 @@ typedef unsigned char byte;
    the converted data. */
 
 typedef struct aldl_define {
-  char id[8];           /* unique identifier for each definition */
+  int id;             /* unique identifier for each definition */
+  char *name;         /* short name */
   char *description;  /* description of each definition */
-  int enable;        /* any plugin using the item must set enable=1.
-                        under no circumstances should a plugin set this
-                        to 0. */
   /* ----- output definition -------------------------- */
   aldl_datatype_t type; /* the OUTPUT type */
   unsigned int uom;     /* unit of measure */
