@@ -40,14 +40,15 @@ int aldl_reconnect(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("attempting to place ecm in diagnostic mode.\n");
   #endif
-  if(c->chatterwait == 1) {
-    /* FIXME chatter wait spec is not completely implemented.. */
-    aldl_waitforchatter(c);
-  } else {
-    /* without chatter wait mode, just wait 10x chatter delay */
-    msleep(c->idledelay * 10);
+  /* reconnect runs in an infinite loop for now. */
+  while(1) {
+    if(c->chatterwait == 1) {
+      aldl_waitforchatter(c);
+    } else {
+      msleep(c->idledelay);
+    };
+    if(aldl_shutup(c) == 1) return 1;
   };
-  if(aldl_shutup(c) == 1) return 1;
   return 0;
 }
 
@@ -68,16 +69,15 @@ int aldl_shutup(aldl_commdef_t *c) {
   if(c->shutuprepeat == 0) return 1; /* no shutup necessary */
   serial_purge_rx(); /* pre-clear read buffer */
   int x;
-  for(x=1;x<=c->shutuprepeat;x++) {
-    aldl_send_shutup(c);
-    if(aldl_recv_shutup(c) == 1) return 1;
-  };
+  for(x=1;x<=c->shutuprepeat;x++) aldl_send_shutup(c);
+  if(aldl_recv_shutup(c) == 1) {
+    return 1;
+  }
   return 0;
 }
 
 int aldl_send_shutup(aldl_commdef_t *c) {
   int x;
-  /* FIXME doesnt entirely match all options of spec */
   for(x=0;x<c->shutuprepeat;x++) {
     #ifdef ALDL_VERBOSE
       printf("sending shutup request %i\n",x + 1);

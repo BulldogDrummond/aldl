@@ -131,8 +131,6 @@ int aldl_acq() {
   /* this is a broken routine that should be used for testing only. */
   int npkt = 0;
   aldl_packetdef_t *pkt = NULL;
-  /* FIXME need to run a timer here to determine connection state, and loop
-     to reconnect if the shutup time is exceeded. */
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   aldl->state = ALDL_CONNECTED;
   printf("connection successful?... !\n");
