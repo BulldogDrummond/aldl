@@ -1,0 +1,132 @@
+#ifndef ALDLTYPES_H
+#define ALDLTYPES_H
+
+/* --------- datatypes ----------------------------------------*/
+
+/* datatypes for OUTPUT conversion only. */
+
+typedef enum aldl_datatype {
+  ALDL_INT, ALDL_UINT, ALDL_FLOAT, ALDL_BOOL
+} aldl_datatype_t;
+
+typedef enum aldl_state {
+  ALDL_CONNECTED, ALDL_CONNECTING, ALDL_ERROR
+} aldl_state_t;
+
+/* 8-bit chunk of data */
+
+typedef unsigned char byte;
+
+/* each data record will be associated with a static definition.  this will
+   contain whatever is necessary to convert a raw stream, as well as interpret
+   the converted data. */
+
+typedef struct aldl_define {
+  char id[12];           /* unique identifier for each definition.  spaces are
+                            forbidden. */
+  char description[32];  /* description of each definition */
+  int enable;        /* any plugin using the item must set enable=1.
+                        under no circumstances should a plugin set this
+                        to 0. */
+  /* ----- output definition -------------------------- */
+  char name[35];        /* name of the definition */
+  aldl_datatype_t type; /* the OUTPUT type */
+  unsigned int uom;     /* unit of measure */
+  byte precision;       /* floating point display precision */
+  float min, max;       /* the low and high range of OUTPUT value */
+  /* ----- conversion ----------------------------------*/
+  float adder;          /*  ... */
+  float multiplier;     /*  ... */
+  /* ----- input definition --------------------------- */
+  byte packet; /* selects which packet unique id the data comes from */
+  byte offset; /* offset within packet in bytes */
+  byte size;   /* size in bits.  8,16,32 only... */
+  byte sig;    /* 1 if signed */
+  /* binary stuff only */
+  byte binary; /* offset in bits.  only works for 1 bit fields */
+  byte invert; /* invert (0 means set) */
+} aldl_define_t;
+
+/* definition of a single multi-type data array member. */
+
+typedef union aldl_data {
+  float f;
+  int i;
+  unsigned int u;
+  byte raw;
+} aldl_data_t;
+
+/* definition of a record, which is a sequential linked-list type structure,
+   used as a container for a snapshot of data. */
+
+typedef struct aldl_record {
+  int lock;            /* semaphore-stype lock for garbage collection */
+  struct aldl_record *next; /* linked list traversal, newer record or NULL */
+  struct aldl_record *prev; /* linked list traversal, older record or NULL */
+  time_t t;            /* timestamp of the record */
+  aldl_data_t *data;   /* pointer to the first data record. */
+} aldl_record_t;
+
+/* defines each packet of data and how to retrieve it */
+
+typedef struct aldl_packetdef {
+  int enable;     /* actually get data for the packet.  if disabled, it's still
+                     placed into the dataset, but filled with NULL. */
+  int id;         /* a unique id for the packet of data, used for associations
+                     with data definitions. */
+  int length;     /* how long the packet is, overall, including the header */
+  int timer;      /* a value in milliseconds.  this should specify a maximum
+                     theoretical time that it takes, in total, for the request
+                     to be processed, and the ecm to become ready for the next
+                     request. */
+  byte *command;  /* the command string sent to retrieve the packet */
+  int commandlength; /* length of the command string in bytes */
+  int offset;        /* the offset of the data in bytes, aka header size */
+  byte *data;     /* pointer to the raw data buffer */
+} aldl_packetdef_t;
+
+/* master definition of a communication spec for an ECM. */
+
+typedef struct aldl_commdef {
+  /* ------- config stuff ---------------- */
+  char ecmstring[4];       /* a unique identifying string for the platform */
+  int checksum_enable;     /* set to 1 to enable checksum verification of
+                              packet data.  checksums of commands are not
+                              generated, and must be calculated manually */
+  byte pcm_address;        /* the address of the PCM */
+  /* ------- idle traffic stuff ---------- */
+  int chatterwait;         /* 1 enables chatter checking.  if this is
+                              disabled, it'll immediately and constanty
+                              send shutup requests. */
+  byte *idletraffic;       /* a known portion of idle traffic, or NULL */
+  int idledelay;           /* a ms delay at the end of idle traffic, before
+                              sending shutup requests, or 0 */
+  /* ------- shutup related stuff -------- */
+  byte *shutupcommand;     /* the shutup (disable comms) command */
+  int shutuplength;        /* length of the shutup string */
+  int shutupfailwait;      /* how long to wait for shutup reply before fail */
+  int shutuptime;          /* time that a shutup lasts, in seconds.  if a
+                              request has not been sent in this time, the
+                              connection is considered back @ idle */
+  int shutupcharlimit;     /* after recieving this many chars, the shutup
+                              request has obviously failed. */
+  int shutuprepeat;        /* how many times to repeat a shutup request */
+  int shutuprepeatdelay;   /* the delay, in ms, to delay in between requests */
+  /* ------- data packet requests -------- */
+  int n_packets;             /* the number of packets of data */
+  aldl_packetdef_t *packet;  /* the actual packet definitions */
+} aldl_commdef_t;
+
+/* an info structure defining aldl communications and data mgmt */
+
+typedef struct aldl_conf {
+  char ecmtype; /* the type of ecm being read */
+  int n;        /* static number of definitions */
+  int bufsize;  /* the minimum number of records to maintain */
+  aldl_state_t state; /* connection state */
+  aldl_define_t *def; /* link to the definition set */
+  aldl_record_t *r; /* link to the latest record */
+  aldl_commdef_t *comm; /* link back to the communication spec */
+} aldl_conf_t;
+
+#endif
