@@ -15,4 +15,7 @@
    more accurate.  increasing improves cpu usage. */
 #define SLEEPYTIME 2
 
+/* the baud rate to set for the ftdi usb userland driver.  reccommend 8192. */
+#define FTDI_BAUD 8192
+
 #endif

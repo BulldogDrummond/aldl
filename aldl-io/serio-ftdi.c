@@ -8,8 +8,6 @@
 #include <sys/ioctl.h>
 #include <fcntl.h>
 
-#include <time.h>
-
 #include <ftdi.h>
 
 #include "serio.h"
@@ -38,18 +36,22 @@ void fatalerror(int errno, int errloc, char *errnotes);
 302 - autodetection failed for some reason
 */
 
-/* inits the ftdi driver by a special port description:
+/* init the ftdi driver by a special port description:
    d:devicenode (usually at /proc/bus/usb)
    i:vendor:product
    i:vendor:product:index
    s:vendor:product:serial
 */
-int serial_init_ftdi(char *port, int baud);
 
 /* special ftdi error handler, bails if errno<0.  could be macro. */
 void ftdierror(int loc,int errno);
 
 /****************FUNCTIONS**************************************/
+
+void serial_close() {
+  ftdi_usb_close(ftdi);
+  ftdi_free(ftdi);
+}
 
 int serial_init(char *port) {
   #ifdef SERIAL_VERBOSE
@@ -57,17 +59,6 @@ int serial_init(char *port) {
   printf("serial_init opening port @ %s with method ftdi\n",port);
   #endif
 
-  serial_init_ftdi(port,8192);
-  ftdi_set_latency_timer(ftdi,2);
-  return 0;
-}
-
-void serial_close() {
-  ftdi_usb_close(ftdi);
-  ftdi_free(ftdi);
-}
-
-int serial_init_ftdi(char *port, int baud) {
   /* new ftdi instance */
   if((ftdi = ftdi_new()) == NULL) {
     fatalerror(299,1,"ftdi_new failed");
@@ -93,7 +84,11 @@ int serial_init_ftdi(char *port, int baud) {
   printf("init ftdi userland driver appears sucessful...\n");
   #endif
 
-  ftdierror(3,ftdi_set_baudrate(ftdi,baud));
+  /* set baud rate */
+  ftdierror(3,ftdi_set_baudrate(ftdi,FTDI_BAUD));
+
+  /* set latency timer */
+  ftdierror(3,ftdi_set_latency_timer(ftdi,2));
 
   /* put connection state tracking here .*/
 
