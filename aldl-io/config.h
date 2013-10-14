@@ -10,6 +10,9 @@
    an actual display interface */
 #define SERIAL_VERBOSE
 
+/* verbose aldl comm routines on stdout */
+#define ALDL_VERBOSE
+
 /* a static delay in milliseconds.  used for waiting in between grabbing
    serial chunks, and for delay timers.  decreasing this value makes timeouts
    more accurate.  increasing improves cpu usage. */

@@ -17,10 +17,6 @@ typedef enum aldl_state {
 
 typedef unsigned char byte;
 
-/* type for sequence numbers of records, etc */
-
-typedef unsigned long int aldl_seq;
-
 /* each data record will be associated with a static definition.  this will
    contain whatever is necessary to convert a raw stream, as well as interpret
    the converted data. */
@@ -57,6 +53,7 @@ typedef union aldl_data {
   float f;
   int i;
   unsigned int u;
+  byte raw;
 } aldl_data_t;
 
 /* definition of a record, which is a sequential linked-list type structure,
@@ -139,13 +136,9 @@ typedef struct aldl_conf {
 
 int aldl_reconnect(); /* go into diagnostic mode, returns 1 on success */
 
-int aldl_waitforchatter(); /* waits forever for a byte, then bails.  this is
-                              generally for autodetection of 'key on' or
-                              'key off' conditions. */
+int aldl_waitforchatter(); /* returns when idle traffic is detected */
 
 byte *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
-
-void printhexstring(byte *str, int length);
 
 /* serial comms-----------------------------------*/
 
@@ -154,8 +147,11 @@ void serial_close(); /* close the serial port */
 
 /* generally useful shit --------------------------*/
 
-/* compare a byte string n(eedle) in h(aystack) */
+/* compare a byte string n(eedle) in h(aystack), nonzero if found */
 int cmp_bytestring(byte *h, int hsize, byte *n, int nsize);
+
+/* print a string of bytes in hex format */
+void printhexstring(byte *str, int length);
 
 /*------- COMPLETE THESE FUNCTIONS ------------*/
 
@@ -184,6 +180,5 @@ int get_record_lock(aldl_record_t *r);
 /* link a detached record to the stream.  includes maintainance of the
    linked list within the records themselves, and counters. */
 void link_record(aldl_conf_t *c, aldl_record_t *r);
-
 
 #endif

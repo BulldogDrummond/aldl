@@ -13,8 +13,6 @@
 #include "config.h"
 #include "aldl-io.h"
 
-#define ALDL_VERBOSE
-
 /* number of attempts to shut up the ecm */
 int shutup_attempts;
 
