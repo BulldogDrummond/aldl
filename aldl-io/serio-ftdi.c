@@ -62,6 +62,9 @@ int serial_init_ftdi(char *port, int baud);
 /* special ftdi error handler, bails if errno<0.  could be macro. */
 void ftdierror(int loc,int errno);
 
+/* compare a byte string n(eedle) in h(aystack) */
+int cmp_bytestring(byte *h, int hsize, byte *n, int nsize);
+
 /****************FUNCTIONS**************************************/
 
 inline void msleep(int ms) {
@@ -223,11 +226,9 @@ inline int serial_read(byte *str, int len) {
 }
 
 int serial_listen(byte *str, int len, int max, int timeout) {
-  int chars_read = 0; /* functions as cursor */
-  int chars_in = 0;
+  int chars_read = 0; /* total chars read into buffer */
+  int chars_in = 0; /* chars added to buffer */
   int timespent = 0; /* estimation of time spent */
-  int matched = 0; /* how many chars have matched */
-  int cursor = 0; /* position of match cursor */
   byte *buf = malloc(max); /* buffer for incoming data */
   memset(buf,0,max);
   #ifdef SERIAL_VERBOSE
@@ -237,20 +238,14 @@ int serial_listen(byte *str, int len, int max, int timeout) {
   while(chars_read < max) {
     chars_in = serial_read(buf + chars_read,max - chars_read);
     if(chars_in > 0) {
-      while(cursor <= chars_read) {
-        cursor++;
-        if(str[matched] == buf[cursor]) { /* this is a match */
-           matched++;
-           if(matched == len) { /* matched all chars */
-             #ifdef SERIAL_VERBOSE
-             printf("STRING FOUND !!\n");
-             #endif
-             free(buf);
-             return(1);
-           };
-        } else { /* char didn't match, reset counter */
-          matched = 0; 
-        };
+      /* this could be improved, it keeps going back and comparing the
+         entire buffer .. */
+      if(cmp_bytestring(buf,chars_read,str,len) == 1) {
+        #ifdef SERIAL_VERBOSE
+        printf("BYTES MATCHED!\n");
+        #endif
+        free(buf);
+        return 1;
       };
       chars_read += chars_in; /* mv cursor */
     };
@@ -274,6 +269,24 @@ int serial_listen(byte *str, int len, int max, int timeout) {
   free(buf);
   return 0; /* got max chars with no result */
 }
+
+int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
+  if(nsize > hsize) return 0; /* needle is larger than haystack */
+  if(hsize < 1 || nsize < 1) return 0;
+  int cursor = 0; /* haystack compare cursor */
+  int matched = 0; /* needle compare cursor */
+  while(cursor <= hsize) {
+    if(nsize == matched) return 1;
+    if(h[cursor] != n[matched]) { /* reset match */
+      matched = 0;
+    } else {
+      printf("matched %i chars\n",matched);
+      matched++;
+    };
+    cursor++;
+  };
+  return 0;
+};
 
 void fatalerror(int errno, int errloc, char *errnotes) {
   fprintf(stderr,"FATAL ERROR: errno %i errloc %i\n",errno,errloc);
