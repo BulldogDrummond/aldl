@@ -155,8 +155,6 @@ int aldl_acq() {
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   aldl->state = ALDL_CONNECTED;
   printf("connection successful?... !\n");
-//  exit(1);
-  /* PERFORM ACQ ROUTINE HERE */
   while(1) {
   for(npkt=0;npkt < comm->n_packets;npkt++) {
     printf("acquiring packet %i\n",npkt);

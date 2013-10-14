@@ -23,19 +23,7 @@
 /* global ftdi context pointer */
 struct ftdi_context *ftdi;
 
-/* a structure containing runtime-configurable timing specifications */
-struct timing_t {
-  int sleepy; /* the delay between most other polls, and the timeout divisor */
-};
-struct timing_t timing;
-
 /***************FUNCTION DEFS************************************/
-
-/* configures the timing structure */
-void serial_set_timing();
-
-/* this sets misc. attribs for the serial port. */
-int serial_config_attrib(int fd);
 
 /* placeholder error handler. */
 void fatalerror(int errno, int errloc, char *errnotes);
@@ -62,20 +50,7 @@ int serial_init_ftdi(char *port, int baud);
 /* special ftdi error handler, bails if errno<0.  could be macro. */
 void ftdierror(int loc,int errno);
 
-/* compare a byte string n(eedle) in h(aystack) */
-int cmp_bytestring(byte *h, int hsize, byte *n, int nsize);
-
 /****************FUNCTIONS**************************************/
-
-inline void msleep(int ms) {
-  usleep(ms * 1000); /* just use usleep and convert from ms in unix */
-};
-
-void serial_set_timing() {
-  /* FIXME should actually import some stuff here. */
-  /* these are just some sane defaults */
-  timing.sleepy = 2; /* 2ms between iterations, and to make timeouts work */
-};
 
 int serial_init(char *port) {
   #ifdef SERIAL_VERBOSE
@@ -83,7 +58,6 @@ int serial_init(char *port) {
   printf("serial_init opening port @ %s with method ftdi\n",port);
   #endif
 
-  serial_set_timing();
   serial_init_ftdi(port,8192);
   ftdi_set_latency_timer(ftdi,2);
   return 0;
@@ -165,43 +139,6 @@ int serial_write(byte *str, int len) {
   return 0;
 }
 
-inline int serial_read_bytes(byte *str, int bytes, int timeout) {
-  int bytes_read = 0;
-  int timespent = 0;
-  #ifdef SERIAL_VERBOSE
-  printf("**START READ_BYTES %i bytes %i timeout ",bytes,timeout);
-  printhexstring(str,bytes);
-  #endif
-
-  do {
-    bytes_read += serial_read(str + bytes_read, bytes - bytes_read);
-    if(bytes_read >= bytes) {
-      #ifdef SERIAL_VERBOSE
-      printf("**END READ_BYTES: ");
-      printhexstring(str,bytes);
-      #endif
-      return 1;
-    }
-    msleep(timing.sleepy);
-    timespent += timing.sleepy; 
-  } while (timespent <= timeout);
-  #ifdef SERIAL_VERBOSE
-  printf("TIMEOUT TRYING TO READ %i BYTES, GOT: ",bytes);
-  printhexstring(str,bytes_read);
-  #endif
-  return 0;
-}
-
-inline int serial_skip_bytes(int bytes, int timeout) {
-  byte *buf = malloc(bytes);
-  int bytes_read = serial_read_bytes(buf,bytes,timeout);
-  #ifdef SERIAL_VERBOSE
-  printf("SKIP_BYTES: Discarded %i bytes.\n",bytes_read);
-  #endif
-  free(buf);
-  return bytes_read;
-}
-
 inline int serial_read(byte *str, int len) {
   /* check for null string or 0 length */
   if(str == NULL || len == 0) {
@@ -224,69 +161,6 @@ inline int serial_read(byte *str, int len) {
 
   return resp; /* return number of bytes read, or zero */
 }
-
-int serial_listen(byte *str, int len, int max, int timeout) {
-  int chars_read = 0; /* total chars read into buffer */
-  int chars_in = 0; /* chars added to buffer */
-  int timespent = 0; /* estimation of time spent */
-  byte *buf = malloc(max); /* buffer for incoming data */
-  memset(buf,0,max);
-  #ifdef SERIAL_VERBOSE
-  printf("LISTEN: ");
-  printhexstring(str,len);
-  #endif
-  while(chars_read < max) {
-    chars_in = serial_read(buf + chars_read,max - chars_read);
-    if(chars_in > 0) {
-      /* this could be improved, it keeps going back and comparing the
-         entire buffer .. */
-      if(cmp_bytestring(buf,chars_read,str,len) == 1) {
-        #ifdef SERIAL_VERBOSE
-        printf("BYTES MATCHED!\n");
-        #endif
-        free(buf);
-        return 1;
-      };
-      chars_read += chars_in; /* mv cursor */
-    };
-    /* timeout and throttling routine */
-    msleep(timing.sleepy); /* timing delay */
-    if(timeout > 0) { /* timeout is enabled, we arent waiting forever */
-      timespent += timing.sleepy; /* increment est. time */
-      if(timespent >= timeout) { /* timeout exceeded */
-        #ifdef SERIAL_VERBOSE
-        printf("LISTEN TIMEOUT\n");
-        #endif
-        free(buf);
-        return 0;
-      };
-    };
-  };
-  #ifdef SERIAL_VERBOSE
-  printf("STRING NOT FOUND, GOT: ");
-  printhexstring(buf,chars_read);
-  #endif
-  free(buf);
-  return 0; /* got max chars with no result */
-}
-
-int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
-  if(nsize > hsize) return 0; /* needle is larger than haystack */
-  if(hsize < 1 || nsize < 1) return 0;
-  int cursor = 0; /* haystack compare cursor */
-  int matched = 0; /* needle compare cursor */
-  while(cursor <= hsize) {
-    if(nsize == matched) return 1;
-    if(h[cursor] != n[matched]) { /* reset match */
-      matched = 0;
-    } else {
-      printf("matched %i chars\n",matched);
-      matched++;
-    };
-    cursor++;
-  };
-  return 0;
-};
 
 void fatalerror(int errno, int errloc, char *errnotes) {
   fprintf(stderr,"FATAL ERROR: errno %i errloc %i\n",errno,errloc);

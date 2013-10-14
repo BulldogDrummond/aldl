@@ -10,4 +10,9 @@
    an actual display interface */
 #define SERIAL_VERBOSE
 
+/* a static delay in milliseconds.  used for waiting in between grabbing
+   serial chunks, and for delay timers.  decreasing this value makes timeouts
+   more accurate.  increasing improves cpu usage. */
+#define SLEEPYTIME 2
+
 #endif

@@ -152,6 +152,11 @@ void printhexstring(byte *str, int length);
 int serial_init(char *port); /* initalize the serial if by port spec */
 void serial_close(); /* close the serial port */
 
+/* generally useful shit --------------------------*/
+
+/* compare a byte string n(eedle) in h(aystack) */
+int cmp_bytestring(byte *h, int hsize, byte *n, int nsize);
+
 /*------- COMPLETE THESE FUNCTIONS ------------*/
 
 /* get the next record, waiting until one is available.  takes a pointer to the
