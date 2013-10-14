@@ -2,7 +2,7 @@
 CFLAGS= -O0 -g -Wall
 LIBS= -lftdi
 
-all: ftdi
+all: aldl-io-ftdi.a
 
 serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
@@ -13,7 +13,7 @@ aldlcomm.o: serio-ftdi.o
 aldldata.o: aldldata.c aldlcomm.o
 	gcc $(CFLAGS) -c aldldata.c -o aldldata.o
 
-ftdi: serio-ftdi.o aldlcomm.o aldldata.o
+aldl-io-ftdi.a: serio-ftdi.o aldlcomm.o aldldata.o
 	ar rcs aldl-io-ftdi.a serio-ftdi.o aldlcomm.o aldldata.o
 
 clean:
