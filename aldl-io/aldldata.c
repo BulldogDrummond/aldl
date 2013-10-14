@@ -26,20 +26,6 @@ int get_definition_by_id(aldl_conf_t *c, char *id) {
   return -1;
 }
 
-/* get type casted and formatted output from a peice of data by its array
-   index.  this is the "safe" way to get data, but if you pick the wrong
-   type, a conversion is applied.  alternatively, typecast on the actual
-   data pointer. */
-int get_int_data(aldl_record_t *r, int i);
-unsigned int get_uint_data(aldl_record_t *r, int i);
-float get_float_data(aldl_record_t *r, int i);
-int get_bool_data(aldl_record_t *r, int i);
-
-/* per-record lock management.  this should be unnecessary if you're only
-   reading the newest record, unless your plugin is rediculously slow.. */
-void set_record_lock(aldl_record_t *r);
-void unset_record_lock(aldl_record_t *r);
-
 void link_record(aldl_conf_t *c, aldl_record_t *r) {
   /* prepare record for linking */
   //set_record_lock(r);
