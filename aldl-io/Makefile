@@ -4,13 +4,13 @@ LIBS= -lftdi
 
 all: ftdi
 
-serio-ftdi.o: serio-ftdi.c aldl-io.h
+serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
 
 aldlcomm.o: serio-ftdi.o
 	gcc $(CFLAGS) -c aldlcomm.c -o aldlcomm.o
 
-aldldata.o: aldldata.c
+aldldata.o: aldldata.c aldlcomm.o
 	gcc $(CFLAGS) -c aldldata.c -o aldldata.o
 
 ftdi: serio-ftdi.o aldlcomm.o aldldata.o
