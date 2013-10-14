@@ -63,9 +63,9 @@ int main() {
   load_config_b("/project/lt1.conf"); /* allocate and load stage b conf */
 
   /* FIXME this needs to come from load_config or switch to autodetct */
-  comm->serialport = "d:002/002";
+  char *serialport = "d:002/002";
 
-  serial_init(comm->serialport); /* init serial port */
+  serial_init(serialport); /* init serial port */
 
   /* ------- EVENT LOOP STUFF ------------------------*/
 
