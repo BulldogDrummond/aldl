@@ -25,6 +25,12 @@ int get_definition_by_id(aldl_conf_t *c, char *id);
 
 /* misc. useful functions ----------------------*/
 
+/* generate a checksum byte */
+byte checksum_generate(byte *buf, int len);
+
+/* test checksum byte of buf, 1 if ok */
+int checksum_test(byte *buf, int len);
+
 /* compare a byte string n(eedle) in h(aystack), nonzero if found */
 int cmp_bytestring(byte *h, int hsize, byte *n, int nsize);
 

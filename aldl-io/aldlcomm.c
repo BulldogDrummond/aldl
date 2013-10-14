@@ -224,6 +224,21 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
   return 0; /* got max chars with no result */
 }
 
+byte checksum_generate(byte *buf, int len) {
+  int x = 0;
+  unsigned int sum;
+  for(x=0;x<len;x++) sum += buf[x];
+  return ( 256 - ( sum % 256 ) );
+};
+
+int checksum_test(byte *buf, int len) {
+  int x = 0;
+  unsigned int sum;
+  for(x=0;x<len;x++) sum += buf[x];
+  if((sum & 0xFF ) == 0) return 1;
+  return 0;
+};
+
 inline void msleep(int ms) {
   usleep(ms * 1000); /* just use usleep and convert from ms in unix */
 };
