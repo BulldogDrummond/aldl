@@ -15,6 +15,15 @@ typedef enum aldl_state {
 
 typedef unsigned char byte;
 
+/* definition of a single multi-type data array member. */
+
+typedef union aldl_data {
+  float f;
+  int i;
+  unsigned int u;
+  byte raw;
+} aldl_data_t;
+
 /* each data record will be associated with a static definition.  this will
    contain whatever is necessary to convert a raw stream, as well as interpret
    the converted data. */
@@ -27,7 +36,7 @@ typedef struct aldl_define {
   aldl_datatype_t type; /* the OUTPUT type */
   unsigned int uom;     /* unit of measure */
   byte precision;       /* floating point display precision */
-  float min, max;       /* the low and high range of OUTPUT value */
+  aldl_data_t min, max;  /* the low and high range of OUTPUT value */
   /* ----- conversion ----------------------------------*/
   float adder;          /*  ... */
   float multiplier;     /*  ... */
@@ -41,20 +50,11 @@ typedef struct aldl_define {
   byte invert; /* invert (0 means set) */
 } aldl_define_t;
 
-/* definition of a single multi-type data array member. */
-
-typedef union aldl_data {
-  float f;
-  int i;
-  unsigned int u;
-  byte raw;
-} aldl_data_t;
-
 /* definition of a record, which is a sequential linked-list type structure,
    used as a container for a snapshot of data. */
 
 typedef struct aldl_record {
-  int lock;            /* semaphore-stype lock for garbage collection */
+  int lock :1;            /* lock bit, locks structure pointers only. */
   struct aldl_record *next; /* linked list traversal, newer record or NULL */
   struct aldl_record *prev; /* linked list traversal, older record or NULL */
   time_t t;            /* timestamp of the record */

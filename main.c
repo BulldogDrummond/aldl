@@ -45,17 +45,11 @@ void tmperror(char *str);
 #endif
 
 int main() {
-  #ifdef VERBLOSITY
-  printf("verblosity routine enabled in main\n");
-  printf("base aldl structure: %i bytes\n",(int)sizeof(aldl_conf_t));
-  printf("base comm structure: %i bytes\n",(int)sizeof(aldl_commdef_t));
-  #endif
-
   /* ------- SETUP AND LOAD CONFIG -------------------*/
 
   aldl_alloc(); /* perform initial allocations */
 
-  aldl->state = ALDL_CONNECTING;
+  aldl->state = ALDL_CONNECTING; /* initial connection state */
 
   load_config_a("/project/lt1.conf"); /* load 1st stage config */
 
