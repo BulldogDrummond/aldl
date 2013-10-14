@@ -181,10 +181,14 @@ void fallback_config() {
   sprintf(comm->ecmstring, "EE");
   comm->checksum_enable = 1;
   comm->pcm_address = 0xF4;
-  comm->idletraffic = "00";
+  comm->idletraffic = 0x00;
   comm->idledelay = 10;
   comm->chatterwait = 1;
-  comm->shutupcommand = "\xF4\x56\x08\xAE";
+  byte *tmp = malloc(4);
+  tmp[0] = comm->pcm_address;
+  tmp[1] = 0x56; tmp[2] = 0x08;
+  tmp[3] = checksum_generate(tmp,3);
+  comm->shutupcommand = tmp;
   comm->shutuplength = 4;
   comm->shutuptime = 3000;
   comm->shutupfailwait = 500;

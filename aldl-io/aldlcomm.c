@@ -226,16 +226,16 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
 
 byte checksum_generate(byte *buf, int len) {
   int x = 0;
-  unsigned int sum;
+  unsigned int sum = 0;
   for(x=0;x<len;x++) sum += buf[x];
   return ( 256 - ( sum % 256 ) );
 };
 
 int checksum_test(byte *buf, int len) {
   int x = 0;
-  unsigned int sum;
+  unsigned int sum = 0;
   for(x=0;x<len;x++) sum += buf[x];
-  if((sum & 0xFF ) == 0) return 1;
+  if(( sum & 0xFF ) == 0) return 1;
   return 0;
 };
 

@@ -12,7 +12,7 @@ configfile_:
 	cd configfile ; make ; cd ..
 
 aldl-io-ftdi:
-	cd aldl-io ; make ftdi ; cd ..
+	cd aldl-io ; make ; cd ..
 
 debugif_:
 	cd debugif ; make ; cd ..

@@ -20,6 +20,9 @@
 /* global ftdi context pointer */
 struct ftdi_context *ftdi;
 
+/* simple connection state status bit */
+byte ftdistatus;
+
 /***************FUNCTION DEFS************************************/
 
 /* placeholder error handler. */
@@ -49,8 +52,10 @@ void ftdierror(int loc,int errno);
 /****************FUNCTIONS**************************************/
 
 void serial_close() {
-  ftdi_usb_close(ftdi);
-  ftdi_free(ftdi);
+  if(ftdistatus > 0) {
+    ftdi_usb_close(ftdi);
+    ftdi_free(ftdi);
+  };
 }
 
 int serial_init(char *port) {
@@ -59,19 +64,24 @@ int serial_init(char *port) {
   printf("serial_init opening port @ %s with method ftdi\n",port);
   #endif
 
+  ftdistatus = 0;
+  int res = -1;
+
   /* new ftdi instance */
   if((ftdi = ftdi_new()) == NULL) {
     fatalerror(299,1,"ftdi_new failed");
   };
 
   if(port != NULL) { /* static device config */
-    ftdierror(2,ftdi_usb_open_string(ftdi,port)); /* trap error */
+    res = ftdi_usb_open_string(ftdi,port);
+    ftdierror(2,res); /* trap error */
   } else { /* autodetect mode */
     struct ftdi_device_list **devlist = NULL;
     int n_devices = ftdi_usb_find_all(ftdi,devlist,0,0);
     if(n_devices > 0) { /* device found */
       /* right now this just grabs the first available ftdi device .. */
-      ftdierror(2,ftdi_usb_open_dev(ftdi,devlist[0]->dev));
+      res = ftdi_usb_open_dev(ftdi,devlist[0]->dev);
+      ftdierror(2,res);
       ftdi_list_free(devlist);
     } else if(n_devices == 0) { /* nothing found */
       fatalerror(301,1,"no devices found, please connect your serial cable");
@@ -79,6 +89,8 @@ int serial_init(char *port) {
       fatalerror(302,1,"ftdi detection failed for some reason.");
     };
   };
+
+  if(res < 0) return 0;
 
   #ifdef SERIAL_VERBOSE
   printf("init ftdi userland driver appears sucessful...\n");
@@ -90,9 +102,8 @@ int serial_init(char *port) {
   /* set latency timer */
   ftdierror(3,ftdi_set_latency_timer(ftdi,2));
 
-  /* put connection state tracking here .*/
-
-  return 0;
+  ftdistatus = 1;
+  return 1;
 };
 
 void serial_purge() {
