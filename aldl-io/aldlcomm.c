@@ -9,9 +9,6 @@
 #include "config.h"
 #include "aldl-io.h"
 
-/* number of attempts to shut up the ecm */
-int shutup_attempts;
-
 typedef unsigned int sum_t;
 
 /* local functions -----*/
@@ -68,14 +65,14 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
 }
 
 int aldl_shutup(aldl_commdef_t *c) {
+  if(c->shutuprepeat == 0) return 1; /* no shutup necessary */
   serial_purge_rx(); /* pre-clear read buffer */
-  shutup_attempts = 1;
-  while(1) {
+  int x;
+  for(x=1;x<=c->shutuprepeat;x++) {
     aldl_send_shutup(c);
-    shutup_attempts++;
-    if(shutup_attempts > c->shutuprepeat) return 0;
     if(aldl_recv_shutup(c) == 1) return 1;
   };
+  return 0;
 }
 
 int aldl_send_shutup(aldl_commdef_t *c) {
