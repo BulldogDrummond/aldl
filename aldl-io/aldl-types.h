@@ -95,6 +95,7 @@ typedef struct aldl_commdef {
   byte *shutupcommand;     /* the shutup (disable comms) command */
   int shutuprepeat;        /* how many times to repeat a shutup request */
   int shutuprepeatdelay;   /* the delay, in ms, to delay in between requests */
+  byte *returncommand;     /* the "return to normal" command */
   /* ------- data packet requests -------- */
   int n_packets;             /* the number of packets of data */
   aldl_packetdef_t *packet;  /* the actual packet definitions */

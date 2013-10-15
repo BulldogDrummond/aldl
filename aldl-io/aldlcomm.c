@@ -46,6 +46,10 @@ int aldl_reconnect(aldl_commdef_t *c) {
   #endif
   /* reconnect runs in an infinite loop for now. */
   while(1) {
+    /* send a 'return to normal mode' command first ... */
+    serial_write(c->returncommand,SHUTUP_LENGTH);
+    msleep(50);
+    serial_purge();
     if(c->chatterwait == 1) {
       aldl_waitforchatter(c);
     } else {

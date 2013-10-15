@@ -214,6 +214,7 @@ void fallback_config() {
   comm->idledelay = 10;
   comm->chatterwait = 1;
   comm->shutupcommand = generate_shutup(0x56,0x08,comm);
+  comm->returncommand = generate_shutup(0x56,0x09,comm);
   comm->shutuprepeat = 3;
   comm->shutuprepeatdelay = 75;
   comm->n_packets = 3;
