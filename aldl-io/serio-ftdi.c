@@ -60,7 +60,6 @@ void serial_close() {
 
 int serial_init(char *port) {
   #ifdef SERIAL_VERBOSE
-  printf("verbosity in the serial handling routine is enabled.\n");
   printf("serial_init opening port @ %s with method ftdi\n",port);
   #endif
 

@@ -103,6 +103,7 @@ typedef struct aldl_commdef {
 
 typedef struct aldl_stats {
   unsigned int packetchecksumfail;
+  unsigned int packetheaderfail;
   unsigned int packetrecvtimeout;
   unsigned int failcounter;
   float packetspersecond;

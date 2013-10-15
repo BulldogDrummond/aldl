@@ -150,20 +150,19 @@ int aldl_acq() {
   #ifdef TRACK_PKTRATE
   time_t timestamp = time(NULL);
   int pktcounter = 0; 
+  int pktfail = 0;
   #endif
   int npkt = 0;
   aldl_packetdef_t *pkt = NULL;
-  ALDL_RECON:
-  aldl_reconnect(comm); /* this shouldn't return without a connection .. */
-  aldl->state = ALDL_CONNECTED;
-  #ifdef VERBLOSITY
-  printf("----- CONNECTION SUCCESSFUL -----\n");
-  #endif
+  aldl->state = ALDL_CONNECTING;
   while(1) {
-    for(npkt=0;npkt < comm->n_packets;npkt++) {
-      if(aldl->stats->failcounter > MAX_FAIL_DISCONNECT) {
-        aldl->state = ALDL_DESYNC;
-        goto ALDL_RECON; 
+    for(npkt=0;npkt < comm->n_packets;npkt++) { /* iterate through all pkts */
+      if(aldl->state != ALDL_CONNECTED) { /* if not connected, reconnect */
+        aldl_reconnect(comm);
+        aldl->state = ALDL_CONNECTED;
+        #ifdef VERBLOSITY
+        printf("----- RECONNETED ----------------\n");
+        #endif
       };
       #ifdef TRACK_PKTRATE
       if(time(NULL) - timestamp >= 5) {
@@ -172,40 +171,48 @@ int aldl_acq() {
         pktcounter = 0;
       };
       #endif
- 
       #ifdef VERBLOSITY
-      printf("acquiring packet %i - packet rate %f/sec\n",npkt,
+      printf("ACQUIRE pkt# %i @ rate %f/sec\n",npkt,
                     aldl->stats->packetspersecond);
       #endif
-      /* FIXME need some retry logic here, for both failed checksums and
-         dropped packets, that tie into connection state so we can tell when
-         sync is lost, and try to reconnect */
       pkt = &comm->packet[npkt];
+      pktfail = 0;
       if(aldl_get_packet(pkt) == NULL) { /* packet timeout or fail */
-        pkt->enable = 0;
         aldl->stats->packetrecvtimeout++;
-        aldl->stats->failcounter++;
         #ifdef VERBLOSITY
         printf("packet %i failed due to timeout...\n",npkt);
         #endif
-        if(pkt->retry == 1) npkt--;
+        continue;
+      };
+      if(pkt->data[0] != comm->pcm_address) { /* fail header */
+        aldl->stats->packetheaderfail++;
+        #ifdef VERBLOSITY
+        printf("header failed @ pkt %i...\n",npkt);
+        #endif
         continue;
       };
       if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
         aldl->stats->packetchecksumfail++;
-        aldl->stats->failcounter++;
-        pkt->enable = 0;
         #ifdef VERBLOSITY
         printf("checksum failed @ pkt %i...\n",npkt);
         #endif
-        if(pkt->retry == 1) npkt--;
         continue;
       };
-      pkt->enable = 1; /* data is good, and can be used */
-      #ifdef TRACK_PKTRATE
-      pktcounter++; /* increment packet counter */
-      #endif
-      aldl->stats->failcounter = 0; /* reset failcounter */
+      if(pktfail == 1) {
+        aldl->stats->failcounter++;
+        pkt->enable = 0;
+        if(pkt->retry == 1) npkt--;
+        /* if we aren't over our fail limit, just go on as normal .. */
+        if(aldl->stats->failcounter > MAX_FAIL_DISCONNECT) {
+          aldl->state = ALDL_DESYNC;
+        };
+      } else {
+        pkt->enable = 1; /* data is good, and can be used */
+        #ifdef TRACK_PKTRATE
+        pktcounter++; /* increment packet counter */
+        #endif
+        aldl->stats->failcounter = 0; /* reset failcounter */
+      };
     };
     /* process packets here */
     debugif_iterate(aldl);

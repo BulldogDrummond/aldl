@@ -72,7 +72,7 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("waiting for idle chatter to confirm key is on..\n");
   #endif
-  while(skip_bytes(1,50) == 0) msleep(500);
+  while(skip_bytes(1,50) == 0) msleep(50);
   #ifdef ALDL_VERBOSE
     printf("got idle chatter or something.\n");
   #endif
@@ -138,7 +138,7 @@ inline int read_bytes(byte *str, int bytes, int timeout) {
   int bytes_read = 0;
   int timespent = 0;
   #ifdef SERIAL_VERBOSE
-  printf("**READ_BYTES %i bytes %i timeout: ",bytes,timeout);
+  printf("**READ_BYTES %i bytes %i timeout : ",bytes,timeout);
   #endif
   do {
     bytes_read += serial_read(str + bytes_read, bytes - bytes_read);
