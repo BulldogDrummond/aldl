@@ -166,7 +166,7 @@ int aldl_acq() {
         goto ALDL_RECON; 
       };
       #ifdef TRACK_PKTRATE
-      if(time(NULL) - timestamp < 5) {
+      if(time(NULL) - timestamp >= 5) {
         aldl->stats->packetspersecond = pktcounter / 5;
         timestamp = time(NULL);
         pktcounter = 0;
