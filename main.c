@@ -107,6 +107,7 @@ int load_config_b(char *filename) {
   if(comm->packet == NULL) tmperror("out of memory 1055"); /* FIXME */
 
   /* !! get packet definitions here, or this flunks due to missing length */
+
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
   comm->packet[0].enable = 1;
@@ -115,8 +116,34 @@ int load_config_b(char *filename) {
   comm->packet[0].msg_mode = 0x01;
   comm->packet[0].commandlength = 5;
   comm->packet[0].offset = 3;
-  comm->packet[0].timer = 50;
   generate_pktcommand(&comm->packet[0],comm);
+  printf("generated packet 0 string: ");
+  printhexstring(comm->packet[0].command,5);
+  
+  /* a placeholder packet, lt1 msg 2 */
+  comm->packet[1].length = 57;
+  comm->packet[1].enable = 1;
+  comm->packet[1].id = 0x02;
+  comm->packet[1].msg_len = 0x57;
+  comm->packet[1].msg_mode = 0x01;
+  comm->packet[1].commandlength = 5;
+  comm->packet[1].offset = 3;
+  generate_pktcommand(&comm->packet[1],comm);
+  printf("generated packet 1 string: ");
+  printhexstring(comm->packet[1].command,5);
+
+  /* a placeholder packet, lt1 msg 4 */
+  comm->packet[2].length = 49;
+  comm->packet[2].enable = 1;
+  comm->packet[2].id = 0x04;
+  comm->packet[2].msg_len = 0x57;
+  comm->packet[2].msg_mode = 0x01;
+  comm->packet[2].commandlength = 5;
+  comm->packet[2].offset = 3;
+  generate_pktcommand(&comm->packet[2],comm);
+  printf("generated packet 2 string: ");
+  printhexstring(comm->packet[2].command,5);
+
 
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
@@ -146,18 +173,21 @@ int aldl_acq() {
       #ifdef VERBLOSITY
       printf("acquiring packet %i\n",npkt);
       #endif
+      /* FIXME need some retry logic here, for both failed checksums and
+         dropped packets, that tie into connection state so we can tell when
+         sync is lost, and try to reconnect */
       pkt = &comm->packet[npkt];
-      if(aldl_get_packet(pkt) == NULL) { /* timeout */
+      if(aldl_get_packet(pkt) == NULL) { /* packet timeout or fail */
         aldl->stats->packetrecvtimeout++;
         #ifdef VERBLOSITY
-        printf("timeout getting packet, dropped\n");
+        printf("packet failed due to timeout...\n",npkt);
         #endif
         continue;
       };
       if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
         aldl->stats->packetchecksumfail++;
         #ifdef VERBLOSITY
-        printf("checksum failed ...\n");
+        printf("checksum failed @ pkt %i...\n",npkt);
         #endif
         continue;
       };
@@ -183,15 +213,12 @@ void fallback_config() {
   sprintf(comm->ecmstring, "EE");
   comm->checksum_enable = 1;
   comm->pcm_address = 0xF4;
-  comm->idletraffic = 0x00;
   comm->idledelay = 10;
   comm->chatterwait = 1;
   comm->shutupcommand = generate_shutup(0x56,0x08,comm);
-  comm->shutupfailwait = 500;
-  comm->shutupcharlimit = 20;
   comm->shutuprepeat = 3;
   comm->shutuprepeatdelay = 75;
-  comm->n_packets = 1;
+  comm->n_packets = 3;
 }
 #endif
 

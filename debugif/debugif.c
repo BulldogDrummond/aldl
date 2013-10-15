@@ -8,7 +8,6 @@
 
 void debugif_loop(aldl_conf_t *c) {
   printf("-------DEBUG DISPLAY INTERFACE ACTIVE--------\n"); 
-  printhexstring("this is a test string",12);
 };
 
 void debugif_iterate(aldl_conf_t *c) {

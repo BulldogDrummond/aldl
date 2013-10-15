@@ -25,4 +25,8 @@
 /* FIXME this might not be good for other ECMS */
 #define SHUTUP_LENGTH 4
 
+/* the maximum number of ftdi devices attached to a system, it'll puke if more
+   than this number of devices is found ... */
+#define FTDI_AUTO_MAXDEVS 100
+
 #endif
