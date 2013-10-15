@@ -51,7 +51,15 @@ int aldl_reconnect(aldl_commdef_t *c) {
     } else {
       msleep(c->idledelay);
     };
-    if(aldl_shutup(c) == 1) return 1;
+    if(aldl_shutup(c) == 1) {
+      /* a delay here seems necessary ... */
+      msleep(50);
+      serial_purge();
+      return 1;
+    } else { /* shutup request failed */
+      msleep(50);
+      serial_purge();
+    };
   };
   return 0;
 }
@@ -72,7 +80,7 @@ int aldl_request(byte *pkt, int len) {
   serial_purge();
   serial_write(pkt,len);
   msleep(aldl_timeout(len));
-  int result = listen_bytes(pkt,len,len*2,aldl_timeout(len));
+  int result = listen_bytes(pkt,len,len,aldl_timeout(len));
   #ifdef ALDL_VERBOSE
     printf("response success: %i\n",result);
   #endif
