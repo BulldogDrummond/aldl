@@ -138,19 +138,27 @@ int aldl_acq() {
   aldl_packetdef_t *pkt = NULL;
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   aldl->state = ALDL_CONNECTED;
+  #ifdef VERBLOSITY
   printf("connection successful?... !\n");
+  #endif
   while(1) {
     for(npkt=0;npkt < comm->n_packets;npkt++) {
+      #ifdef VERBLOSITY
       printf("acquiring packet %i\n",npkt);
+      #endif
       pkt = &comm->packet[npkt];
       if(aldl_get_packet(pkt) == NULL) { /* timeout */
         aldl->stats->packetrecvtimeout++;
+        #ifdef VERBLOSITY
         printf("timeout getting packet, dropped\n");
+        #endif
         continue;
       };
       if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
         aldl->stats->packetchecksumfail++;
+        #ifdef VERBLOSITY
         printf("checksum failed ...\n");
+        #endif
         continue;
       };
       /* process the packet here */
