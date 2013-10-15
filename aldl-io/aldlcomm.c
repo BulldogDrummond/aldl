@@ -13,11 +13,15 @@ typedef unsigned int sum_t;
 
 /* local functions -----*/
 int aldl_shutup(); /* repeatedly attempt to make the ecm shut up */
-int aldl_send_shutup(); /* send shutup requests, returns 1 all the time */
-int aldl_recv_shutup(); /* wait for shutup response, returns 1 on success */
+
 int aldl_waitforchatter(); /* waits forever for a byte, then bails */
 
-/* serial wrappers -----------------------*/
+int aldl_timeout(int len); /* figure out a timeout period */
+
+/* sends a request, delays for a calculated time, and waits for an echo.  if
+   the request is successful, returns 1, otherwise 0. */
+int aldl_request(byte *pkt, int len);
+
 /* read the number of bytes specified, into str.  waits until the correct
    number of bytes were read, and returns 1, or the timeout (in ms)
    has expired, and returns 0. */
@@ -56,7 +60,6 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("waiting for idle chatter to confirm key is on..\n");
   #endif
-  /* FIXME this should be tuneable */
   while(skip_bytes(1,50) == 0) msleep(500);
   #ifdef ALDL_VERBOSE
     printf("got idle chatter or something.\n");
@@ -65,55 +68,41 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
   return 1;
 }
 
-int aldl_shutup(aldl_commdef_t *c) {
-  if(c->shutuprepeat == 0) return 1; /* no shutup necessary */
-  serial_purge_rx(); /* pre-clear read buffer */
-  int x;
-  for(x=1;x<=c->shutuprepeat;x++) aldl_send_shutup(c);
-  if(aldl_recv_shutup(c) == 1) {
-    return 1;
-  }
-  return 0;
-}
-
-int aldl_send_shutup(aldl_commdef_t *c) {
-  int x;
-  for(x=0;x<c->shutuprepeat;x++) {
-    #ifdef ALDL_VERBOSE
-      printf("sending shutup request %i\n",x + 1);
-    #endif
-    serial_write(c->shutupcommand,SHUTUP_LENGTH);
-    msleep(c->shutuprepeatdelay);
-  };
-  return 1;
-}
-
-int aldl_recv_shutup(aldl_commdef_t *c){
-  /* the pcm should echo the string on success, then wait. */
-  #ifdef ALDL_VERBOSE
-    printf("waiting for response...\n");
-  #endif
-  int result = listen_bytes(c->shutupcommand,SHUTUP_LENGTH,
-               c->shutupcharlimit,
-               c->shutupfailwait);
+int aldl_request(byte *pkt, int len) {
+  serial_purge();
+  serial_write(pkt,len);
+  msleep(aldl_timeout(len));
+  int result = listen_bytes(pkt,len,len*2,aldl_timeout(len));
   #ifdef ALDL_VERBOSE
     printf("response success: %i\n",result);
   #endif
   return result;
 }
 
+int aldl_timeout(int len) {
+  int timeout = len + 5;
+  if(timeout < SLEEPYTIME) timeout = SLEEPYTIME * 2;
+  return(timeout);
+}
+
+int aldl_shutup(aldl_commdef_t *c) {
+  if(c->shutuprepeat == 0) return 1; /* no shutup necessary */
+  int x;
+  for(x=1;x<=c->shutuprepeat;x++) {
+    if(aldl_request(c->shutupcommand,SHUTUP_LENGTH) == 1) return 1;
+  }
+  return 0;
+}
+
 byte *aldl_get_packet(aldl_packetdef_t *p) {
-  serial_purge_rx();
-  serial_write(p->command, p->commandlength);
-  msleep(p->timer); /* wait for packet generation */
+  if(aldl_request(p->command, p->commandlength) == 0) return NULL;
   /* get actual data */
-  /* note that this may theoretically take timer * 2 msec to actually fail,
-     if the packet isn't actually complete.  that's ok, though. */
-  if(read_bytes(p->data, p->length, p->timer) == 0) {
+  if(read_bytes(p->data, p->length, aldl_timeout(p->length)) == 0) {
     /* failed to get data */
-    //memset(p->data,0,p->length);
+    memset(p->data,0,p->length);
     return NULL;
   }
+  return p->data;
 }
 
 int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
@@ -126,7 +115,6 @@ int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
     if(h[cursor] != n[matched]) { /* reset match */
       matched = 0;
     } else {
-      printf("matched %i chars\n",matched);
       matched++;
     };
     cursor++;
@@ -141,7 +129,6 @@ inline int read_bytes(byte *str, int bytes, int timeout) {
   printf("**START READ_BYTES %i bytes %i timeout ",bytes,timeout);
   printhexstring(str,bytes);
   #endif
-
   do {
     bytes_read += serial_read(str + bytes_read, bytes - bytes_read);
     if(bytes_read >= bytes) {
@@ -184,16 +171,15 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
   while(chars_read < max) {
     chars_in = serial_read(buf + chars_read,max - chars_read);
     if(chars_in > 0) {
-      /* this could be improved, it keeps going back and comparing the
-         entire buffer .. */
+      chars_read += chars_in; /* mv cursor */
       if(cmp_bytestring(buf,chars_read,str,len) == 1) {
         #ifdef SERIAL_VERBOSE
-        printf("BYTES MATCHED!\n");
+        printf(" FOUND.\n");
+        printhexstring(str,len);
         #endif
         free(buf);
         return 1;
       };
-      chars_read += chars_in; /* mv cursor */
     };
     /* timeout and throttling routine */
     msleep(SLEEPYTIME); /* timing delay */
