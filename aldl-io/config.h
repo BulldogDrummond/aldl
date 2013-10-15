@@ -22,6 +22,14 @@
 /* the baud rate to set for the ftdi usb userland driver.  reccommend 8192. */
 #define FTDI_BAUD 8192
 
+/* a constant theoretical amount of bytes per millisecond that can be
+   moved at the baud rate; generally 1 / baud * 1000 */
+#define SERIAL_BYTES_PER_MS 0.98
+
+/* a theoretical maximum multiplier per byte that the ECM may take to generate
+   data under any circumstance ... */
+#define ECMLAGTIME 0.45
+
 /* length of an aldl mode change request string */
 /* FIXME this might not be good for other ECMS */
 #define SHUTUP_LENGTH 4
