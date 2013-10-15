@@ -21,6 +21,7 @@ clean:
 	rm -f *.o aldl-ftdi
 	cd aldl-io ; make clean ; cd ..
 	cd configfile ; make clean ; cd ..
+	cd debugif ; make clean ; cd ..
 
 stats:
 	wc -l *.c *.h */*.c */*.h
