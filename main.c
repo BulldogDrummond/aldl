@@ -2,6 +2,7 @@
 #include <string.h>
 #include <malloc.h>
 #include <stdlib.h>
+#include <time.h>
 
 /* local objects */
 #include "config.h"
@@ -146,6 +147,10 @@ int load_config_b(char *filename) {
 }
 
 int aldl_acq() {
+  #ifdef TRACK_PKTRATE
+  time_t timestamp = time(NULL);
+  int pktcounter = 0; 
+  #endif
   int npkt = 0;
   aldl_packetdef_t *pkt = NULL;
   ALDL_RECON:
@@ -160,8 +165,17 @@ int aldl_acq() {
         aldl->state = ALDL_DESYNC;
         goto ALDL_RECON; 
       };
+      #ifdef TRACK_PKTRATE
+      if(time(NULL) - timestamp < 5) {
+        aldl->stats->packetspersecond = pktcounter / 5;
+        timestamp = time(NULL);
+        pktcounter = 0;
+      };
+      #endif
+ 
       #ifdef VERBLOSITY
-      printf("acquiring packet %i\n",npkt);
+      printf("acquiring packet %i - packet rate %f/sec\n",npkt,
+                    aldl->stats->packetspersecond);
       #endif
       /* FIXME need some retry logic here, for both failed checksums and
          dropped packets, that tie into connection state so we can tell when
@@ -188,6 +202,9 @@ int aldl_acq() {
         continue;
       };
       pkt->enable = 1; /* data is good, and can be used */
+      #ifdef TRACK_PKTRATE
+      pktcounter++; /* increment packet counter */
+      #endif
       aldl->stats->failcounter = 0; /* reset failcounter */
     };
     /* process packets here */

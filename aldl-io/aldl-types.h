@@ -105,6 +105,7 @@ typedef struct aldl_stats {
   unsigned int packetchecksumfail;
   unsigned int packetrecvtimeout;
   unsigned int failcounter;
+  float packetspersecond;
 } aldl_stats_t;
 
 /* an info structure defining aldl communications and data mgmt */
