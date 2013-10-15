@@ -80,7 +80,9 @@ int aldl_request(byte *pkt, int len) {
 }
 
 int aldl_timeout(int len) {
-  int timeout = ( len * 1.5 ) + 2;
+  /* 8192 baud is 122 theoretical bits/us, *8 = 976us per byte.
+     the ECM may take more time than that to actually generate the traffic. */
+  int timeout = ( len * 1.3 ) + 5;
   if(timeout < SLEEPYTIME) timeout = SLEEPYTIME * 2;
   return(timeout);
 }
