@@ -28,7 +28,7 @@
 
 /* a theoretical maximum multiplier per byte that the ECM may take to generate
    data under any circumstance ... */
-#define ECMLAGTIME 0.45
+#define ECMLAGTIME 0.35
 
 /* length of an aldl mode change request string */
 /* FIXME this might not be good for other ECMS */

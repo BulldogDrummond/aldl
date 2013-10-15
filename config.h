@@ -7,3 +7,7 @@
 /* build in preproduction code */
 
 #define PREPRODUCTION
+
+/* the maximum failed packets before the connection is marked failed */
+#define MAX_FAIL_DISCONNECT 6
+

@@ -74,9 +74,6 @@ int main() {
 }
 
 int aldl_alloc() {
-#ifdef VERBLOSITY
-  printf("performing initial allocation\n");
-#endif
   aldl = malloc(sizeof(aldl_conf_t));
   if(aldl == NULL) tmperror("out of memory 1055"); /* FIXME */
   memset(aldl,0,sizeof(aldl_conf_t));
@@ -91,17 +88,10 @@ int aldl_alloc() {
 }
 
 int load_config_a(char *filename) {
-#ifdef VERBLOSITY
-  printf("load stage a config\n");
-#endif
-
   return 0;
 }
 
 int load_config_b(char *filename) {
-#ifdef VERBLOSITY
-  printf("load stage b config\n");
-#endif
   /* allocate space to store packet definitions */
   comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
   if(comm->packet == NULL) tmperror("out of memory 1055"); /* FIXME */
@@ -116,6 +106,7 @@ int load_config_b(char *filename) {
   comm->packet[0].msg_mode = 0x01;
   comm->packet[0].commandlength = 5;
   comm->packet[0].offset = 3;
+  comm->packet[0].retry = 1;
   generate_pktcommand(&comm->packet[0],comm);
   
   /* a placeholder packet, lt1 msg 2 */
@@ -126,6 +117,7 @@ int load_config_b(char *filename) {
   comm->packet[1].msg_mode = 0x01;
   comm->packet[1].commandlength = 5;
   comm->packet[1].offset = 3;
+  comm->packet[1].retry = 1;
   generate_pktcommand(&comm->packet[1],comm);
 
   /* a placeholder packet, lt1 msg 4 */
@@ -136,6 +128,7 @@ int load_config_b(char *filename) {
   comm->packet[2].msg_mode = 0x01;
   comm->packet[2].commandlength = 5;
   comm->packet[2].offset = 3;
+  comm->packet[2].retry = 1;
   generate_pktcommand(&comm->packet[2],comm);
 
   int x = 0;
@@ -155,6 +148,7 @@ int load_config_b(char *filename) {
 int aldl_acq() {
   int npkt = 0;
   aldl_packetdef_t *pkt = NULL;
+  ALDL_RECON:
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   aldl->state = ALDL_CONNECTED;
   #ifdef VERBLOSITY
@@ -162,6 +156,10 @@ int aldl_acq() {
   #endif
   while(1) {
     for(npkt=0;npkt < comm->n_packets;npkt++) {
+      if(aldl->stats->failcounter > MAX_FAIL_DISCONNECT) {
+        aldl->state = ALDL_DESYNC;
+        goto ALDL_RECON; 
+      };
       #ifdef VERBLOSITY
       printf("acquiring packet %i\n",npkt);
       #endif
@@ -172,22 +170,27 @@ int aldl_acq() {
       if(aldl_get_packet(pkt) == NULL) { /* packet timeout or fail */
         pkt->enable = 0;
         aldl->stats->packetrecvtimeout++;
+        aldl->stats->failcounter++;
         #ifdef VERBLOSITY
         printf("packet %i failed due to timeout...\n",npkt);
         #endif
+        if(pkt->retry == 1) npkt--;
         continue;
       };
       if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
         aldl->stats->packetchecksumfail++;
+        aldl->stats->failcounter++;
         pkt->enable = 0;
         #ifdef VERBLOSITY
         printf("checksum failed @ pkt %i...\n",npkt);
         #endif
+        if(pkt->retry == 1) npkt--;
         continue;
       };
       pkt->enable = 1; /* data is good, and can be used */
-      /* process the packet here */
+      aldl->stats->failcounter = 0; /* reset failcounter */
     };
+    /* process packets here */
     debugif_iterate(aldl);
   };
   return 0;
