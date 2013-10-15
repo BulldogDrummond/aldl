@@ -70,10 +70,6 @@ typedef struct aldl_packetdef {
   byte msg_len;    /* message length byte */
   byte msg_mode;   /* message mode */
   int length;     /* how long the packet is, overall, including the header */
-  int timer;      /* a value in milliseconds.  this should specify a maximum
-                     theoretical time that it takes, in total, for the request
-                     to be processed, and the ecm to become ready for the next
-                     request. */
   byte *command;  /* the command string sent to retrieve the packet */
   int commandlength; /* length of the command string in bytes */
   int offset;        /* the offset of the data in bytes, aka header size */
@@ -93,14 +89,10 @@ typedef struct aldl_commdef {
   int chatterwait;         /* 1 enables chatter checking.  if this is
                               disabled, it'll immediately and constanty
                               send shutup requests. */
-  byte *idletraffic;       /* a known portion of idle traffic, or NULL */
   int idledelay;           /* a ms delay at the end of idle traffic, before
                               sending shutup requests, or 0 */
   /* ------- shutup related stuff -------- */
   byte *shutupcommand;     /* the shutup (disable comms) command */
-  int shutupfailwait;      /* how long to wait for shutup reply before fail */
-  int shutupcharlimit;     /* after recieving this many chars, the shutup
-                              request has obviously failed. */
   int shutuprepeat;        /* how many times to repeat a shutup request */
   int shutuprepeatdelay;   /* the delay, in ms, to delay in between requests */
   /* ------- data packet requests -------- */
