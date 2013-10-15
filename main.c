@@ -110,7 +110,7 @@ int load_config_b(char *filename) {
 
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
-  comm->packet[0].enable = 1;
+  comm->packet[0].enable = 0;
   comm->packet[0].id = 0x00;
   comm->packet[0].msg_len = 0x57;
   comm->packet[0].msg_mode = 0x01;
@@ -120,7 +120,7 @@ int load_config_b(char *filename) {
   
   /* a placeholder packet, lt1 msg 2 */
   comm->packet[1].length = 57;
-  comm->packet[1].enable = 1;
+  comm->packet[1].enable = 0;
   comm->packet[1].id = 0x02;
   comm->packet[1].msg_len = 0x57;
   comm->packet[1].msg_mode = 0x01;
@@ -130,7 +130,7 @@ int load_config_b(char *filename) {
 
   /* a placeholder packet, lt1 msg 4 */
   comm->packet[2].length = 49;
-  comm->packet[2].enable = 1;
+  comm->packet[2].enable = 0;
   comm->packet[2].id = 0x04;
   comm->packet[2].msg_len = 0x57;
   comm->packet[2].msg_mode = 0x01;
@@ -153,7 +153,6 @@ int load_config_b(char *filename) {
 }
 
 int aldl_acq() {
-  /* this is a broken routine that should be used for testing only. */
   int npkt = 0;
   aldl_packetdef_t *pkt = NULL;
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
@@ -171,6 +170,7 @@ int aldl_acq() {
          sync is lost, and try to reconnect */
       pkt = &comm->packet[npkt];
       if(aldl_get_packet(pkt) == NULL) { /* packet timeout or fail */
+        pkt->enable = 0;
         aldl->stats->packetrecvtimeout++;
         #ifdef VERBLOSITY
         printf("packet %i failed due to timeout...\n",npkt);
@@ -179,11 +179,13 @@ int aldl_acq() {
       };
       if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
         aldl->stats->packetchecksumfail++;
+        pkt->enable = 0;
         #ifdef VERBLOSITY
         printf("checksum failed @ pkt %i...\n",npkt);
         #endif
         continue;
       };
+      pkt->enable = 1; /* data is good, and can be used */
       /* process the packet here */
     };
     debugif_iterate(aldl);
