@@ -136,7 +136,7 @@ int serial_write(byte *str, int len) {
     #endif
     return 1;
   };
-  #ifdef SERIAL_VERBOSE
+  #ifdef SERIAL_SUPERVERBOSE
   printf("WRITE: ");
   printhexstring(str,len);
   #endif
@@ -156,7 +156,7 @@ inline int serial_read(byte *str, int len) {
   int resp = 0; /* to store response from whatever read */
   resp = ftdi_read_data(ftdi,(unsigned char *)str,len);
   ftdierror(22,resp); /* this will break if resp<0 */
-  #ifdef SERIAL_VERBOSE
+  #ifdef SERIAL_SUPERVERBOSE
   if(resp > 0) {
     printf("READ %i of %i bytes: ",resp,len);
     printhexstring(str,resp);

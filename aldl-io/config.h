@@ -9,6 +9,7 @@
 /* spits a bunch of random shit out on stdout.  probably disable when using
    an actual display interface */
 #define SERIAL_VERBOSE
+//#define SERIAL_SUPERVERBOSE
 
 /* verbose aldl comm routines on stdout */
 #define ALDL_VERBOSE
