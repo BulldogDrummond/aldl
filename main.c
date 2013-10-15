@@ -173,7 +173,7 @@ int aldl_acq() {
       if(aldl_get_packet(pkt) == NULL) { /* packet timeout or fail */
         aldl->stats->packetrecvtimeout++;
         #ifdef VERBLOSITY
-        printf("packet failed due to timeout...\n",npkt);
+        printf("packet %i failed due to timeout...\n",npkt);
         #endif
         continue;
       };
