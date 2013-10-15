@@ -108,6 +108,11 @@ typedef struct aldl_commdef {
   aldl_packetdef_t *packet;  /* the actual packet definitions */
 } aldl_commdef_t;
 
+typedef struct aldl_stats {
+  unsigned int packetchecksumfail;
+  unsigned int packetrecvtimeout;
+} aldl_stats_t;
+
 /* an info structure defining aldl communications and data mgmt */
 
 typedef struct aldl_conf {
@@ -118,6 +123,7 @@ typedef struct aldl_conf {
   aldl_define_t *def; /* link to the definition set */
   aldl_record_t *r; /* link to the latest record */
   aldl_commdef_t *comm; /* link back to the communication spec */
+  aldl_stats_t *stats;   /* statistics */
 } aldl_conf_t;
 
 #endif

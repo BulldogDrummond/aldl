@@ -111,11 +111,9 @@ byte *aldl_get_packet(aldl_packetdef_t *p) {
      if the packet isn't actually complete.  that's ok, though. */
   if(read_bytes(p->data, p->length, p->timer) == 0) {
     /* failed to get data */
-    memset(p->data,0,p->length);
+    //memset(p->data,0,p->length);
     return NULL;
   }
-  /* got data */
-  return p->data;
 }
 
 int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
@@ -251,7 +249,6 @@ byte *generate_shutup(byte len, byte mode, aldl_commdef_t *comm) {
   tmp[3] = checksum_generate(tmp,SHUTUP_LENGTH - 1);
   return tmp;
 };
-
 
 inline void msleep(int ms) {
   usleep(ms * 1000); /* just use usleep and convert from ms in unix */

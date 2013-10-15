@@ -79,9 +79,14 @@ int aldl_alloc() {
 #endif
   aldl = malloc(sizeof(aldl_conf_t));
   if(aldl == NULL) tmperror("out of memory 1055"); /* FIXME */
+  memset(aldl,0,sizeof(aldl_conf_t));
   comm = malloc(sizeof(aldl_commdef_t));
   if(comm == NULL) tmperror("out of memory 1055"); /* FIXME */
+  memset(comm,0,sizeof(aldl_commdef_t));
   aldl->comm = comm; /* link */
+  aldl->stats = malloc(sizeof(aldl_stats_t));
+  if(aldl->stats == NULL) tmperror("out of memory 1056");
+  memset(aldl->stats,0,sizeof(aldl_stats_t));
   return 0;
 }
 
@@ -135,12 +140,22 @@ int aldl_acq() {
   aldl->state = ALDL_CONNECTED;
   printf("connection successful?... !\n");
   while(1) {
-  for(npkt=0;npkt < comm->n_packets;npkt++) {
-    printf("acquiring packet %i\n",npkt);
-    pkt = &comm->packet[npkt];
-    aldl_get_packet(pkt);
-  };
-  debugif_iterate(aldl);
+    for(npkt=0;npkt < comm->n_packets;npkt++) {
+      printf("acquiring packet %i\n",npkt);
+      pkt = &comm->packet[npkt];
+      if(aldl_get_packet(pkt) == NULL) { /* timeout */
+        aldl->stats->packetrecvtimeout++;
+        printf("timeout getting packet, dropped\n");
+        continue;
+      };
+      if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
+        aldl->stats->packetchecksumfail++;
+        printf("checksum failed ...\n");
+        continue;
+      };
+      /* process the packet here */
+    };
+    debugif_iterate(aldl);
   };
   return 0;
 }
