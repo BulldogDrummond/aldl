@@ -31,8 +31,8 @@ inline int read_bytes(byte *str, int bytes, int timeout);
    ignoring a known-length string of bytes. */
 inline int skip_bytes(int bytes, int timeout);
 
-/* listen for something.  it must match str exactly, if str is non-null.
-   len is the length of str if it is known, or not null terminated. */
+/* look for str in the serial stream up to a length of max, or a time of
+   timeout. */
 int listen_bytes(byte *str, int len, int max, int timeout);
 
 /* sleep for ms milliseconds */
