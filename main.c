@@ -117,8 +117,6 @@ int load_config_b(char *filename) {
   comm->packet[0].commandlength = 5;
   comm->packet[0].offset = 3;
   generate_pktcommand(&comm->packet[0],comm);
-  printf("generated packet 0 string: ");
-  printhexstring(comm->packet[0].command,5);
   
   /* a placeholder packet, lt1 msg 2 */
   comm->packet[1].length = 57;
@@ -129,8 +127,6 @@ int load_config_b(char *filename) {
   comm->packet[1].commandlength = 5;
   comm->packet[1].offset = 3;
   generate_pktcommand(&comm->packet[1],comm);
-  printf("generated packet 1 string: ");
-  printhexstring(comm->packet[1].command,5);
 
   /* a placeholder packet, lt1 msg 4 */
   comm->packet[2].length = 49;
@@ -141,9 +137,6 @@ int load_config_b(char *filename) {
   comm->packet[2].commandlength = 5;
   comm->packet[2].offset = 3;
   generate_pktcommand(&comm->packet[2],comm);
-  printf("generated packet 2 string: ");
-  printhexstring(comm->packet[2].command,5);
-
 
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
@@ -166,7 +159,7 @@ int aldl_acq() {
   aldl_reconnect(comm); /* this shouldn't return without a connection .. */
   aldl->state = ALDL_CONNECTED;
   #ifdef VERBLOSITY
-  printf("connection successful?... !\n");
+  printf("----- CONNECTION SUCCESSFUL -----\n");
   #endif
   while(1) {
     for(npkt=0;npkt < comm->n_packets;npkt++) {
