@@ -80,7 +80,7 @@ int aldl_request(byte *pkt, int len) {
 }
 
 int aldl_timeout(int len) {
-  int timeout = len + 5;
+  int timeout = ( len * 1.5 ) + 2;
   if(timeout < SLEEPYTIME) timeout = SLEEPYTIME * 2;
   return(timeout);
 }
