@@ -167,8 +167,8 @@ int aldl_acq(aldl_conf_t *aldl) {
       pktcounter++; /* increment packet counter */
       #endif
       aldl->stats->failcounter = 0; /* reset failcounter */
+      /* process packet here ?? */
     };
-    /* process packets here maybe ? */
     debugif_iterate(aldl);
   };
   return 0;
