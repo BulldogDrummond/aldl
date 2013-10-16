@@ -52,7 +52,11 @@ int aldl_acq(aldl_conf_t *aldl) {
 
   /* ---- event loop header -----  until ALDL_QUIT connection state is set,
      iterate through all packets in sequence. */
+  #ifdef ALDL_MULTIPACKET
   while(aldl->state != ALDL_QUIT) for(npkt=0;npkt < comm->n_packets;npkt++) {
+  #else
+  npkt = 0; while(aldl->state != ALDL_QUIT) {
+  #endif
 
     /* detect a necessary retry, and step back iterator */
     if(pktfail == 1) {
