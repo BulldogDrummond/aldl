@@ -14,5 +14,8 @@
 /* track packet retrieval rate */
 #define TRACK_PKTRATE
 
+/* number of seconds to average retrieval rate.  reccommend at least 5. */
+#define PKTRATE_DURATION 7
+
 /* extra check for bad message header.  checksum should be sufficient.. */
 #define CHECK_HEADER_SANITY

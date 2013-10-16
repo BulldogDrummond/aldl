@@ -8,7 +8,8 @@ typedef enum aldl_datatype {
 } aldl_datatype_t;
 
 typedef enum aldl_state {
-  ALDL_CONNECTED, ALDL_CONNECTING, ALDL_LOADING, ALDL_DESYNC, ALDL_ERROR
+  ALDL_CONNECTED, ALDL_CONNECTING, ALDL_LOADING,
+  ALDL_DESYNC, ALDL_ERROR, ALDL_QUIT
 } aldl_state_t;
 
 /* 8-bit chunk of data */
@@ -73,7 +74,7 @@ typedef struct aldl_packetdef {
   int commandlength; /* length of the command string in bytes */
   int offset;        /* the offset of the data in bytes, aka header size */
   int retry;        /* set to 1 to retry on failed retrieve */
-  int frequency;    /* retrieval frequency in iterations to skip */
+  int frequency;    /* retrieval frequency, or 0 to disable packet */
   byte *data;     /* pointer to the raw data buffer */
 } aldl_packetdef_t;
 

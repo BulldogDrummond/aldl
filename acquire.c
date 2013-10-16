@@ -21,11 +21,13 @@ int aldl_acq(aldl_conf_t *aldl) {
   int pktfail = 0; /* marker for a failed packet in event loop */
   int npkt = 0; /* array index of packet to operate on */
 
-  /* prepare array for packet retrieval frequency */
+  /* prepare array for packet retrieval frequency tracking */
   int *freq_counter = malloc(sizeof(int) * comm->n_packets);
   int freq_init;
   for(freq_init=0;freq_init < comm->n_packets; freq_init++) {
-    freq_counter[freq_init] = 1;
+    /* if we init the frequency with freq max, that will ensure that each
+       packet is iterated once at the beginning of the acq. routine */
+    freq_counter[freq_init] = comm->packet[npkt].frequency;
   };
 
   /* config vars and get initial stamp if packet rate tracking is enabled */
@@ -37,11 +39,12 @@ int aldl_acq(aldl_conf_t *aldl) {
   /* intial connection state */
   aldl->state = ALDL_CONNECTING;
 
-  /* this should be fine as an infinite loop ... */
-  while(1) {
+  /* if the connection state gets set to quit, end the infinite loop.  not
+     sure where a good place to set this would be anyway ... */
+  while(aldl->state != ALDL_QUIT) {
 
-    /* iterate through all of the packets sequentially */
-    for(npkt=0;npkt < comm->n_packets;npkt++) {
+  /* iterate through all of the packets sequentially */
+  for(npkt=0;npkt < comm->n_packets;npkt++) {
 
     /* detect a necessary retry, and step back iterator */
     if(pktfail == 1) {
@@ -53,36 +56,34 @@ int aldl_acq(aldl_conf_t *aldl) {
       pktfail = 0; /* reset fail marker */
       /* note that *pkt will have persisted from last iteration */
     } else {  /* retry skips the frequency selector */
-      /* ---- frequency select routine ---- */
-      if(comm->packet[npkt].frequency == 0) {
-        continue; /* skip packet if frequency is 0 */
-      };
+
+    /* ---- frequency select routine ---- */
+      /* skip packet if frequency is 0 to match spec */
+      if(comm->packet[npkt].frequency == 0) continue;
       if(freq_counter[npkt] < comm->packet[npkt].frequency) {
         /* frequency requirement not met */
         freq_counter[npkt]++;
         continue; /* go to next pkt */
       } else {
+        /* reached frequency, reset to 1 */
         freq_counter[npkt] = 1;
       };
     };
 
     pkt = &comm->packet[npkt]; /* pointer to the correct packet */
 
-    /* if not connected, perform connection routine.  this is actually
-       where the initial connection will probably happen ... */      
+    /* this would seem an appropriate time to maintain the connection if it
+       drops, or if it never existed ... */
     if(aldl->state != ALDL_CONNECTED) {
       aldl_reconnect(comm); /* main connection happens here */
       aldl->state = ALDL_CONNECTED;
-      #ifdef VERBLOSITY
-      printf("----- RECONNECTED ----------------\n");
-      #endif
     };
 
     /* check if we're @ 5 seconds, and average the number of packets for
        statistical purposes */
     #ifdef TRACK_PKTRATE
-    if(time(NULL) - timestamp >= 5) {
-      aldl->stats->packetspersecond = pktcounter / 5;
+    if(time(NULL) - timestamp >= PKTRATE_DURATION) {
+      aldl->stats->packetspersecond = pktcounter / PKTRATE_DURATION;
       timestamp = time(NULL);
       pktcounter = 0;
     };
@@ -134,10 +135,12 @@ int aldl_acq(aldl_conf_t *aldl) {
       printf("packet fail counter: %i\n",aldl->stats->failcounter);
       #endif
       pkt->clean = 0; /* mark packet unclean temporarily */
+
       /* --- set a desync state if we're getting lots of fails in a row */
       if(aldl->stats->failcounter > MAX_FAIL_DISCONNECT) {
         aldl->state = ALDL_DESYNC;
       };
+
       /* if a retry is not required, do not persist the fail bit.. */
       if(pkt->retry != 1) pktfail = 0;
 

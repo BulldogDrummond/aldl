@@ -119,7 +119,7 @@ void load_config_b(char *filename) {
   comm->packet[1].commandlength = 5;
   comm->packet[1].offset = 3;
   comm->packet[1].retry = 1;
-  comm->packet[1].frequency = 10;
+  comm->packet[1].frequency = 50;
   generate_pktcommand(&comm->packet[1],comm);
 
   /* a placeholder packet, lt1 msg 4 */
@@ -131,7 +131,7 @@ void load_config_b(char *filename) {
   comm->packet[2].commandlength = 5;
   comm->packet[2].offset = 3;
   comm->packet[2].retry = 1;
-  comm->packet[2].frequency = 100;
+  comm->packet[2].frequency = 500;
   generate_pktcommand(&comm->packet[2],comm);
 }
 
