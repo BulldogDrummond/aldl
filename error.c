@@ -4,8 +4,19 @@
 #include <string.h>
 #include "error.h"
 
+char errstr[6][24] = {
+"GENERAL",
+"NULL",
+"OUT OF MEMORY",
+"FTDI DRIVER",
+"OUT OF RANGE",
+"TIMING"
+};
+
 void fatalerror(error_t code, char *str) {
-  fprintf(stderr,"FATAL ERROR, CODE %i\n",code);
-  fprintf(stderr,"%s\n",str);
+  fprintf(stderr,"FATAL: %s ERROR (%i)\n",errstr[code],code);
+  if(str != NULL) {
+    fprintf(stderr,"NOTES: %s\n",str);
+  };
   exit(1);
 };

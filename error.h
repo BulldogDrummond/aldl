@@ -2,12 +2,12 @@
 #define _ERROR_H
 
 typedef enum _error {
-  ERROR_GENERAL,
-  ERROR_NULL,
-  ERROR_MEMORY,
-  ERROR_FTDI,
-  ERROR_RANGE,
-  ERROR_TIMING
+  ERROR_GENERAL=0,
+  ERROR_NULL=1,
+  ERROR_MEMORY=2,
+  ERROR_FTDI=3,
+  ERROR_RANGE=4,
+  ERROR_TIMING=5
 } error_t;
 
 void fatalerror(error_t code, char *str);
