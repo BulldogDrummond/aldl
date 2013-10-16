@@ -122,6 +122,9 @@ typedef struct aldl_conf {
   aldl_record_t *r; /* link to the latest record */
   aldl_commdef_t *comm; /* link back to the communication spec */
   aldl_stats_t *stats;   /* statistics */
+  int rate;    /* slow down data collection, in milliseconds.  this should
+                  never be higher than 1000 or so, or connection may become
+                  unstable... */
 } aldl_conf_t;
 
 #endif

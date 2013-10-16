@@ -2,8 +2,10 @@
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
+#include <unistd.h>
 
 /* local objects */
+#include "error.h"
 #include "config.h"
 #include "aldl-io/config.h"
 #include "aldl-io/aldl-io.h"
@@ -20,6 +22,10 @@ int aldl_acq(aldl_conf_t *aldl) {
   aldl_packetdef_t *pkt = NULL; /* temporary pointer to the packet def */
   int pktfail = 0; /* marker for a failed packet in event loop */
   int npkt = 0; /* array index of packet to operate on */
+
+  /* sanity checks */
+  if(aldl->rate > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
+  if(comm->n_packets < 1) fatalerror(ERROR_RANGE,"no packets in acq");
 
   /* prepare array for packet retrieval frequency tracking */
   int *freq_counter = malloc(sizeof(int) * comm->n_packets);
@@ -73,10 +79,13 @@ int aldl_acq(aldl_conf_t *aldl) {
     pkt = &comm->packet[npkt]; /* pointer to the correct packet */
 
     /* this would seem an appropriate time to maintain the connection if it
-       drops, or if it never existed ... */
+       drops, or if it never existed ... if not, time for a delay */
     if(aldl->state != ALDL_CONNECTED) {
       aldl_reconnect(comm); /* main connection happens here */
       aldl->state = ALDL_CONNECTED;
+    } else {
+      /* delay between data collection iterations */
+      usleep(aldl->rate);
     };
 
     /* check if we're @ 5 seconds, and average the number of packets for
