@@ -27,6 +27,11 @@ int aldl_acq(aldl_conf_t *aldl) {
   if(aldl->rate * 1000 > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
   if(comm->n_packets < 1) fatalerror(ERROR_RANGE,"no packets in acq");
 
+  /* timestamp for lag check */
+  #ifdef LAGCHECK
+  time_t lagtime;
+  #endif
+
   #ifdef ALDL_MULTIPACKET
   /* prepare array for packet retrieval frequency tracking */
   int *freq_counter = malloc(sizeof(int) * comm->n_packets);
@@ -95,6 +100,12 @@ int aldl_acq(aldl_conf_t *aldl) {
       /* delay between data collection iterations */
       usleep(aldl->rate);
     };
+
+    /* reset lag check timer, note that the above instructions are not covered
+       in lagtime measurement, so they need to be FAST .... */
+    #ifdef LAGCHECK
+    lagtime = time(NULL); 
+    #endif
 
     /* check if we're @ 5 seconds, and average the number of packets for
        statistical purposes */
@@ -169,6 +180,13 @@ int aldl_acq(aldl_conf_t *aldl) {
       aldl->stats->failcounter = 0; /* reset failcounter */
       /* process packet here ?? */
     };
+
+    /* check if lagtime exceeded, and set lag state.  obviously this is a
+       rough estimate, but good enough to maintain shutup state*/
+    #ifdef LAGCHECK
+    if(time(NULL) >= lagtime + LAGTIME) aldl->state = ALDL_LAGGY;
+    #endif
+
     debugif_iterate(aldl);
   };
   return 0;

@@ -23,3 +23,8 @@
 /* support multiple packets */
 #define ALDL_MULTIPACKET
 
+/* track connection state for shutup lag */
+#define LAGCHECK
+
+/* seconds of acceptable lag time */
+#define LAGTIME 2

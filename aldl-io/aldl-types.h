@@ -9,7 +9,7 @@ typedef enum aldl_datatype {
 
 typedef enum aldl_state {
   ALDL_CONNECTED, ALDL_CONNECTING, ALDL_LOADING,
-  ALDL_DESYNC, ALDL_ERROR, ALDL_QUIT
+  ALDL_DESYNC, ALDL_ERROR, ALDL_QUIT, ALDL_LAGGY
 } aldl_state_t;
 
 /* 8-bit chunk of data */
