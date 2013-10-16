@@ -7,6 +7,7 @@
 /* local objects */
 #include "config.h"
 #include "acquire.h"
+#include "error.h"
 #include "aldl-io/config.h"
 #include "aldl-io/aldl-io.h"
 #include "configfile/varstore.h"
@@ -32,14 +33,6 @@ int load_config_a(char *filename);
 /* load all packet definitions, and allocate as needed */
 int load_config_b(char *filename);
 
-#ifdef PREPRODUCTION
-/* debug-only fallback config */
-void fallback_config();
-
-/* placeholder error handler */
-void tmperror(char *str);
-#endif
-
 int main() {
   /* ------- SETUP AND LOAD CONFIG -------------------*/
 
@@ -48,8 +41,6 @@ int main() {
   aldl->state = ALDL_CONNECTING; /* initial connection state */
 
   load_config_a("/project/lt1.conf"); /* load 1st stage config */
-
-  fallback_config(); /* REMOVE ME */
 
   load_config_b("/project/lt1.conf"); /* allocate and load stage b conf */
 
@@ -71,26 +62,36 @@ int main() {
 
 int aldl_alloc() {
   aldl = malloc(sizeof(aldl_conf_t));
-  if(aldl == NULL) tmperror("out of memory 1055"); /* FIXME */
+  if(aldl == NULL) fatalerror(ERROR_MEMORY,"conf_t alloc"); /* FIXME */
   memset(aldl,0,sizeof(aldl_conf_t));
   comm = malloc(sizeof(aldl_commdef_t));
-  if(comm == NULL) tmperror("out of memory 1055"); /* FIXME */
+  if(comm == NULL) fatalerror(ERROR_MEMORY,"commdef alloc"); /* FIXME */
   memset(comm,0,sizeof(aldl_commdef_t));
   aldl->comm = comm; /* link */
   aldl->stats = malloc(sizeof(aldl_stats_t));
-  if(aldl->stats == NULL) tmperror("out of memory 1056");
+  if(aldl->stats == NULL) fatalerror(ERROR_MEMORY,"stats alloc");
   memset(aldl->stats,0,sizeof(aldl_stats_t));
   return 0;
 }
 
 int load_config_a(char *filename) {
-  return 0;
+  sprintf(comm->ecmstring, "EE");
+  comm->checksum_enable = 1;
+  comm->pcm_address = 0xF4;
+  comm->idledelay = 10;
+  comm->chatterwait = 1;
+  comm->shutupcommand = generate_shutup(0x56,0x08,comm);
+  comm->returncommand = generate_shutup(0x56,0x09,comm);
+  comm->shutuprepeat = 3;
+  comm->shutuprepeatdelay = 75;
+  comm->n_packets = 3;
+  return 1;
 }
 
 int load_config_b(char *filename) {
   /* allocate space to store packet definitions */
   comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
-  if(comm->packet == NULL) tmperror("out of memory 1055"); /* FIXME */
+  if(comm->packet == NULL) fatalerror(ERROR_MEMORY,"packet mem");
 
   /* !! get packet definitions here, or this flunks due to missing length */
 
@@ -130,11 +131,11 @@ int load_config_b(char *filename) {
   int x = 0;
   for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
     comm->packet[x].data = malloc(comm->packet[x].length);
-    if(comm->packet[x].data == NULL) tmperror("out of memory 1055"); /* FIXME */
+    if(comm->packet[x].data == NULL) fatalerror(ERROR_MEMORY,"pkt data");
   };
 
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n);
-  if(aldl->def == NULL) tmperror("out of memory 1055"); /* FIXME */
+  if(aldl->def == NULL) fatalerror(ERROR_MEMORY,"definition");
   /* get data definitions here !! */
 
   /* allocate space for records */
@@ -145,24 +146,4 @@ int aldl_finish() {
   serial_close();
   return 0;
 }
-
-void tmperror(char *str) {
-  printf("FATAL ERROR: %s",str);
-  exit(1);
-}
-
-#ifdef PREPRODUCTION
-void fallback_config() {
-  sprintf(comm->ecmstring, "EE");
-  comm->checksum_enable = 1;
-  comm->pcm_address = 0xF4;
-  comm->idledelay = 10;
-  comm->chatterwait = 1;
-  comm->shutupcommand = generate_shutup(0x56,0x08,comm);
-  comm->returncommand = generate_shutup(0x56,0x09,comm);
-  comm->shutuprepeat = 3;
-  comm->shutuprepeatdelay = 75;
-  comm->n_packets = 3;
-}
-#endif
 

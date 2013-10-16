@@ -6,10 +6,9 @@
 #include "serio.h"
 #include "config.h"
 
+#include "../error.h"
 #include "aldl-io.h"
 #include "../configfile/configfile.h"
-
-void tmp_error(char *str);
 
 /* fill data pointer from pkt using definition */
 aldl_data_t *aldl_parse_def(aldl_data_t *out, aldl_packetdef_t *pkt,
@@ -21,7 +20,7 @@ long int inputsizeconvert(int size, byte *p);
 
 aldl_data_t *aldl_parse_def(aldl_data_t *out, aldl_packetdef_t *pkt,
                     aldl_define_t *def) {
-  if(def->packet != pkt->id) tmp_error("parse id mismatch");
+  if(def->packet != pkt->id) fatalerror(ERROR_RANGE,"parse id mismatch");
   byte *p = ( pkt->data + pkt->offset + def->offset );
   long int data = inputsizeconvert(def->size,p);
   printf("GOT DATA %li\n",data);
@@ -37,7 +36,7 @@ long int inputsizeconvert(int size, byte *p) {
       return (long int)((*p<<8)|*(p+1));
       break;
     default:
-      tmp_error("bad input size in definition"); 
+      fatalerror(ERROR_RANGE,"bad input size in definition"); 
   };
   return 0;
 };
@@ -48,9 +47,4 @@ void printhexstring(byte *str, int length) {
   for(x=0;x<length;x++) printf("%X ",(unsigned int)str[x]);
   printf("\n");
 };
-
-void tmp_error(char *str) {
-  printf("aldldata.c fatal error: %s\n",str);
-  exit(1);
-}
 

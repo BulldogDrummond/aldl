@@ -12,7 +12,7 @@
 
 #include "serio.h"
 #include "aldl-io.h"
-
+#include "../error.h"
 #include "config.h"
 
 /****************GLOBALSn'STRUCTURES*****************************/
@@ -24,20 +24,6 @@ struct ftdi_context *ftdi;
 byte ftdistatus;
 
 /***************FUNCTION DEFS************************************/
-
-/* placeholder error handler. */
-void fatalerror(int errno, int errloc, char *errnotes);
-
-/* temporary codes:
-99 - generic error, see notes
-100 - port could not be opened.
-101 - failed to retrieve serial port attributes (not a serial port?)
-102 - failed to set attributes, perhaps specified an invalid attribute
-104 - unsupported connection method
-299 - ftdi error
-301 - autodetection failed no devices found
-302 - autodetection failed for some reason
-*/
 
 /* init the ftdi driver by a special port description:
    d:devicenode (usually at /proc/bus/usb)
@@ -68,7 +54,7 @@ int serial_init(char *port) {
 
   /* new ftdi instance */
   if((ftdi = ftdi_new()) == NULL) {
-    fatalerror(299,1,"ftdi_new failed");
+    fatalerror(ERROR_FTDI,"ftdi_new failed");
   };
 
   if(port != NULL) { /* static device config */
@@ -84,9 +70,9 @@ int serial_init(char *port) {
       ftdierror(2,res);
       ftdi_list_free(devlist);
     } else if(n_devices == 0) { /* nothing found */
-      fatalerror(301,1,"no devices found, please connect your serial cable");
+      fatalerror(ERROR_FTDI,"no ftdi devices found");
     } else {
-      fatalerror(302,1,"ftdi detection failed for some reason.");
+      fatalerror(ERROR_FTDI,"detection failed for some reason.");
     };
   };
 
@@ -167,23 +153,9 @@ inline int serial_read(byte *str, int len) {
   return resp; /* return number of bytes read, or zero */
 }
 
-void fatalerror(int errno, int errloc, char *errnotes) {
-  fprintf(stderr,"FATAL ERROR: errno %i errloc %i\n",errno,errloc);
-  #ifdef SERIAL_DEBUG
-    if(errnotes != NULL) fprintf(stderr,"DEBUG NOTE: %s\n",errnotes);
-  #endif
-  fprintf(stderr,"-- this used the depreciated error handler\n");
-  fprintf(stderr,"exiting.\n");
-  /* error 104 is the bad method error.  don't try to close anything if the
-     method is bad, it'll probably cause an infinite loop, since close will
-     generate another bad method error. */
-  if(errno != 104) serial_close();
-  exit(0);
-}
-
 void ftdierror(int loc,int errno) {
   if(errno>=0) return;
   fprintf(stderr,"FTDI ERROR: %i, %s\n",errno,ftdi_get_error_string(ftdi)); 
-  fatalerror(299,loc,NULL);
+  fatalerror(ERROR_FTDI,"see error message @ stderr");
 };
 

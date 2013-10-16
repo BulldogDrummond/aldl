@@ -13,8 +13,6 @@
 /* plugins */
 #include "debugif/debugif.h"
 
-/* ------- LOCAL FUNCTIONS ------------- */
-
 int aldl_acq(aldl_conf_t *aldl) {
   aldl_commdef_t *comm = aldl->comm;
   #ifdef TRACK_PKTRATE
