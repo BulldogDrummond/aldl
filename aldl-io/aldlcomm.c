@@ -86,9 +86,6 @@ int aldl_request(byte *pkt, int len) {
   serial_write(pkt,len);
   msleep(aldl_timeout(len));
   int result = listen_bytes(pkt,len,len,aldl_timeout(len));
-  #ifdef ALDL_VERBOSE
-    printf("response success: %i\n",result);
-  #endif
   return result;
 }
 
@@ -184,10 +181,6 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
     if(chars_in > 0) {
       chars_read += chars_in; /* mv cursor */
       if(cmp_bytestring(buf,chars_read,str,len) == 1) {
-        #ifdef SERIAL_VERBOSE
-        printf(" FOUND.\n");
-        printhexstring(str,len);
-        #endif
         free(buf);
         return 1;
       };
