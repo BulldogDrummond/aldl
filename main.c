@@ -63,12 +63,12 @@ void aldl_setup() {
 void aldl_alloc_a() {
   /* primary aldl configuration structure */
   aldl = malloc(sizeof(aldl_conf_t));
-  if(aldl == NULL) fatalerror(ERROR_MEMORY,"conf_t alloc"); /* FIXME */
+  if(aldl == NULL) fatalerror(ERROR_MEMORY,"conf_t alloc");
   memset(aldl,0,sizeof(aldl_conf_t));
 
   /* communication definition */
   comm = malloc(sizeof(aldl_commdef_t));
-  if(comm == NULL) fatalerror(ERROR_MEMORY,"commdef alloc"); /* FIXME */
+  if(comm == NULL) fatalerror(ERROR_MEMORY,"commdef alloc");
   memset(comm,0,sizeof(aldl_commdef_t));
   aldl->comm = comm; /* link to conf */
 
@@ -154,7 +154,7 @@ void aldl_alloc_c() {
   };
 
   /* storage for data definitions */
-  aldl->def = malloc(sizeof(aldl_define_t) * aldl->n);
+  aldl->def = malloc(sizeof(aldl_define_t) * aldl->n_defs);
   if(aldl->def == NULL) fatalerror(ERROR_MEMORY,"definition");
 
   /* get data definitions here !! */

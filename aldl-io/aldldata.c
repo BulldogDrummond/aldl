@@ -2,6 +2,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <string.h>
 
 #include "serio.h"
 #include "config.h"
@@ -21,6 +22,32 @@ int inputsizeconvert(int size, byte *p);
 /* get a single bit from a byte */
 int getbit(byte *p, int byte, int flip);
 
+aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
+  /* allocate record memory */
+  aldl_record_t *rec = malloc(sizeof(aldl_record_t));
+  if(rec == NULL) fatalerror(ERROR_MEMORY,"record creation");
+
+  /* allocate data memory */
+  rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);
+  if(rec == NULL) fatalerror(ERROR_MEMORY,"data str in record");
+
+  /* start with old data here, that way if any data isn't filled, at least the
+     stale data is there ... if there's no old data, just fill zeros. */
+  if(aldl->r == NULL) {
+    memset(rec->data,0,sizeof(aldl_data_t) * aldl->n_defs);
+  } else {
+    memcpy(rec->data,aldl->r->data,sizeof(aldl_data_t) * aldl->n_defs);
+  };
+
+  /* process packet data */
+  int def_n;
+  for(def_n=0;def_n<aldl->n_defs;def_n++) {
+    aldl_parse_def(aldl,rec,def_n); 
+  };
+
+  return rec;
+};
+
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* check for out of range */
   if(n < 0 || n > aldl->n_defs - 1) fatalerror(ERROR_RANGE,"def number"); 
@@ -38,6 +65,8 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   #endif
 
   aldl_packetdef_t *pkt = &aldl->comm->packet[id]; /* ptr to packet */
+
+  /* FIXME need to check for bad or stale packet here */
 
   /* check to ensure byte location is in range */
   if(pkt->offset + def->offset > pkt->length) {
