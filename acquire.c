@@ -24,7 +24,7 @@ int aldl_acq(aldl_conf_t *aldl) {
   int npkt = 0; /* array index of packet to operate on */
 
   /* sanity checks */
-  if(aldl->rate > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
+  if(aldl->rate * 1000 > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
   if(comm->n_packets < 1) fatalerror(ERROR_RANGE,"no packets in acq");
 
   /* prepare array for packet retrieval frequency tracking */
