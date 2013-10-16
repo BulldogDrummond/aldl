@@ -33,7 +33,7 @@ int aldl_acq(aldl_conf_t *aldl) {
   for(freq_init=0;freq_init < comm->n_packets; freq_init++) {
     /* if we init the frequency with freq max, that will ensure that each
        packet is iterated once at the beginning of the acq. routine */
-    freq_counter[freq_init] = comm->packet[npkt].frequency;
+    freq_counter[freq_init] = comm->packet[freq_init].frequency;
   };
 
   /* config vars and get initial stamp if packet rate tracking is enabled */
