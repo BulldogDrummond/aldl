@@ -149,19 +149,20 @@ int load_config_b(char *filename) {
 int aldl_acq() {
   #ifdef TRACK_PKTRATE
   time_t timestamp = time(NULL);
-  int pktcounter = 0; 
-  int pktfail = 0;
+  int pktcounter = 0; /* how many packets between timestamps */
   #endif
-  int npkt = 0;
-  aldl_packetdef_t *pkt = NULL;
-  aldl->state = ALDL_CONNECTING;
+  int pktfail = 0; /* marker for a failed packet in event loop */
+  int npkt = 0; /* array index of packet to operate on */
+  aldl_packetdef_t *pkt = NULL; /* temporary pointer to the packet def */
+  aldl->state = ALDL_CONNECTING; /* initial disconnected state */
+  /* this should be fine as an infinite loop ... */
   while(1) {
     for(npkt=0;npkt < comm->n_packets;npkt++) { /* iterate through all pkts */
-      if(aldl->state != ALDL_CONNECTED) { /* if not connected, reconnect */
-        aldl_reconnect(comm);
+      if(aldl->state != ALDL_CONNECTED) {
+        aldl_reconnect(comm); /* main connection happens here */
         aldl->state = ALDL_CONNECTED;
         #ifdef VERBLOSITY
-        printf("----- RECONNETED ----------------\n");
+        printf("----- RECONNECTED ----------------\n");
         #endif
       };
       #ifdef TRACK_PKTRATE
@@ -176,30 +177,33 @@ int aldl_acq() {
                     aldl->stats->packetspersecond);
       #endif
       pkt = &comm->packet[npkt];
-      pktfail = 0;
+      pktfail = 0; /* assume no failure ... */
       if(aldl_get_packet(pkt) == NULL) { /* packet timeout or fail */
         aldl->stats->packetrecvtimeout++;
+        pktfail = 1;
         #ifdef VERBLOSITY
         printf("packet %i failed due to timeout...\n",npkt);
         #endif
-        continue;
       };
       if(pkt->data[0] != comm->pcm_address) { /* fail header */
+        pktfail = 1;
         aldl->stats->packetheaderfail++;
         #ifdef VERBLOSITY
         printf("header failed @ pkt %i...\n",npkt);
         #endif
-        continue;
       };
       if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
+        pktfail = 1;
         aldl->stats->packetchecksumfail++;
         #ifdef VERBLOSITY
         printf("checksum failed @ pkt %i...\n",npkt);
         #endif
-        continue;
       };
       if(pktfail == 1) {
         aldl->stats->failcounter++;
+        #ifdef VERBLOSITY
+        printf("packet fail counter: %i\n",aldl->stats->failcounter);
+        #endif
         pkt->enable = 0;
         if(pkt->retry == 1) npkt--;
         /* if we aren't over our fail limit, just go on as normal .. */
