@@ -24,57 +24,61 @@ char *config_file; /* path to config file */
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
 
-/* allocate all base data structures */
-int aldl_alloc();
+/* allocate all major structures and load config routines */
+void aldl_setup();
 
-/* load all base config data, but no packet definitions. */
-int load_config_a(char *filename);
+/* initial memory allocation routines */
+void aldl_alloc_a(); /* fixed structures */
+void aldl_alloc_b(); /* definition arrays */
+void aldl_alloc_c(); /* more data space */
 
-/* load all packet definitions, and allocate as needed */
-int load_config_b(char *filename);
+/* config file loading */
+void load_config_a(char *filename); /* load data to alloc_a structures */
+void load_config_b(char *filename); /* load data to alloc_b structures */
 
 int main() {
-  /* ------- SETUP AND LOAD CONFIG -------------------*/
+  aldl_setup();
 
-  aldl_alloc(); /* perform initial allocations */
-
-  aldl->state = ALDL_CONNECTING; /* initial connection state */
-
-  load_config_a("/project/lt1.conf"); /* load 1st stage config */
-
-  load_config_b("/project/lt1.conf"); /* allocate and load stage b conf */
+  aldl->state = ALDL_LOADING; /* initial connection state */
 
   /* FIXME this needs to come from load_config or switch to autodetct */
   char *serialport = "d:002/002";
-
   serial_init(serialport); /* init serial port */
 
-  /* ------- EVENT LOOP STUFF ------------------------*/
-
   aldl_acq(aldl); /* start main event loop */
-
-  /* ------- CLEANUP ----------------------------------*/
 
   aldl_finish(comm);
 
   return 0;
 }
 
-int aldl_alloc() {
+void aldl_setup() {
+  aldl_alloc_a();
+  load_config_a("/project/lt1.conf");
+  aldl_alloc_b();
+  load_config_b("/project/lt1.conf");
+  aldl_alloc_c();
+}
+
+void aldl_alloc_a() {
+  /* primary aldl configuration structure */
   aldl = malloc(sizeof(aldl_conf_t));
   if(aldl == NULL) fatalerror(ERROR_MEMORY,"conf_t alloc"); /* FIXME */
   memset(aldl,0,sizeof(aldl_conf_t));
+
+  /* communication definition */
   comm = malloc(sizeof(aldl_commdef_t));
   if(comm == NULL) fatalerror(ERROR_MEMORY,"commdef alloc"); /* FIXME */
   memset(comm,0,sizeof(aldl_commdef_t));
-  aldl->comm = comm; /* link */
+  aldl->comm = comm; /* link to conf */
+
+  /* stats tracking structure */
   aldl->stats = malloc(sizeof(aldl_stats_t));
   if(aldl->stats == NULL) fatalerror(ERROR_MEMORY,"stats alloc");
   memset(aldl->stats,0,sizeof(aldl_stats_t));
-  return 0;
 }
 
-int load_config_a(char *filename) {
+void load_config_a(char *filename) {
   sprintf(comm->ecmstring, "EE");
   comm->checksum_enable = 1;
   comm->pcm_address = 0xF4;
@@ -85,16 +89,15 @@ int load_config_a(char *filename) {
   comm->shutuprepeat = 3;
   comm->shutuprepeatdelay = 75;
   comm->n_packets = 3;
-  return 1;
 }
 
-int load_config_b(char *filename) {
+void aldl_alloc_b() {
   /* allocate space to store packet definitions */
   comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
   if(comm->packet == NULL) fatalerror(ERROR_MEMORY,"packet mem");
+}
 
-  /* !! get packet definitions here, or this flunks due to missing length */
-
+void load_config_b(char *filename) {
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
   comm->packet[0].enable = 0;
@@ -127,19 +130,23 @@ int load_config_b(char *filename) {
   comm->packet[2].offset = 3;
   comm->packet[2].retry = 1;
   generate_pktcommand(&comm->packet[2],comm);
+}
 
+void aldl_alloc_c() {
+  /* storage for raw packet data */
   int x = 0;
-  for(x=0;x<comm->n_packets;x++) { /* allocate data storage */
+  for(x=0;x<comm->n_packets;x++) {
     comm->packet[x].data = malloc(comm->packet[x].length);
     if(comm->packet[x].data == NULL) fatalerror(ERROR_MEMORY,"pkt data");
   };
 
+  /* storage for data definitions */
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n);
   if(aldl->def == NULL) fatalerror(ERROR_MEMORY,"definition");
+
   /* get data definitions here !! */
 
-  /* allocate space for records */
-  return 0;
+  /* allocate space for records here ~ */
 }
 
 int aldl_finish() {

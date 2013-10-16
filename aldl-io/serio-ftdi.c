@@ -155,7 +155,7 @@ inline int serial_read(byte *str, int len) {
 
 void ftdierror(int loc,int errno) {
   if(errno>=0) return;
-  fprintf(stderr,"FTDI ERROR: %i, %s\n",errno,ftdi_get_error_string(ftdi)); 
-  fatalerror(ERROR_FTDI,"see error message @ stderr");
+  fprintf(stderr,"FTDI DRIVER: %i, %s\n",errno,ftdi_get_error_string(ftdi)); 
+  fatalerror(ERROR_FTDI,"*** See above FTDI DRIVER error message @ stderr");
 };
 

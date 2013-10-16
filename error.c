@@ -5,7 +5,7 @@
 #include "error.h"
 
 void fatalerror(error_t code, char *str) {
-  fprintf(stderr,"FATAL ERROR:  CODE %i:\n",code);
+  fprintf(stderr,"FATAL ERROR, CODE %i\n",code);
   fprintf(stderr,"%s\n",str);
   exit(1);
 };
