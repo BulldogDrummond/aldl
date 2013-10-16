@@ -7,31 +7,85 @@
 #include "config.h"
 
 #include "../error.h"
+#include "../config.h"
 #include "aldl-io.h"
 #include "../configfile/configfile.h"
 
-/* fill data pointer from pkt using definition */
-aldl_data_t *aldl_parse_def(aldl_data_t *out, aldl_packetdef_t *pkt,
-                    aldl_define_t *def);
+/* update the value in the record from definition n ... */
+aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n);
 
 /* where size is the number of bits and p is a pointer to the beginning of the
    data, output the result as an int */
 int inputsizeconvert(int size, byte *p);
 
 /* get a single bit from a byte */
-int getbit(byte *p, int byte);
+int getbit(byte *p, int byte, int flip);
 
-aldl_data_t *aldl_parse_def(aldl_data_t *out, aldl_packetdef_t *pkt,
-                    aldl_define_t *def) {
-  if(def->packet != pkt->id) fatalerror(ERROR_RANGE,"parse id mismatch");
-  byte *p = ( pkt->data + pkt->offset + def->offset );
-  long int data = inputsizeconvert(def->size,p);
-  printf("GOT DATA %li\n",data);
-  return NULL;
+aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
+  /* check for out of range */
+  if(n < 0 || n > aldl->n_defs - 1) fatalerror(ERROR_RANGE,"def number"); 
+
+  aldl_define_t *def = &aldl->def[n]; /* shortcut to definition */
+
+  /* find associated packet number as 'id' */
+  int id = 0; /* array index, not actual id ..... */
+  #ifdef ALDL_MULTIPACKET
+  /* we'll assume the packet exists; this should be checked during config
+     load time ... */
+  for(id=0; id < aldl->comm->n_packets - 1; id++) {
+    if(aldl->comm->packet[id].id == def->id) break;
+  };
+  #endif
+
+  aldl_packetdef_t *pkt = &aldl->comm->packet[id]; /* ptr to packet */
+
+  /* check to ensure byte location is in range */
+  if(pkt->offset + def->offset > pkt->length) {
+    fatalerror(ERROR_RANGE,"definition out of packet range");
+  };
+
+  /* location of actual data byte */
+  byte *data = pkt->data + def->offset + pkt->offset;
+
+  /* location for output of data, matches definition array index ... */
+  aldl_data_t *out = &r->data[n];
+
+  /* FIXME this doesnt deal with fields wider than 1 byte ... */
+  /* FIXME doesn't deal with signed input */
+  /* FIXME doesn't deal with min/max */
+
+  /* get value, this does need more work ... */
+  switch(def->type) {
+    case ALDL_INT:
+      out->i = (int)*data + def->adder * def->multiplier;
+      break;
+    case ALDL_UINT:
+      out->u = (unsigned int)*data + def->adder * def->multiplier;
+      break;
+    case ALDL_FLOAT:
+      out->f = (float)*data + def->adder * def->multiplier;
+      break;
+    case ALDL_BOOL:
+      out->i = getbit(data,def->binary,def->invert) ;
+      break;
+    /* raw or invalid bit just transfers the raw byte */
+    case ALDL_RAW:
+    default:
+      out->raw = *data;
+  };
+
+  return out;
 };
 
-int getbit(byte *p, int byte) {
+int getbit(byte *p, int byte, int flip) {
   if(byte < 0 || byte > 7) fatalerror(ERROR_RANGE,"byte field number");
+  int bit = ( *p >> ( byte + 1 ) & 0x01 );
+  /* FIXME convert to bitwise operator */
+  if(flip == 1 && bit == 0) {
+    bit = 1;
+  } else if (flip == 1 && bit == 1) {
+    bit = 0;
+  };
   return( ( *p >> ( byte + 1 ) & 0x01 ));
 };
 

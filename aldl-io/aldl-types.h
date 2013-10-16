@@ -4,7 +4,7 @@
 /* --------- datatypes ----------------------------------------*/
 
 typedef enum aldl_datatype {
-  ALDL_INT, ALDL_UINT, ALDL_FLOAT, ALDL_BOOL
+  ALDL_INT, ALDL_UINT, ALDL_FLOAT, ALDL_BOOL, ALDL_RAW
 } aldl_datatype_t;
 
 typedef enum aldl_state {
@@ -115,7 +115,7 @@ typedef struct aldl_stats {
 
 typedef struct aldl_conf {
   char ecmtype; /* the type of ecm being read */
-  int n;        /* static number of definitions */
+  int n_defs;   /* number of definitions */
   int bufsize;  /* the minimum number of records to maintain */
   aldl_state_t state; /* connection state */
   aldl_define_t *def; /* link to the definition set */
