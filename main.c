@@ -88,7 +88,7 @@ void load_config_a(char *filename) {
   comm->returncommand = generate_shutup(0x56,0x09,comm);
   comm->shutuprepeat = 3;
   comm->shutuprepeatdelay = 75;
-  comm->n_packets = 3;
+  comm->n_packets = 1;
 }
 
 void aldl_alloc_b() {
@@ -109,30 +109,40 @@ void load_config_b(char *filename) {
   comm->packet[0].retry = 1;
   comm->packet[0].frequency = 1;
   generate_pktcommand(&comm->packet[0],comm);
+
+  /* sanity checks for single packet mode */
+  #ifndef ALDL_MULTIPACKET
+  if(comm->packet[0].frequency == 0) {
+    fatalerror(ERROR_CONFIG,"the only packet is disabled");
+  };
+  if(comm->n_packets != 1) {
+    fatalerror(ERROR_CONFIG,"this config requires multipacket capabilities");
+  };
+  #endif
   
   /* a placeholder packet, lt1 msg 2 */
-  comm->packet[1].length = 57;
-  comm->packet[1].clean = 0;
-  comm->packet[1].id = 0x02;
-  comm->packet[1].msg_len = 0x57;
-  comm->packet[1].msg_mode = 0x01;
-  comm->packet[1].commandlength = 5;
-  comm->packet[1].offset = 3;
-  comm->packet[1].retry = 1;
-  comm->packet[1].frequency = 50;
-  generate_pktcommand(&comm->packet[1],comm);
+//  comm->packet[1].length = 57;
+//  comm->packet[1].clean = 0;
+//  comm->packet[1].id = 0x02;
+//  comm->packet[1].msg_len = 0x57;
+//  comm->packet[1].msg_mode = 0x01;
+//  comm->packet[1].commandlength = 5;
+//  comm->packet[1].offset = 3;
+//  comm->packet[1].retry = 1;
+//  comm->packet[1].frequency = 50;
+//  generate_pktcommand(&comm->packet[1],comm);
 
   /* a placeholder packet, lt1 msg 4 */
-  comm->packet[2].length = 49;
-  comm->packet[2].clean = 0;
-  comm->packet[2].id = 0x04;
-  comm->packet[2].msg_len = 0x57;
-  comm->packet[2].msg_mode = 0x01;
-  comm->packet[2].commandlength = 5;
-  comm->packet[2].offset = 3;
-  comm->packet[2].retry = 1;
-  comm->packet[2].frequency = 500;
-  generate_pktcommand(&comm->packet[2],comm);
+//  comm->packet[2].length = 49;
+//  comm->packet[2].clean = 0;
+//  comm->packet[2].id = 0x04;
+//  comm->packet[2].msg_len = 0x57;
+//  comm->packet[2].msg_mode = 0x01;
+//  comm->packet[2].commandlength = 5;
+//  comm->packet[2].offset = 3;
+//  comm->packet[2].retry = 1;
+//  comm->packet[2].frequency = 500;
+//  generate_pktcommand(&comm->packet[2],comm);
 }
 
 void aldl_alloc_c() {

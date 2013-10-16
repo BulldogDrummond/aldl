@@ -7,7 +7,8 @@ typedef enum _error {
   ERROR_MEMORY=2,
   ERROR_FTDI=3,
   ERROR_RANGE=4,
-  ERROR_TIMING=5
+  ERROR_TIMING=5,
+  ERROR_CONFIG=6
 } error_t;
 
 void fatalerror(error_t code, char *str);

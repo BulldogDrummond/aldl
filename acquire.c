@@ -27,6 +27,7 @@ int aldl_acq(aldl_conf_t *aldl) {
   if(aldl->rate * 1000 > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
   if(comm->n_packets < 1) fatalerror(ERROR_RANGE,"no packets in acq");
 
+  #ifdef ALDL_MULTIPACKET
   /* prepare array for packet retrieval frequency tracking */
   int *freq_counter = malloc(sizeof(int) * comm->n_packets);
   int freq_init;
@@ -35,6 +36,7 @@ int aldl_acq(aldl_conf_t *aldl) {
        packet is iterated once at the beginning of the acq. routine */
     freq_counter[freq_init] = comm->packet[freq_init].frequency;
   };
+  #endif
 
   /* config vars and get initial stamp if packet rate tracking is enabled */
   #ifdef TRACK_PKTRATE
@@ -62,7 +64,8 @@ int aldl_acq(aldl_conf_t *aldl) {
       pktfail = 0; /* reset fail marker */
       /* note that *pkt will have persisted from last iteration */
     } else {  /* retry skips the frequency selector */
-
+    
+    #ifdef ALDL_MULTIPACKET
     /* ---- frequency select routine ---- */
       /* skip packet if frequency is 0 to match spec */
       if(comm->packet[npkt].frequency == 0) continue;
@@ -74,6 +77,7 @@ int aldl_acq(aldl_conf_t *aldl) {
         /* reached frequency, reset to 1 */
         freq_counter[npkt] = 1;
       };
+    #endif
     };
 
     pkt = &comm->packet[npkt]; /* pointer to the correct packet */

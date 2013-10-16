@@ -19,3 +19,7 @@
 
 /* extra check for bad message header.  checksum should be sufficient.. */
 #define CHECK_HEADER_SANITY
+
+/* support multiple packets */
+#define ALDL_MULTIPACKET
+

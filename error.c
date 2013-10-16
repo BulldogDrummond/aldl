@@ -4,13 +4,14 @@
 #include <string.h>
 #include "error.h"
 
-char errstr[6][24] = {
+char errstr[7][24] = {
 "GENERAL",
 "NULL",
 "OUT OF MEMORY",
 "FTDI DRIVER",
 "OUT OF RANGE",
-"TIMING"
+"TIMING",
+"CONFIG"
 };
 
 void fatalerror(error_t code, char *str) {
