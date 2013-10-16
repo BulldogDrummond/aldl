@@ -3,16 +3,13 @@
 
 /*------ DEBUG STUFF --------------------------------------*/
 
-/* extra debugging routines that can probably be disabed in production */
-#define SERIAL_DEBUG
-
 /* spits a bunch of random shit out on stdout.  probably disable when using
    an actual display interface */
-#define SERIAL_VERBOSE
+//#define SERIAL_VERBOSE
 //#define SERIAL_SUPERVERBOSE
 
 /* verbose aldl comm routines on stdout */
-#define ALDL_VERBOSE
+//#define ALDL_VERBOSE
 
 /* a static delay in milliseconds.  used for waiting in between grabbing
    serial chunks, and for delay timers.  decreasing this value makes timeouts

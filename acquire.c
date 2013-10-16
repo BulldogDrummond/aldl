@@ -100,8 +100,7 @@ int aldl_acq(aldl_conf_t *aldl) {
 
     /* print debugging info */
     #ifdef VERBLOSITY
-    printf("ACQUIRE pkt# %i @ rate %f/sec\n",npkt,
-                  aldl->stats->packetspersecond);
+    printf("ACQUIRE pkt# %i\n",npkt);
     #endif
 
     /* send request and get packet data (from aldlcomm.c); if NULL is

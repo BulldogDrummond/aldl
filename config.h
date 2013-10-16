@@ -15,7 +15,7 @@
 #define TRACK_PKTRATE
 
 /* number of seconds to average retrieval rate.  reccommend at least 5. */
-#define PKTRATE_DURATION 7
+#define PKTRATE_DURATION 5
 
 /* extra check for bad message header.  checksum should be sufficient.. */
 #define CHECK_HEADER_SANITY

@@ -15,6 +15,9 @@ void debugif_iterate(aldl_conf_t *c) {
   int x;
   aldl_commdef_t *comm = c->comm;
   aldl_packetdef_t *pkt = NULL;
+  printf("STATS: %f pkt/sec, %i timeouts, %i bad header, %i checksum fail\n",
+            c->stats->packetspersecond, c->stats->packetrecvtimeout,
+            c->stats->packetheaderfail, c->stats->packetchecksumfail);
   for(x=0;x<comm->n_packets;x++) {
     pkt = &comm->packet[x];
     if(pkt->clean == 1) {
