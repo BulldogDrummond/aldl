@@ -64,7 +64,7 @@ typedef struct aldl_record {
 /* defines each packet of data and how to retrieve it */
 
 typedef struct aldl_packetdef {
-  int enable;     /* set to 1 if the packet has good data in it ... */
+  int clean;     /* set to 1 if the packet has good data in it ... */
   byte id;         /* message number */
   byte msg_len;    /* message length byte */
   byte msg_mode;   /* message mode */
@@ -73,6 +73,7 @@ typedef struct aldl_packetdef {
   int commandlength; /* length of the command string in bytes */
   int offset;        /* the offset of the data in bytes, aka header size */
   int retry;        /* set to 1 to retry on failed retrieve */
+  int frequency;    /* retrieval frequency in iterations to skip */
   byte *data;     /* pointer to the raw data buffer */
 } aldl_packetdef_t;
 

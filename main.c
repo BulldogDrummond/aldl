@@ -100,35 +100,38 @@ void aldl_alloc_b() {
 void load_config_b(char *filename) {
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
-  comm->packet[0].enable = 0;
+  comm->packet[0].clean = 0;
   comm->packet[0].id = 0x00;
   comm->packet[0].msg_len = 0x57;
   comm->packet[0].msg_mode = 0x01;
   comm->packet[0].commandlength = 5;
   comm->packet[0].offset = 3;
   comm->packet[0].retry = 1;
+  comm->packet[0].frequency = 1;
   generate_pktcommand(&comm->packet[0],comm);
   
   /* a placeholder packet, lt1 msg 2 */
   comm->packet[1].length = 57;
-  comm->packet[1].enable = 0;
+  comm->packet[1].clean = 0;
   comm->packet[1].id = 0x02;
   comm->packet[1].msg_len = 0x57;
   comm->packet[1].msg_mode = 0x01;
   comm->packet[1].commandlength = 5;
   comm->packet[1].offset = 3;
   comm->packet[1].retry = 1;
+  comm->packet[1].frequency = 10;
   generate_pktcommand(&comm->packet[1],comm);
 
   /* a placeholder packet, lt1 msg 4 */
   comm->packet[2].length = 49;
-  comm->packet[2].enable = 0;
+  comm->packet[2].clean = 0;
   comm->packet[2].id = 0x04;
   comm->packet[2].msg_len = 0x57;
   comm->packet[2].msg_mode = 0x01;
   comm->packet[2].commandlength = 5;
   comm->packet[2].offset = 3;
   comm->packet[2].retry = 1;
+  comm->packet[2].frequency = 100;
   generate_pktcommand(&comm->packet[2],comm);
 }
 

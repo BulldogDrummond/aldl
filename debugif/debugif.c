@@ -17,12 +17,12 @@ void debugif_iterate(aldl_conf_t *c) {
   aldl_packetdef_t *pkt = NULL;
   for(x=0;x<comm->n_packets;x++) {
     pkt = &comm->packet[x];
-    if(pkt->enable == 1) {
+    if(pkt->clean == 1) {
       printf("COMPLETED PKT id=%i length=%i: ",pkt->id,pkt->length);
       printhexstring(pkt->data,pkt->length);
       /* print raw data here */
     } else {
-      printf("skipping packet %i, enable bit not set\n",x);
+      printf("skipping packet %i, not clean\n",x);
     };
   };
 };
