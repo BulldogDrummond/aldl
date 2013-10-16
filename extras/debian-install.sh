@@ -9,3 +9,4 @@ echo 'SUBSYSTEMS=="usb", ACTION=="add", MODE="0664", GROUP="usb"' >> /etc/udev/r
 echo "blacklisting ftdi_sio driver"
 echo 'blacklist ftdi_sio' > /etc/modprobe.d/ftdi.conf
 
+echo 'you should add your user to the usb group and reboot now, should be good to go ...'
