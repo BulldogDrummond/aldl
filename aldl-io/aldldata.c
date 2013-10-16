@@ -15,8 +15,11 @@ aldl_data_t *aldl_parse_def(aldl_data_t *out, aldl_packetdef_t *pkt,
                     aldl_define_t *def);
 
 /* where size is the number of bits and p is a pointer to the beginning of the
-   data, output the result as a long int */
-long int inputsizeconvert(int size, byte *p);
+   data, output the result as an int */
+int inputsizeconvert(int size, byte *p);
+
+/* get a single bit from a byte */
+int getbit(byte *p, int byte);
 
 aldl_data_t *aldl_parse_def(aldl_data_t *out, aldl_packetdef_t *pkt,
                     aldl_define_t *def) {
@@ -27,7 +30,12 @@ aldl_data_t *aldl_parse_def(aldl_data_t *out, aldl_packetdef_t *pkt,
   return NULL;
 };
 
-long int inputsizeconvert(int size, byte *p) {
+int getbit(byte *p, int byte) {
+  if(byte < 0 || byte > 7) fatalerror(ERROR_RANGE,"byte field number");
+  return( ( *p >> ( byte + 1 ) & 0x01 ));
+};
+
+int inputsizeconvert(int size, byte *p) {
     switch(size) {
     case 8:
       return (long int)*p;
