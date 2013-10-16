@@ -55,6 +55,7 @@ int aldl_acq(aldl_conf_t *aldl) {
         printf("packet %i failed due to timeout...\n",npkt);
         #endif
       };
+      #ifdef CHECK_HEADER_SANITY
       if(pkt->data[0] != comm->pcm_address) { /* fail header */
         pktfail = 1;
         aldl->stats->packetheaderfail++;
@@ -62,7 +63,9 @@ int aldl_acq(aldl_conf_t *aldl) {
         printf("header failed @ pkt %i...\n",npkt);
         #endif
       };
-      if(checksum_test(pkt->data, pkt->length) == 0) { /* fail chksum */
+      #endif
+      if(comm->checksum_enable == 1 &&
+         checksum_test(pkt->data, pkt->length) == 0) {
         pktfail = 1;
         aldl->stats->packetchecksumfail++;
         #ifdef VERBLOSITY
