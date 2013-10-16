@@ -41,10 +41,10 @@ int aldl_acq(aldl_conf_t *aldl) {
 
   /* if the connection state gets set to quit, end the infinite loop.  not
      sure where a good place to set this would be anyway ... */
-  while(aldl->state != ALDL_QUIT) {
 
-  /* iterate through all of the packets sequentially */
-  for(npkt=0;npkt < comm->n_packets;npkt++) {
+  /* ---- event loop header -----  until ALDL_QUIT connection state is set,
+     iterate through all packets in sequence. */
+  while(aldl->state != ALDL_QUIT) for(npkt=0;npkt < comm->n_packets;npkt++) {
 
     /* detect a necessary retry, and step back iterator */
     if(pktfail == 1) {
@@ -154,7 +154,6 @@ int aldl_acq(aldl_conf_t *aldl) {
     };
     /* process packets here maybe ? */
     debugif_iterate(aldl);
-  };
   };
   return 0;
 }
