@@ -106,7 +106,6 @@ void load_config_b(char *filename) {
   comm->packet[0].msg_mode = 0x01;
   comm->packet[0].commandlength = 5;
   comm->packet[0].offset = 3;
-  comm->packet[0].retry = 1;
   comm->packet[0].frequency = 1;
   generate_pktcommand(&comm->packet[0],comm);
 
@@ -128,7 +127,6 @@ void load_config_b(char *filename) {
 //  comm->packet[1].msg_mode = 0x01;
 //  comm->packet[1].commandlength = 5;
 //  comm->packet[1].offset = 3;
-//  comm->packet[1].retry = 1;
 //  comm->packet[1].frequency = 50;
 //  generate_pktcommand(&comm->packet[1],comm);
 
@@ -140,7 +138,6 @@ void load_config_b(char *filename) {
 //  comm->packet[2].msg_mode = 0x01;
 //  comm->packet[2].commandlength = 5;
 //  comm->packet[2].offset = 3;
-//  comm->packet[2].retry = 1;
 //  comm->packet[2].frequency = 500;
 //  generate_pktcommand(&comm->packet[2],comm);
 }

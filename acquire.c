@@ -161,19 +161,14 @@ int aldl_acq(aldl_conf_t *aldl) {
       #ifdef VERBLOSITY
       printf("packet fail counter: %i\n",aldl->stats->failcounter);
       #endif
-      pkt->clean = 0; /* mark packet unclean temporarily */
 
       /* --- set a desync state if we're getting lots of fails in a row */
       if(aldl->stats->failcounter > MAX_FAIL_DISCONNECT) {
         aldl->state = ALDL_DESYNC;
       };
 
-      /* if a retry is not required, do not persist the fail bit.. */
-      if(pkt->retry != 1) pktfail = 0;
-
     /* packet is good to go */
     } else {
-      pkt->clean = 1; /* data is good, and can be used */
       #ifdef TRACK_PKTRATE
       pktcounter++; /* increment packet counter */
       #endif
