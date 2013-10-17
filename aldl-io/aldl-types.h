@@ -45,10 +45,10 @@ typedef struct aldl_define {
   byte packet; /* selects which packet unique id the data comes from */
   byte offset; /* offset within packet in bytes */
   byte size;   /* size in bits.  8,16,32 only... */
-  byte sig;    /* 1 if signed */
+  byte sig:1;    /* 1 if signed */
   /* binary stuff only */
   byte binary; /* offset in bits.  only works for 1 bit fields */
-  byte invert; /* invert (0 means set) */
+  byte invert:1; /* invert (0 means set) */
 } aldl_define_t;
 
 /* definition of a record, which is a sequential linked-list type structure,
@@ -81,12 +81,12 @@ typedef struct aldl_packetdef {
 typedef struct aldl_commdef {
   /* ------- config stuff ---------------- */
   char ecmstring[4];       /* a unique identifying string for the platform */
-  int checksum_enable;     /* set to 1 to enable checksum verification of
+  int checksum_enable:1;    /* set to 1 to enable checksum verification of
                               packet data.  checksums of commands are not
                               generated, and must be calculated manually */
   byte pcm_address;        /* the address of the PCM */
   /* ------- idle traffic stuff ---------- */
-  int chatterwait;         /* 1 enables chatter checking.  if this is
+  int chatterwait:1;        /* 1 enables chatter checking.  if this is
                               disabled, it'll immediately and constanty
                               send shutup requests. */
   int idledelay;           /* a ms delay at the end of idle traffic, before
