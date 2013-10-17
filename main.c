@@ -39,7 +39,7 @@ void load_config_b(char *filename); /* load data to alloc_b structures */
 int main() {
   aldl_setup();
 
-  aldl->state = ALDL_LOADING; /* initial connection state */
+  set_connstate(ALDL_LOADING,aldl); /* initial connection state */
 
   /* FIXME this needs to come from load_config or switch to autodetct */
   char *serialport = "d:002/002";

@@ -51,13 +51,13 @@ int aldl_acq(aldl_conf_t *aldl) {
   #endif
 
   /* intial connection state */
-  aldl->state = ALDL_CONNECTING;
+  set_connstate(ALDL_CONNECTING,aldl);
 
   /* if the connection state gets set to quit, end the infinite loop.  not
      sure where a good place to set this would be anyway ... */
 
   /* loop infinitely until ALDL_QUIT is set */
-  while(aldl->state != ALDL_QUIT) {
+  while(get_connstate(aldl) != ALDL_QUIT) {
 
     /* iterate through all packets */
     for(npkt=0;npkt < comm->n_packets;npkt++) {
@@ -82,11 +82,14 @@ int aldl_acq(aldl_conf_t *aldl) {
        packet selector */
     PKTRETRY:
 
+    /* handle pause condition */
+    while(get_connstate(aldl) == ALDL_PAUSE) usleep(50000);
+
     /* this would seem an appropriate time to maintain the connection if it
        drops, or if it never existed ... if not, time for a delay */
-    if(aldl->state != ALDL_CONNECTED) {
+    if(get_connstate(aldl) >= 10) { /* if in any sort of disconnected state */
       aldl_reconnect(comm); /* main connection happens here */
-      aldl->state = ALDL_CONNECTED;
+      set_connstate(ALDL_CONNECTED,aldl);
     } else {
       /* delay between data collection iterations */
       usleep(aldl->rate);
@@ -155,7 +158,7 @@ int aldl_acq(aldl_conf_t *aldl) {
 
       /* --- set a desync state if we're getting lots of fails in a row */
       if(aldl->stats->failcounter > MAX_FAIL_DISCONNECT) {
-        aldl->state = ALDL_DESYNC;
+        set_connstate(ALDL_DESYNC,aldl);
       };
 
       pktfail = 0; /* reset fail state */
@@ -172,7 +175,7 @@ int aldl_acq(aldl_conf_t *aldl) {
     /* check if lagtime exceeded, and set lag state.  obviously this is a
        rough estimate, but good enough to maintain shutup state*/
     #ifdef LAGCHECK
-    if(time(NULL) >= lagtime + LAGTIME) aldl->state = ALDL_LAGGY;
+    if(time(NULL) >= lagtime + LAGTIME) set_connstate(ALDL_LAGGY,aldl);
     #endif
 
     }; /* end packet iterator */

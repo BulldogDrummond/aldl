@@ -169,6 +169,17 @@ unsigned int sixteenbit(byte *p) {
   return (unsigned int)((*p<<8)|*(p+1));
 };
 
+/* get/set data that requires locking ... */
+aldl_state_t get_connstate(aldl_conf_t *aldl) {
+  /* FIXME needs locking ... */
+  return aldl->state;
+};
+
+void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
+  /* FIXME needs locking ... */
+  aldl->state = s;
+};
+
 /* a debug output function ... */
 void printhexstring(byte *str, int length) {
   int x;

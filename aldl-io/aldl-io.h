@@ -30,6 +30,9 @@ void remove_record(aldl_record_t *rec);
 /* return a pointer to the oldest record in the linked list */
 aldl_record_t *oldest_record(aldl_conf_t *aldl);
 
+/* get/set connection state */
+aldl_state_t get_connstate(aldl_conf_t *aldl);
+void set_connstate(aldl_state_t s, aldl_conf_t *aldl);
 
 /* misc. useful functions ----------------------*/
 

@@ -3,13 +3,26 @@
 
 /* --------- datatypes ----------------------------------------*/
 
+/* output data type enumeration */
+
 typedef enum aldl_datatype {
   ALDL_INT, ALDL_UINT, ALDL_FLOAT, ALDL_BOOL, ALDL_RAW
 } aldl_datatype_t;
 
+/* connection state tracking */
+
 typedef enum aldl_state {
-  ALDL_CONNECTED, ALDL_CONNECTING, ALDL_LOADING,
-  ALDL_DESYNC, ALDL_ERROR, ALDL_QUIT, ALDL_LAGGY
+  /* connected states <=10 */
+  ALDL_CONNECTED = 0,
+  /* disconnected states >=10 */
+  ALDL_CONNECTING = 11,
+  ALDL_LOADING = 12,
+  ALDL_DESYNC = 13,
+  ALDL_ERROR = 14,
+  ALDL_LAGGY = 15,
+  /* special disconnected states >=50 */
+  ALDL_QUIT = 51,
+  ALDL_PAUSE = 52
 } aldl_state_t;
 
 /* 8-bit chunk of data */
@@ -115,7 +128,7 @@ typedef struct aldl_conf {
   char ecmtype; /* the type of ecm being read */
   int n_defs;   /* number of definitions */
   int bufsize;  /* the minimum number of records to maintain */
-  aldl_state_t state; /* connection state */
+  aldl_state_t state; /* connection state, do not touch */
   aldl_define_t *def; /* link to the definition set */
   aldl_record_t *r; /* link to the latest record */
   aldl_commdef_t *comm; /* link back to the communication spec */
