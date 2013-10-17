@@ -27,12 +27,11 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl);
 /* fill a prepared record with data */
 aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
 
-/* where size is the number of bits and p is a pointer to the beginning of the
-   data, output the result as an int */
-int inputsizeconvert(int size, byte *p);
+/* turn two 8 bit bytes into a 16 bit int */
+unsigned int sixteenbit(byte *p);
 
 /* get a single bit from a byte */
-int getbit(byte *p, int bpos, int flip);
+int getbit(byte p, int bpos, int flip);
 
 aldl_record_t *process_data(aldl_conf_t *aldl) {
   aldl_record_t *rec = aldl_create_record(aldl);
@@ -123,23 +122,32 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* location for output of data, matches definition array index ... */
   aldl_data_t *out = &r->data[n];
 
-  /* FIXME this doesnt deal with fields wider than 1 byte ... */
   /* FIXME doesn't deal with signed input */
   /* FIXME doesn't deal with min/max */
+
+  unsigned int x; /* converted value */
+  switch(def->size) {
+    case 16:
+      x = sixteenbit(data);
+      break;
+    case 8: /* direct conversion */
+    default:
+      x = (unsigned int)*data;
+  };
 
   /* get value, this does need more work ... */
   switch(def->type) {
     case ALDL_INT:
-      out->i = (int)*data + def->adder * def->multiplier;
+      out->i = (int)x + def->adder * def->multiplier;
       break;
     case ALDL_UINT:
-      out->u = (unsigned int)*data + def->adder * def->multiplier;
+      out->u = (unsigned int)x + def->adder * def->multiplier;
       break;
     case ALDL_FLOAT:
-      out->f = (float)*data + def->adder * def->multiplier;
+      out->f = (float)x + def->adder * def->multiplier;
       break;
     case ALDL_BOOL:
-      out->i = getbit(data,def->binary,def->invert) ;
+      out->i = getbit(x,def->binary,def->invert) ;
       break;
     /* raw or invalid bit just transfers the raw byte */
     case ALDL_RAW:
@@ -150,25 +158,15 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   return out;
 };
 
-int getbit(byte *p, int bpos, int flip) {
+int getbit(byte p, int bpos, int flip) {
   if(bpos < 0 || bpos > 7) fatalerror(ERROR_RANGE,"bit field number");
-  int bit = ( *p >> ( bpos + 1 ) & 0x01 );
+  int bit = ( p >> ( bpos + 1 ) & 0x01 );
   /* implement XOR */
   return bit;
 };
 
-int inputsizeconvert(int size, byte *p) {
-    switch(size) {
-    case 8:
-      return (long int)*p;
-      break;
-    case 16:
-      return (long int)((*p<<8)|*(p+1));
-      break;
-    default:
-      fatalerror(ERROR_RANGE,"bad input size in definition"); 
-  };
-  return 0;
+unsigned int sixteenbit(byte *p) {
+  return (unsigned int)((*p<<8)|*(p+1));
 };
 
 /* a debug output function ... */
