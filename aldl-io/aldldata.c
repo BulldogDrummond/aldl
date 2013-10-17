@@ -67,6 +67,10 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   aldl_record_t *rec = malloc(sizeof(aldl_record_t));
   if(rec == NULL) fatalerror(ERROR_MEMORY,"record creation");
 
+  /* handle no definition case, which creates records with no data,
+     for testing purposes */
+  if(aldl->n_defs < 1) return rec;
+
   /* allocate data memory */
   rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);
   if(rec == NULL) fatalerror(ERROR_MEMORY,"data str in record");
