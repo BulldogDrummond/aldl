@@ -7,8 +7,6 @@
 
 int aldl_reconnect(); /* go into diagnostic mode, returns 1 on success */
 
-int aldl_waitforchatter(); /* returns when idle traffic is detected */
-
 byte *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
 
 /* generate request strings */
@@ -23,8 +21,8 @@ void serial_close(); /* close the serial port */
 
 /* data mgmt ----------------------------------*/
 
-/* allocate and fill record ... */
-aldl_record_t *aldl_create_record(aldl_conf_t *aldl);
+/* process data from all packets, create a record, and link it to the list */
+aldl_record_t *process_data(aldl_conf_t *aldl);
 
 /* misc. useful functions ----------------------*/
 

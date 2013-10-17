@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
+#include <time.h>
 
 #include "serio.h"
 #include "config.h"
@@ -12,11 +13,22 @@
 #include "aldl-io.h"
 #include "../configfile/configfile.h"
 
-/* update the value in the record from definition n ... */
+/* --------- local functions ---------------- */
+
+/* update the value in the record from definition n */
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n);
 
-/* remove a record */
+/* remove a record from the linked list and deallocate */
 void remove_record(aldl_record_t *rec);
+
+/* allocate and populate record */
+aldl_record_t *aldl_create_record(aldl_conf_t *aldl);
+
+/* link a prepared record to the linked list */
+void link_record(aldl_record_t *rec, aldl_conf_t *aldl);
+
+/* return a pointer to the oldest record in the linked list */
+aldl_record_t *oldest_record(aldl_conf_t *aldl);
 
 /* where size is the number of bits and p is a pointer to the beginning of the
    data, output the result as an int */
@@ -25,13 +37,39 @@ int inputsizeconvert(int size, byte *p);
 /* get a single bit from a byte */
 int getbit(byte *p, int bpos, int flip);
 
+aldl_record_t *process_data(aldl_conf_t *aldl) {
+  aldl_record_t *rec = aldl_create_record(aldl);
+  link_record(rec,aldl);
+  return rec;
+};
+
+aldl_record_t *oldest_record(aldl_conf_t *aldl) {
+  aldl_record_t *last = aldl->r;
+  while(last->prev != NULL) last++;
+  return last;
+};
+
 void remove_record(aldl_record_t *rec) {
+  /* FIXME need to do some locking and underrun checking here ... */
+  if(rec->next == NULL) return; /* dont remove the only record */
+  if(rec->prev != NULL) fatalerror(ERROR_NULL,"remove wrong record");
+  rec->next->prev = NULL; /* delink from linked list */
   free(rec->data);
   free(rec);
 };
 
+void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
+  /* prepare links in new record */
+  rec->next = NULL; /* terminate linked list */
+  rec->prev = aldl->r; /* previous link */
+  /* FIXME need to do some locking and sanity checks here */
+  aldl->r->next = rec; /* attach to linked list */
+  aldl->r = rec; /* fix master link */
+};
+
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   /* allocate record memory */
+  /* FIXME this could use a defined pool of memory with a selection routine*/
   aldl_record_t *rec = malloc(sizeof(aldl_record_t));
   if(rec == NULL) fatalerror(ERROR_MEMORY,"record creation");
 
@@ -39,13 +77,11 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);
   if(rec == NULL) fatalerror(ERROR_MEMORY,"data str in record");
 
-  /* start with old data here, that way if any data isn't filled, at least the
-     stale data is there ... if there's no old data, just fill zeros. */
-  if(aldl->r == NULL) {
-    memset(rec->data,0,sizeof(aldl_data_t) * aldl->n_defs);
-  } else {
-    memcpy(rec->data,aldl->r->data,sizeof(aldl_data_t) * aldl->n_defs);
-  };
+  /* zero memory (shouldn't really be necessary) */
+  memset(rec->data,0,sizeof(aldl_data_t) * aldl->n_defs);
+
+  /* timestamp record */
+  rec->t = time(NULL);
 
   /* process packet data */
   int def_n;
