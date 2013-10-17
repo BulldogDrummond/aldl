@@ -65,7 +65,6 @@ typedef struct aldl_record {
 /* defines each packet of data and how to retrieve it */
 
 typedef struct aldl_packetdef {
-  int clean;     /* set to 1 if the packet has good data in it ... */
   byte id;         /* message number */
   byte msg_len;    /* message length byte */
   byte msg_mode;   /* message mode */
