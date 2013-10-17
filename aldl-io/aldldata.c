@@ -18,11 +18,14 @@
 /* update the value in the record from definition n */
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n);
 
-/* allocate and populate record */
+/* allocate record and timestamp it */
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl);
 
 /* link a prepared record to the linked list */
 void link_record(aldl_record_t *rec, aldl_conf_t *aldl);
+
+/* fill a prepared record with data */
+aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
 
 /* where size is the number of bits and p is a pointer to the beginning of the
    data, output the result as an int */
@@ -33,6 +36,7 @@ int getbit(byte *p, int bpos, int flip);
 
 aldl_record_t *process_data(aldl_conf_t *aldl) {
   aldl_record_t *rec = aldl_create_record(aldl);
+  aldl_fill_record(aldl,rec);
   link_record(rec,aldl);
   return rec;
 };
@@ -63,7 +67,6 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
 
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   /* allocate record memory */
-  /* FIXME this could use a defined pool of memory with a selection routine*/
   aldl_record_t *rec = malloc(sizeof(aldl_record_t));
   if(rec == NULL) fatalerror(ERROR_MEMORY,"record creation");
 
@@ -71,22 +74,22 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
      for testing purposes */
   if(aldl->n_defs < 1) return rec;
 
+  /* timestamp record */
+  rec->t = time(NULL);
+
   /* allocate data memory */
   rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);
   if(rec == NULL) fatalerror(ERROR_MEMORY,"data str in record");
 
-  /* zero memory (shouldn't really be necessary) */
-  memset(rec->data,0,sizeof(aldl_data_t) * aldl->n_defs);
+  return rec;
+};
 
-  /* timestamp record */
-  rec->t = time(NULL);
-
+aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec) {
   /* process packet data */
   int def_n;
   for(def_n=0;def_n<aldl->n_defs;def_n++) {
-    aldl_parse_def(aldl,rec,def_n); 
+    aldl_parse_def(aldl,rec,def_n);
   };
-
   return rec;
 };
 
@@ -108,9 +111,8 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
 
   aldl_packetdef_t *pkt = &aldl->comm->packet[id]; /* ptr to packet */
 
-  /* FIXME need to check for bad or stale packet here */
-
   /* check to ensure byte location is in range */
+  /* FIXME this could be checked while loading definitions ... */
   if(pkt->offset + def->offset > pkt->length) {
     fatalerror(ERROR_RANGE,"definition out of packet range");
   };
