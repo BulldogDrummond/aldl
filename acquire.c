@@ -56,9 +56,10 @@ int aldl_acq(aldl_conf_t *aldl) {
   /* if the connection state gets set to quit, end the infinite loop.  not
      sure where a good place to set this would be anyway ... */
 
-  /* ---- event loop header -----  until ALDL_QUIT connection state is set,
-     iterate through all packets in sequence. */
+  /* loop infinitely until ALDL_QUIT is set */
   while(aldl->state != ALDL_QUIT) {
+
+    /* iterate through all packets */
     for(npkt=0;npkt < comm->n_packets;npkt++) {
 
     #ifdef ALDL_MULTIPACKET
@@ -122,35 +123,28 @@ int aldl_acq(aldl_conf_t *aldl) {
       #ifdef VERBLOSITY
       printf("packet %i failed due to timeout...\n",npkt);
       #endif
-      goto NOMORETESTS;
-    };
 
     /* optional check for pcm address bit in the header, to see if we're
        even in the ballpark of a legit packet.  this may avoid an expensive
        checksumming run if the packet is total garbage. */
     #ifdef CHECK_HEADER_SANITY
-    if(pkt->data[0] != comm->pcm_address) { /* fail header */
+    } else if (pkt->data[0] != comm->pcm_address) {
       pktfail = 1;
       aldl->stats->packetheaderfail++;
       #ifdef VERBLOSITY
       printf("header failed @ pkt %i...\n",npkt);
       #endif
-      goto NOMORETESTS;
-    };
     #endif
 
     /* verify checksum if that option is enabled in the commdef. */
-    if(comm->checksum_enable == 1 &&
+    } else if(comm->checksum_enable == 1 &&
        checksum_test(pkt->data, pkt->length) == 0) {
       pktfail = 1;
       aldl->stats->packetchecksumfail++;
       #ifdef VERBLOSITY
       printf("checksum failed @ pkt %i...\n",npkt);
       #endif
-      goto NOMORETESTS;
     };
-
-    NOMORETESTS:
 
     /* handle condition of a bad packet */
     if(pktfail == 1) {
