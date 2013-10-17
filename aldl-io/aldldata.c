@@ -23,7 +23,7 @@ void remove_record(aldl_record_t *rec);
 int inputsizeconvert(int size, byte *p);
 
 /* get a single bit from a byte */
-int getbit(byte *p, int byte, int flip);
+int getbit(byte *p, int bpos, int flip);
 
 void remove_record(aldl_record_t *rec) {
   free(rec->data);
@@ -114,16 +114,11 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   return out;
 };
 
-int getbit(byte *p, int byte, int flip) {
-  if(byte < 0 || byte > 7) fatalerror(ERROR_RANGE,"byte field number");
-  int bit = ( *p >> ( byte + 1 ) & 0x01 );
-  /* FIXME convert to bitwise operator */
-  if(flip == 1 && bit == 0) {
-    bit = 1;
-  } else if (flip == 1 && bit == 1) {
-    bit = 0;
-  };
-  return( ( *p >> ( byte + 1 ) & 0x01 ));
+int getbit(byte *p, int bpos, int flip) {
+  if(bpos < 0 || bpos > 7) fatalerror(ERROR_RANGE,"bit field number");
+  int bit = ( *p >> ( bpos + 1 ) & 0x01 );
+  /* implement XOR */
+  return bit;
 };
 
 int inputsizeconvert(int size, byte *p) {
