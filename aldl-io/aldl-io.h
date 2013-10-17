@@ -23,9 +23,8 @@ void serial_close(); /* close the serial port */
 
 /* data mgmt ----------------------------------*/
 
-/* get an array index for a definition or data chunk by id.  returns -1 if it
-   doesn't exist. */
-int get_definition_by_id(aldl_conf_t *c, char *id);
+/* allocate and fill record ... */
+aldl_record_t *aldl_create_record(aldl_conf_t *aldl);
 
 /* misc. useful functions ----------------------*/
 

@@ -15,12 +15,20 @@
 /* update the value in the record from definition n ... */
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n);
 
+/* remove a record */
+void remove_record(aldl_record_t *rec);
+
 /* where size is the number of bits and p is a pointer to the beginning of the
    data, output the result as an int */
 int inputsizeconvert(int size, byte *p);
 
 /* get a single bit from a byte */
 int getbit(byte *p, int byte, int flip);
+
+void remove_record(aldl_record_t *rec) {
+  free(rec->data);
+  free(rec);
+};
 
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   /* allocate record memory */
