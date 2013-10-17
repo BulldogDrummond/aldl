@@ -1,6 +1,8 @@
 #ifndef _ERROR_H
 #define _ERROR_H
 
+#define N_ERRORCODES 7
+
 typedef enum _error {
   ERROR_GENERAL=0,
   ERROR_NULL=1,
