@@ -18,17 +18,11 @@
 /* update the value in the record from definition n */
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n);
 
-/* remove a record from the linked list and deallocate */
-void remove_record(aldl_record_t *rec);
-
 /* allocate and populate record */
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl);
 
 /* link a prepared record to the linked list */
 void link_record(aldl_record_t *rec, aldl_conf_t *aldl);
-
-/* return a pointer to the oldest record in the linked list */
-aldl_record_t *oldest_record(aldl_conf_t *aldl);
 
 /* where size is the number of bits and p is a pointer to the beginning of the
    data, output the result as an int */

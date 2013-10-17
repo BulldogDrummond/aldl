@@ -24,6 +24,13 @@ void serial_close(); /* close the serial port */
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
 
+/* remove a record from the linked list and deallocate */
+void remove_record(aldl_record_t *rec);
+
+/* return a pointer to the oldest record in the linked list */
+aldl_record_t *oldest_record(aldl_conf_t *aldl);
+
+
 /* misc. useful functions ----------------------*/
 
 /* generate a checksum byte */

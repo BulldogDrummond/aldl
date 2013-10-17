@@ -22,6 +22,7 @@ int aldl_acq(aldl_conf_t *aldl) {
   aldl_packetdef_t *pkt = NULL; /* temporary pointer to the packet def */
   int pktfail = 0; /* marker for a failed packet in event loop */
   int npkt = 0; /* array index of packet to operate on */
+  int buffered = 0;
 
   /* sanity checks */
   if(aldl->rate * 1000 > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
@@ -57,23 +58,9 @@ int aldl_acq(aldl_conf_t *aldl) {
 
   /* ---- event loop header -----  until ALDL_QUIT connection state is set,
      iterate through all packets in sequence. */
-  #ifdef ALDL_MULTIPACKET
-  while(aldl->state != ALDL_QUIT) for(npkt=0;npkt < comm->n_packets;npkt++) {
-  #else
-  npkt = 0; while(aldl->state != ALDL_QUIT) {
-  #endif
+  while(aldl->state != ALDL_QUIT) {
+    for(npkt=0;npkt < comm->n_packets;npkt++) {
 
-    /* detect a necessary retry, and step back iterator */
-    if(pktfail == 1) {
-      if(npkt == 0) {
-        npkt = comm->n_packets - 1;
-      } else {
-        npkt--;
-      };
-      pktfail = 0; /* reset fail marker */
-      /* note that *pkt will have persisted from last iteration */
-    } else {  /* retry skips the frequency selector */
-    
     #ifdef ALDL_MULTIPACKET
     /* ---- frequency select routine ---- */
       /* skip packet if frequency is 0 to match spec */
@@ -87,9 +74,12 @@ int aldl_acq(aldl_conf_t *aldl) {
         freq_counter[npkt] = 1;
       };
     #endif
-    };
 
     pkt = &comm->packet[npkt]; /* pointer to the correct packet */
+
+    /* this is a jump point for packet retry that skils the for loop and
+       packet selector */
+    PKTRETRY:
 
     /* this would seem an appropriate time to maintain the connection if it
        drops, or if it never existed ... if not, time for a delay */
@@ -107,11 +97,11 @@ int aldl_acq(aldl_conf_t *aldl) {
     lagtime = time(NULL); 
     #endif
 
-    /* check if we're @ 5 seconds, and average the number of packets for
+    /* check if we're @ duration, and average the number of packets for
        statistical purposes */
     #ifdef TRACK_PKTRATE
     if(time(NULL) - timestamp >= PKTRATE_DURATION) {
-      aldl->stats->packetspersecond = pktcounter / PKTRATE_DURATION;
+      aldl->stats->packetspersecond = (float)pktcounter / PKTRATE_DURATION;
       timestamp = time(NULL);
       pktcounter = 0;
     };
@@ -122,6 +112,8 @@ int aldl_acq(aldl_conf_t *aldl) {
     printf("ACQUIRE pkt# %i\n",npkt);
     #endif
 
+    /* ------- sanity checks and retrieve packet ------------ */
+
     /* send request and get packet data (from aldlcomm.c); if NULL is
        returned, it's because it timed out waiting for data. */
     if(aldl_get_packet(pkt) == NULL) {
@@ -130,6 +122,7 @@ int aldl_acq(aldl_conf_t *aldl) {
       #ifdef VERBLOSITY
       printf("packet %i failed due to timeout...\n",npkt);
       #endif
+      goto NOMORETESTS;
     };
 
     /* optional check for pcm address bit in the header, to see if we're
@@ -142,6 +135,7 @@ int aldl_acq(aldl_conf_t *aldl) {
       #ifdef VERBLOSITY
       printf("header failed @ pkt %i...\n",npkt);
       #endif
+      goto NOMORETESTS;
     };
     #endif
 
@@ -153,7 +147,10 @@ int aldl_acq(aldl_conf_t *aldl) {
       #ifdef VERBLOSITY
       printf("checksum failed @ pkt %i...\n",npkt);
       #endif
+      goto NOMORETESTS;
     };
+
+    NOMORETESTS:
 
     /* handle condition of a bad packet */
     if(pktfail == 1) {
@@ -167,13 +164,15 @@ int aldl_acq(aldl_conf_t *aldl) {
         aldl->state = ALDL_DESYNC;
       };
 
+      pktfail = 0; /* reset fail state */
+      goto PKTRETRY; /* jump back to earlier in the loop, no increment */
+
     /* packet is good to go */
     } else {
       #ifdef TRACK_PKTRATE
       pktcounter++; /* increment packet counter */
       #endif
       aldl->stats->failcounter = 0; /* reset failcounter */
-      /* process packet here ?? */
     };
 
     /* check if lagtime exceeded, and set lag state.  obviously this is a
@@ -181,6 +180,20 @@ int aldl_acq(aldl_conf_t *aldl) {
     #ifdef LAGCHECK
     if(time(NULL) >= lagtime + LAGTIME) aldl->state = ALDL_LAGGY;
     #endif
+
+    }; /* end packet iterator */
+
+    /* all packets should be complete here */
+
+    /* process the packet */
+    process_data(aldl);
+
+    /* buffering logic for removal of records */
+    if(buffered < aldl->bufsize) { /* buffer not full, dont remove records */
+      buffered++;
+    } else { /* buffer is full, delete oldest record */
+      remove_record(oldest_record(aldl));
+    };
 
     debugif_iterate(aldl);
   };
