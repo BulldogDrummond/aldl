@@ -8,6 +8,9 @@
 
 #define PREPRODUCTION
 
+/* debug structures and buffering */
+#define DEBUGSTRUCT
+
 /* the maximum failed packets before the connection is marked failed */
 #define MAX_FAIL_DISCONNECT 6
 

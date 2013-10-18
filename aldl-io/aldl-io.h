@@ -52,6 +52,9 @@ int get_index_by_id(aldl_conf_t *aldl, int id);
 /* this pauses until a 'connected' state is detected */
 void pause_until_connected(aldl_conf_t *aldl);
 
+/* this pauses until the buffer is full */
+void pause_until_buffered(aldl_conf_t *aldl);
+
 /* misc. useful functions ----------------------*/
 
 /* generate a checksum byte */

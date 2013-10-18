@@ -136,6 +136,7 @@ typedef struct aldl_conf {
   aldl_stats_t *stats;   /* statistics */
   int rate;    /* slow down data collection, in microseconds.  never exceed
                   one second, or connection quality may suffer.. */
+  int ready:1; /* mark this flag when the buffer is full enough */
 } aldl_conf_t;
 
 #endif

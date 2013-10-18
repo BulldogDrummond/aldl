@@ -6,24 +6,12 @@ Access of Data:
 - No locking is required for reading data from the top of the buffer, the data
   will NEVER be modified once it is attached to the linked list.
 
-- Never access the linked list pointers directly, use the following functions:
-  aldl_record_t *newest_record(aldl_conf_t *aldl);
-  aldl_record_t *next_record_wait(aldl_record_t *rec);
-  aldl_record_t *next_record(aldl_record_t *rec);
-
-- Plugins that are too slow and underrun the buffer may produce undefined
-  behavior, as dumb garbage collection with no locking is used.  It is much
-  cheaper to just create a gigantic buffer, than to implement locking for every
-  record access to ensure that a record that's being worked on isn't deleted.
-  Plugins that are slow need to use newest_record, which inherently skips
-  frames if they are produced faster than they are accessed.
-
 - Data in a record always matches the array index of the definition set, as in
   conf->def[x] and record->data[x].  This can be leveraged to easily get data
   from a definition.
 
   This is an example of a stupid plugin that has some initial knowledge of the
-  unique ID of the RPM definition, and displays RPM in a loop:
+  unique ID of the RPM definition, and displays RPM in a loop, it's thread-safe
 
 /*------------------------------------------------------------------------*/
 
@@ -35,14 +23,9 @@ void display_rpm(aldl_conf_t *aldl) {
   int rpmindex = get_index_by_id(aldl,RPM_FIELD_ID);
   aldl_record_t *rec = NULL; /* pointer to the most current record */
 
-  while(1) {
+  pause_until_connected(aldl);
 
-    /* track connection state */
-    if(get_connstate(aldl) > 10) {
-      printf("disconnected.  waiting for connection ...");
-      pause_until_connected(aldl);
-      printf("reconnected!\n");
-    };
+  while(1) {
 
     /* pause until new data is available, then retrieve it. */
     rec = next_record_wait(aldl);
@@ -55,4 +38,43 @@ void display_rpm(aldl_conf_t *aldl) {
 };
 
 /*------------------------------------------------------------------------*/
+
+RULES FOR PLUGIN DEVELOPERS:
+
+- Always call pause_until_connected before your intial data retrieval, this
+  ensures the buffer is full enough, and the connection has happened.  after
+  one call, the buffer will ALWAYS be full enough.
+
+- Never access the linked list pointers directly, use the following functions:
+  aldl_record_t *newest_record(aldl_conf_t *aldl);
+  aldl_record_t *next_record_wait(aldl_record_t *rec);
+  aldl_record_t *next_record(aldl_record_t *rec);
+  these ensure thread safety on the structural components themselves...
+
+- Never, under any circumstances, write directly to any data structure.
+
+- Ending the program via a plugin should always be done by running:
+  while(1) set_commstate(ALDL_QUIT);
+
+- Speed is important when using next_record or next_record_wait, your routine
+  must theoretically execute in average speed more quickly than:
+
+  t = ( 0.122ms * number of bytes in all pkts * 1.2 )
+
+  On an LT1 using 64 byte packets this allows approx. 10ms once calculation
+  overhead is taken into account.  If your route is slower than this on average
+  over the buffer size, you must use newest_record() to allow frame skipping,
+  in which case your routine can take t * bufsize with no problems.
+
+  Results are UNDEFINED BEHAVIOR if you try to retrieve data from the last
+  record, no locking is done on deletion, as it is assumed any routine that
+  operates so slowly is a display routine, that will want frame skipping
+  anyway.
+
+- If you are using next_record_wait or next_record, you must always call
+  pause_until_buffered() before entering your event loop to ensure you have
+  sufficient buffering.  If using newest_record(), you must always call
+  pause_until_connected() before entering your event loop.  If you are using
+  both functions, you should call pause_until_connected() and THEN call
+  pause_until_buffered().
 

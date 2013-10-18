@@ -121,7 +121,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* we'll assume the packet exists; this should be checked during config
      load time ... */
   for(id=0; id < aldl->comm->n_packets - 1; id++) {
-    if(aldl->comm->packet[id].id == def->id) break;
+    if(aldl->comm->packet[id].id == def->packet) break;
   };
   #endif
 
@@ -192,6 +192,9 @@ aldl_state_t get_connstate(aldl_conf_t *aldl) {
 
 void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
   pthread_mutex_lock(lock.connstate);
+  #ifdef DEBUGSTRUCT
+  printf("set connection state to %i\n",s);
+  #endif
   aldl->state = s;
   pthread_mutex_unlock(lock.connstate);
 };
@@ -239,6 +242,10 @@ int get_index_by_id(aldl_conf_t *aldl, int id) {
 
 void pause_until_connected(aldl_conf_t *aldl) {
   while(get_connstate(aldl) > 10) usleep(100);
+};
+
+void pause_until_buffered(aldl_conf_t *aldl) {
+  while(aldl->ready ==0) usleep(50);
 };
 
 /* a debug output function ... */

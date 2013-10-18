@@ -184,8 +184,12 @@ int aldl_acq(aldl_conf_t *aldl) {
 
     /* buffering logic for removal of records */
     if(buffered < aldl->bufsize) { /* buffer not full, dont remove records */
+      #ifdef DEBUGSTRUCT
+      printf("filling buffer %i of %i\n",buffered,aldl->bufsize);
+      #endif
       buffered++;
     } else { /* buffer is full, delete oldest record */
+      aldl->ready = 1; /* set readyness bit */
       remove_record(oldest_record(aldl));
     };
 
