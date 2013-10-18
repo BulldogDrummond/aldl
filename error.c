@@ -8,7 +8,7 @@
    error_t.  these will have ERROR printed AFTER them, so GENERAL will come
    out as GENERAL ERROR. */
 
-char errstr[N_ERRORCODES][] = {
+char errstr[N_ERRORCODES][20] = {
 "GENERAL",
 "NULL",
 "OUT OF MEMORY",
