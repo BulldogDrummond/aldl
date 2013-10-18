@@ -68,6 +68,8 @@ typedef struct aldl_define {
    used as a container for a snapshot of data. */
 
 typedef struct aldl_record {
+  /* WARNING! never traverse the linked list manually, as that would not
+     necessarily be thread-safe ... there are functions for that. */
   struct aldl_record *next; /* linked list traversal, newer record or NULL */
   struct aldl_record *prev; /* linked list traversal, older record or NULL */
   time_t t;            /* timestamp of the record */
