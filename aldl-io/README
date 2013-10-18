@@ -1,29 +1,29 @@
-there will be multiple aldl i/o methods, so far just these two:
+this aldl-io library provides every function necessary to communicate with an
+8192 baud GM aldl ecm, and create parsed data structures to be used by the
+various interfaces in the program.  it does not manage events or connection
+state, that must be done with an external event loop.
 
-tty serial i/o:
-  * removed for now
+aldl-io.h: all public functions are exported here.  this also explicitly
+           includes aldl-types.h.
 
-ftdilib:
-  * this is a super-portable userspace ftdi chipset driver.  most usb aldl
-    cables seem to use that chipset.
-  * for the most common usb-serial adaptors, seems to be more powerful and
-    can be configured with very specific baud rates, bit banging, advanced
-    timing.  this should be the most commonly used.
-  * to use it, the ftdi_sio driver must be blacklisted or it'll auto-load
-    when the interface is plugged in, and ftdilib wont work.
+aldl-types.h: defines all public data structures used in this library.
+
+aldldata.c: provides functions for data management, including construction of 
+            the linked list of records, parsing and conversion of raw data, and
+            thread-safe read/write of critical data.
+
+aldlcomm.c: provides communication protocols for dealing with the ECM, including
+            sending and generating requests, retrieving raw packets of data,
+            and verifying them.
+
+serio-ftdi.c: an object that allows serial communications using the libftdi
+              userland driver (via libusb).  this is the reccommended and only
+              currently supported interface.
+
+NOTES:
 
 string to identify your ftdi interface (pick one):
    d:devicenode (usually at /proc/bus/usb)
    i:vendor:product
    i:vendor:product:index
    s:vendor:product:serial
-
-autodetection is activated if the string isn't present.  this is untested, and
-simply picks the first available ftdi interface on the bus.
-
-these interfaces are compile-time selected.  object files for each method are
-available with an identical api for each method.
-
-Notes on Timing:
-the 'timeout' fields are imprecise, and are a minimum timeout only.
-
