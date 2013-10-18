@@ -169,7 +169,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
     /* raw or invalid bit just transfers the raw byte */
     case ALDL_RAW:
     default:
-      out->raw = *data;
+      out->raw = x;
   };
 
   return out;
@@ -177,9 +177,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
 
 int getbit(byte p, int bpos, int flip) {
   if(bpos < 0 || bpos > 7) fatalerror(ERROR_RANGE,"bit field number");
-  int bit = ( p >> ( bpos + 1 ) & 0x01 );
-  /* implement XOR */
-  return bit;
+  return flip ^ ( p >> ( bpos + 1 ) & 0x01 );
 };
 
 unsigned int sixteenbit(byte *p) {
