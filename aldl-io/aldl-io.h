@@ -21,6 +21,9 @@ void serial_close(); /* close the serial port */
 
 /* data mgmt ----------------------------------*/
 
+/* set up lock structures */
+void init_locks();
+
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
 

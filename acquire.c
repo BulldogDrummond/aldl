@@ -53,9 +53,6 @@ int aldl_acq(aldl_conf_t *aldl) {
   /* intial connection state */
   set_connstate(ALDL_CONNECTING,aldl);
 
-  /* if the connection state gets set to quit, end the infinite loop.  not
-     sure where a good place to set this would be anyway ... */
-
   /* loop infinitely until ALDL_QUIT is set */
   while(get_connstate(aldl) != ALDL_QUIT) {
 

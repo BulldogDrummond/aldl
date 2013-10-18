@@ -13,6 +13,15 @@
 #include "aldl-io.h"
 #include "../configfile/configfile.h"
 
+/* -------- globalstuffs ------------------ */
+
+typedef struct aldl_lock {
+  int connstate:1; /* locks connection state */
+  int recordptr:1; /* locks linked list links in records */
+} aldl_lock_t;
+
+aldl_lock_t lock;
+
 /* --------- local functions ---------------- */
 
 /* update the value in the record from definition n */
@@ -33,6 +42,11 @@ unsigned int sixteenbit(byte *p);
 /* get a single bit from a byte */
 int getbit(byte p, int bpos, int flip);
 
+void init_locks() {
+  lock.connstate = 0;
+  lock.recordptr = 0;
+};
+
 aldl_record_t *process_data(aldl_conf_t *aldl) {
   aldl_record_t *rec = aldl_create_record(aldl);
   aldl_fill_record(aldl,rec);
@@ -47,7 +61,6 @@ aldl_record_t *oldest_record(aldl_conf_t *aldl) {
 };
 
 void remove_record(aldl_record_t *rec) {
-  /* FIXME need to do some locking and underrun checking here ... */
   if(rec->next == NULL) return; /* dont remove the only record */
   if(rec->prev != NULL) fatalerror(ERROR_NULL,"remove wrong record");
   rec->next->prev = NULL; /* delink from linked list */
@@ -59,9 +72,11 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
   /* prepare links in new record */
   rec->next = NULL; /* terminate linked list */
   rec->prev = aldl->r; /* previous link */
-  /* FIXME need to do some locking and sanity checks here */
+  while(lock.recordptr == 1);
+  lock.recordptr = 1;
   aldl->r->next = rec; /* attach to linked list */
   aldl->r = rec; /* fix master link */
+  lock.recordptr = 0;
 };
 
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
@@ -169,15 +184,16 @@ unsigned int sixteenbit(byte *p) {
   return (unsigned int)((*p<<8)|*(p+1));
 };
 
-/* get/set data that requires locking ... */
 aldl_state_t get_connstate(aldl_conf_t *aldl) {
-  /* FIXME needs locking ... */
+  while(lock.connstate == 1);
   return aldl->state;
 };
 
 void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
-  /* FIXME needs locking ... */
+  while(lock.connstate == 1);
+  lock.connstate = 1;
   aldl->state = s;
+  lock.connstate = 0;
 };
 
 /* a debug output function ... */
