@@ -1,31 +1,26 @@
+for detailed project overview, see: http://resflter.github.io/aldl
 
-** in active development, not ready for use **
+dependancies: libftdi, bison, flex, pthreads
 
-for detailed project overview, see:
+the build is now statically compiled with a serial driver.  right now, the ftdi
+driver is the only one supported.  to build: make aldl-ftdi
 
-http://resfilter.github.io/aldl
+contents:
 
-it has various serial interface methods, which it uses to place the ECM in
-diagnostic mode, so realtime data can be retrieved, calculated, and then
-processed by a series of display or scripting modules.  right now the ftdi
-driver is the only one in active development, the others have been removed.
+main.c: sets up initial structures and spawns some threads, to get things going
 
-it uses a proprietery config format, which defines the location of various
-data sets, and conversion specifications per diagnostic commands, as well
-as ecm-specific strings and timing.
+aldl-io/  a static library that manages all retrieval of serial data, parsing,
+          and placing it into structures to be used by all other modules of
+          this program.
 
-a script will be provided to import some of the specs in a tunerpro ADF
-file.
+acquire.c: an object that runs an event loop full of functions from aldl-io,
+           maintaining connection state and constructing a linked list buffer
+           of parsed and verified aldl data.
 
-it is intended for use on low-power devices such as the raspberry pi, to
-construct digital secondary dashboard type devices.
+error.c: a global error handling object.
 
-dependancies: libftdi, bison, flex
+configfile/  a library for loading and managing defintion and config files
 
-build is now statically compiled with a particular i/o handler, and is no
-longer selectable at runtime.
-
-run following in root directory:
-
-make aldl-ftdi
+debugif/  a testing display module just to spit out raw data to make sure it's
+          working.
 
