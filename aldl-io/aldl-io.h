@@ -37,6 +37,18 @@ aldl_record_t *oldest_record(aldl_conf_t *aldl);
 aldl_state_t get_connstate(aldl_conf_t *aldl);
 void set_connstate(aldl_state_t s, aldl_conf_t *aldl);
 
+/* get newest record in the list */
+aldl_record_t *newest_record(aldl_conf_t *aldl);
+
+/* get next record in the list, waits until one is available */
+aldl_record_t *next_record_wait(aldl_record_t *rec);
+
+/* get next record in the list, returns NULL if none is available */
+aldl_record_t *next_record(aldl_record_t *rec);
+
+/* get definition or data array index by id number, returns -1 if not found */
+int get_index_by_id(aldl_conf_t *aldl, int id);
+
 /* misc. useful functions ----------------------*/
 
 /* generate a checksum byte */

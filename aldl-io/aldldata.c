@@ -198,6 +198,47 @@ void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
   pthread_mutex_unlock(lock.connstate);
 };
 
+/* get newest record in the list */
+aldl_record_t *newest_record(aldl_conf_t *aldl) {
+  aldl_record_t *rec = NULL;
+  pthread_mutex_lock(lock.recordptr);
+  rec = aldl->r; 
+  pthread_mutex_unlock(lock.recordptr);
+  return rec;
+};
+
+/* get next record in the list, waits until one is available */
+aldl_record_t *next_record_wait(aldl_record_t *rec) {
+  aldl_record_t *next = NULL;
+  while(next == NULL) {
+    /* just call next_record repeatedly until one shows up */
+    next = next_record(rec);
+    usleep(100); /* throttling ... */
+  };
+  return next;
+};
+
+/* get next record in the list, returns NULL if none is available */
+aldl_record_t *next_record(aldl_record_t *rec) {
+  /* check for underrun ... */
+  if(rec->prev == NULL || rec->prev->prev == NULL) {
+     fatalerror(ERROR_BUFFER,"underrun in record retrieve");
+  };
+  aldl_record_t *next;
+  pthread_mutex_lock(lock.recordptr);
+  next = rec->next;
+  pthread_mutex_unlock(lock.recordptr);
+  return next;
+};
+
+int get_index_by_id(aldl_conf_t *aldl, int id) {
+  int x;
+  for(x=0;x<aldl->n_defs;x++) {
+    if(id == aldl->def[x].id) return x;
+  };
+  return -1; /* not found */
+};
+
 /* a debug output function ... */
 void printhexstring(byte *str, int length) {
   int x;
