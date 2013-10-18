@@ -1,0 +1,58 @@
+Access of Data:
+
+- A linked list of aldl_record_t structures is constructed as fixed length
+  buffer.
+
+- No locking is required for reading data from the top of the buffer, the data
+  will NEVER be modified once it is attached to the linked list.
+
+- Never access the linked list pointers directly, use the following functions:
+  aldl_record_t *newest_record(aldl_conf_t *aldl);
+  aldl_record_t *next_record_wait(aldl_record_t *rec);
+  aldl_record_t *next_record(aldl_record_t *rec);
+
+- Plugins that are too slow and underrun the buffer may produce undefined
+  behavior, as dumb garbage collection with no locking is used.  It is much
+  cheaper to just create a gigantic buffer, than to implement locking for every
+  record access to ensure that a record that's being worked on isn't deleted.
+  Plugins that are slow need to use newest_record, which inherently skips
+  frames if they are produced faster than they are accessed.
+
+- Data in a record always matches the array index of the definition set, as in
+  conf->def[x] and record->data[x].  This can be leveraged to easily get data
+  from a definition.
+
+  This is an example of a stupid plugin that has some initial knowledge of the
+  unique ID of the RPM definition, and displays RPM in a loop:
+
+/*------------------------------------------------------------------------*/
+
+#define RPM_FIELD_ID 22
+
+void display_rpm(aldl_conf_t *aldl) {
+
+  /* get the index and store it, to avoid repeated lookups */
+  int rpmindex = get_index_by_id(aldl,RPM_FIELD_ID);
+  aldl_record_t *rec = NULL; /* pointer to the most current record */
+
+  while(1) {
+
+    /* track connection state */
+    if(get_connstate(aldl) > 10) {
+      printf("disconnected.  waiting for connection ...");
+      pause_until_connected(aldl);
+      printf("reconnected!\n");
+    };
+
+    /* pause until new data is available, then retrieve it. */
+    rec = next_record_wait(aldl);
+
+    /* in that record, get data field rpmindex, and the floating point value
+       contained within ... also get the short name from the definition. */
+    printf("%s: %f",aldl->def[rpmindex]->name, rec->data[rpmindex].f);
+
+  };
+};
+
+/*------------------------------------------------------------------------*/
+
