@@ -237,6 +237,10 @@ int get_index_by_id(aldl_conf_t *aldl, int id) {
   return -1; /* not found */
 };
 
+void pause_until_connected(aldl_conf_t *aldl) {
+  while(get_connstate(aldl) > 10) usleep(100);
+};
+
 /* a debug output function ... */
 void printhexstring(byte *str, int length) {
   int x;

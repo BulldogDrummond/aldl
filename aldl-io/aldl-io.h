@@ -49,6 +49,9 @@ aldl_record_t *next_record(aldl_record_t *rec);
 /* get definition or data array index by id number, returns -1 if not found */
 int get_index_by_id(aldl_conf_t *aldl, int id);
 
+/* this pauses until a 'connected' state is detected */
+void pause_until_connected(aldl_conf_t *aldl);
+
 /* misc. useful functions ----------------------*/
 
 /* generate a checksum byte */

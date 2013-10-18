@@ -38,7 +38,6 @@ void load_config_a(char *filename); /* load data to alloc_a structures */
 void load_config_b(char *filename); /* load data to alloc_b structures */
 
 int main() {
-
   init_locks();
 
   aldl_setup();
