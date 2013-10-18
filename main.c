@@ -3,6 +3,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <time.h>
+#include <pthread.h>
 
 /* local objects */
 #include "config.h"

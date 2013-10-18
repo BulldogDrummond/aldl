@@ -6,7 +6,7 @@ FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 all: aldl-ftdi
 
 aldl-ftdi: main.c aldl-io-ftdi configfile_ debugif_ acquire.o error.o
-	gcc $(CFLAGS) -lftdi main.c -o aldl-ftdi $(OBJS) aldl-io/aldl-io-ftdi.a
+	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io/aldl-io-ftdi.a
 
 acquire.o: acquire.h
 	gcc $(CFLAGS) -c acquire.c -o acquire.o

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <time.h>
+#include <pthread.h>
 
 #include "serio.h"
 #include "config.h"
@@ -16,8 +17,8 @@
 /* -------- globalstuffs ------------------ */
 
 typedef struct aldl_lock {
-  int connstate:1; /* locks connection state */
-  int recordptr:1; /* locks linked list links in records */
+  pthread_mutex_t *connstate; /* locks connection state */
+  pthread_mutex_t *recordptr; /* locks linked list links in records */
 } aldl_lock_t;
 
 aldl_lock_t lock;
@@ -43,8 +44,10 @@ unsigned int sixteenbit(byte *p);
 int getbit(byte p, int bpos, int flip);
 
 void init_locks() {
-  lock.connstate = 0;
-  lock.recordptr = 0;
+  lock.connstate = malloc(sizeof(pthread_mutex_t));
+  pthread_mutex_init(lock.connstate,NULL);
+  lock.recordptr = malloc(sizeof(pthread_mutex_t));
+  pthread_mutex_init(lock.recordptr,NULL);
 };
 
 aldl_record_t *process_data(aldl_conf_t *aldl) {
@@ -72,11 +75,10 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
   /* prepare links in new record */
   rec->next = NULL; /* terminate linked list */
   rec->prev = aldl->r; /* previous link */
-  while(lock.recordptr == 1);
-  lock.recordptr = 1;
+  pthread_mutex_lock(lock.recordptr);
   aldl->r->next = rec; /* attach to linked list */
   aldl->r = rec; /* fix master link */
-  lock.recordptr = 0;
+  pthread_mutex_unlock(lock.recordptr);
 };
 
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
@@ -185,15 +187,15 @@ unsigned int sixteenbit(byte *p) {
 };
 
 aldl_state_t get_connstate(aldl_conf_t *aldl) {
-  while(lock.connstate == 1);
+  pthread_mutex_lock(lock.connstate);
   return aldl->state;
+  pthread_mutex_unlock(lock.connstate);
 };
 
 void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
-  while(lock.connstate == 1);
-  lock.connstate = 1;
+  pthread_mutex_lock(lock.connstate);
   aldl->state = s;
-  lock.connstate = 0;
+  pthread_mutex_unlock(lock.connstate);
 };
 
 /* a debug output function ... */
