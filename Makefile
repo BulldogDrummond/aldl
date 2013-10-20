@@ -1,11 +1,11 @@
 # compiler flags
 CFLAGS= -g -Wall
-OBJS= configfile/lex.yy.o configfile/y.tab.o configfile/varstore.o debugif/debugif.o acquire.o error.o
+OBJS= debugif/debugif.o acquire.o error.o
 FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
 all: aldl-ftdi
 
-aldl-ftdi: main.c aldl-io-ftdi configfile_ debugif_ acquire.o error.o
+aldl-ftdi: main.c aldl-io-ftdi debugif_ acquire.o error.o
 	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io/aldl-io-ftdi.a
 
 acquire.o: acquire.h

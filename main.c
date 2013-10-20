@@ -14,6 +14,23 @@
 #include "configfile/varstore.h"
 #include "configfile/configfile.h"
 
+/* TEMP remove me */
+/* end of line delimters */
+#define EOL '\n'
+#define DOSEOL '\r'
+
+/* copy the contents of field number f in *d to dst.  returns NULL if the
+   field cannot be located.  start and end define the field delimters,
+   or 0 for start/end of line. */
+char *brk_get_field(char *dst, char start, char end, int f, char *d);
+
+/* case sensitive string match the first field of every line until a
+   match is found, return a pointer to it, or NULL if can't be found. */
+char *brk_get_line(char end, char *d, char *str);
+
+/* allocate and load a file, return a pointer to it */
+char *load_file(char *filename);
+
 /* ------- GLOBAL----------------------- */
 
 aldl_conf_t *aldl; /* aldl data structure */
@@ -26,7 +43,7 @@ char *config_file; /* path to config file */
 int aldl_finish();
 
 /* allocate all major structures and load config routines */
-void aldl_setup();
+void aldl_setup(char *configdata);
 
 /* initial memory allocation routines */
 void aldl_alloc_a(); /* fixed structures */
@@ -34,13 +51,14 @@ void aldl_alloc_b(); /* definition arrays */
 void aldl_alloc_c(); /* more data space */
 
 /* config file loading */
-void load_config_a(char *filename); /* load data to alloc_a structures */
-void load_config_b(char *filename); /* load data to alloc_b structures */
+void load_config_a(char *configdata); /* load data to alloc_a structures */
+void load_config_b(char *configdata); /* load data to alloc_b structures */
 
 int main() {
   init_locks();
 
-  aldl_setup();
+  /* allocate structures and parse config data */
+  aldl_setup(configdata);
 
   set_connstate(ALDL_LOADING,aldl); /* initial connection state */
 
@@ -55,11 +73,11 @@ int main() {
   return 0;
 }
 
-void aldl_setup() {
+void aldl_setup(char *configdata) {
   aldl_alloc_a();
-  load_config_a("/project/lt1.conf");
+  load_config_a(configdata);
   aldl_alloc_b();
-  load_config_b("/project/lt1.conf");
+  load_config_b(configdata);
   aldl_alloc_c();
 }
 
@@ -131,15 +149,6 @@ void load_config_b(char *filename) {
 //  comm->packet[1].frequency = 50;
 //  generate_pktcommand(&comm->packet[1],comm);
 
-  /* a placeholder packet, lt1 msg 4 */
-//  comm->packet[2].length = 49;
-//  comm->packet[2].id = 0x04;
-//  comm->packet[2].msg_len = 0x57;
-//  comm->packet[2].msg_mode = 0x01;
-//  comm->packet[2].commandlength = 5;
-//  comm->packet[2].offset = 3;
-//  comm->packet[2].frequency = 500;
-//  generate_pktcommand(&comm->packet[2],comm);
 }
 
 void aldl_alloc_c() {

@@ -120,7 +120,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   #ifdef ALDL_MULTIPACKET
   /* we'll assume the packet exists; this should be checked during config
      load time ... */
-  for(id=0; id < aldl->comm->n_packets - 1; id++) {
+  for(id=0; id < aldl->comm->n_packets; id++) {
     if(aldl->comm->packet[id].id == def->packet) break;
   };
   #endif
