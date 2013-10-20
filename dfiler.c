@@ -13,7 +13,7 @@ dfile_t *dfile_load(char *filename) {
   char *data = load_file(filename);
   if(data == NULL) return NULL;
   dfile_t *d = dfile(data);
-//  dfile_strip_quotes(d);
+  dfile_strip_quotes(d);
   dfile_shrink(d);
   free(data);
   return d; 

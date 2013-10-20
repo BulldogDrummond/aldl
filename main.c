@@ -58,10 +58,6 @@ int main() {
   config = dfile_load("lt1.conf");
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
 
-  #ifdef VERBLOSITY
-  print_config(config);
-  #endif
-
   /* allocate structures and parse config data */
   aldl_setup();
 
@@ -135,9 +131,6 @@ void load_config_b() {
     comm->packet[x].frequency = configopt_int(pktconfig(pktname,
                                                  "FREQUENCY",x),0,1000,1);
     generate_pktcommand(&comm->packet[x],comm);
-    printf("id=%i len=%i offset=%i freq=%i\n",
-           comm->packet[x].id, comm->packet[x].length,
-           comm->packet[x].offset, comm->packet[x].frequency);
   };
   free(pktname);
 

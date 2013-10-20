@@ -61,7 +61,7 @@ typedef struct aldl_define {
   byte sig:1;    /* 1 if signed */
   /* binary stuff only */
   byte binary; /* offset in bits.  only works for 1 bit fields */
-  byte invert:1; /* invert (0 means set) */
+  byte invert:1; /* invert (0 means no) */
 } aldl_define_t;
 
 /* definition of a record, which is a sequential linked-list type structure,
