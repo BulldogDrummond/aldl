@@ -224,17 +224,17 @@ int checksum_test(byte *buf, int len) {
 byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
   packet->command = malloc(5);
   packet->command[0] = comm->pcm_address;
-  packet->command[1] = packet->msg_len;
+  packet->command[1] = 0x57;
   packet->command[2] = packet->msg_mode;
   packet->command[3] = packet->id;
   packet->command[4] = checksum_generate(packet->command,4);
   return packet->command;
 }
 
-byte *generate_shutup(byte len, byte mode, aldl_commdef_t *comm) {
+byte *generate_mode(byte mode, aldl_commdef_t *comm) {
   byte *tmp = malloc(SHUTUP_LENGTH);
   tmp[0] = comm->pcm_address;
-  tmp[1] = len;
+  tmp[1] = 0x56;
   tmp[2] = mode;
   tmp[3] = checksum_generate(tmp,SHUTUP_LENGTH - 1);
   return tmp;

@@ -80,7 +80,6 @@ typedef struct aldl_record {
 
 typedef struct aldl_packetdef {
   byte id;         /* message number */
-  byte msg_len;    /* message length byte */
   byte msg_mode;   /* message mode */
   int length;     /* how long the packet is, overall, including the header */
   byte *command;  /* the command string sent to retrieve the packet */
@@ -94,10 +93,8 @@ typedef struct aldl_packetdef {
 
 typedef struct aldl_commdef {
   /* ------- config stuff ---------------- */
-  char ecmstring[4];       /* a unique identifying string for the platform */
   int checksum_enable:1;    /* set to 1 to enable checksum verification of
-                              packet data.  checksums of commands are not
-                              generated, and must be calculated manually */
+                              packet data. */
   byte pcm_address;        /* the address of the PCM */
   /* ------- idle traffic stuff ---------- */
   int chatterwait:1;        /* 1 enables chatter checking.  if this is

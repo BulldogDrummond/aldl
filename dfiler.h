@@ -4,8 +4,7 @@ typedef struct _dfile_t {
   char **v;  /* value */
 } dfile_t;
 
-/* loads file, shrinks, parses in one step.. makes it fairly impossible to
-   free afterwards, though. */
+/* loads file, strips quotes, shrinks, parses in one step.. */
 dfile_t *dfile_load(char *filename);
 
 /* read file into memory */

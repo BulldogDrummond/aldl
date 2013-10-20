@@ -24,11 +24,15 @@ dfile_t *config; /* configuration */
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
 
+/* self explanitory */
+int configopt_int(char *str, int min, int max);
+byte configopt_byte(char *str);
+
 /* get a REQURIED config option, fatal error if it's missing */
 char *configopt(char *str);
 
 /* convert a 0xFF format string to a 'byte', or 00 on error... */
-byte hexstringtobyte(char *str);
+byte hextobyte(char *str);
 
 /* allocate all major structures and load config routines */
 void aldl_setup();
@@ -43,8 +47,6 @@ void load_config_a(); /* load data to alloc_a structures */
 void load_config_b(); /* load data to alloc_b structures */
 
 int main() {
-  printf("%i\n",(int)strtol("0x55",NULL,16));
-  exit(1);
   /* initialize locking mechanisms */
   init_locks();
 
@@ -99,15 +101,14 @@ void aldl_alloc_a() {
 }
 
 void load_config_a() {
-  sprintf(comm->ecmstring, "EE");
-  comm->checksum_enable = 1;
-  comm->pcm_address = 0xF4;
-  comm->idledelay = 10;
-  comm->chatterwait = 1;
-  comm->shutupcommand = generate_shutup(0x56,0x08,comm);
-  comm->returncommand = generate_shutup(0x56,0x09,comm);
-  comm->shutuprepeat = 3;
-  comm->shutuprepeatdelay = 75;
+  comm->checksum_enable = configopt_int("CHECKSUM_ENABLE",0,1);;
+  comm->pcm_address = configopt_byte("PCM_ADDRESS");
+  comm->idledelay = configopt_int("IDLE_DELAY",0,5000);
+  comm->chatterwait = configopt_int("IDLE_ENABLE",0,1);
+  comm->shutupcommand = generate_mode(configopt_byte("SHUTUP_MODE"),comm);
+  comm->returncommand = generate_mode(configopt_byte("RETURN_MODE"),comm);
+  comm->shutuprepeat = configopt_int("SHUTUP_REPEAT",0,5000);
+  comm->shutuprepeatdelay = configopt_int("SHUTUP_DELAY",0,5000);
   comm->n_packets = 1;
 }
 
@@ -121,7 +122,6 @@ void load_config_b() {
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
   comm->packet[0].id = 0x00;
-  comm->packet[0].msg_len = 0x57;
   comm->packet[0].msg_mode = 0x01;
   comm->packet[0].commandlength = 5;
   comm->packet[0].offset = 3;
@@ -173,7 +173,17 @@ char *configopt(char *str) {
   return val;
 };
 
-byte hexstringtobyte(char *str) {
+int configopt_int(char *str, int min, int max) {
+  int x = atoi(configopt(str));
+  if(x < min || x > max) fatalerror(ERROR_RANGE,str);
+  return x;
+};
+
+byte configopt_byte(char *str) {
+  return hextobyte(configopt(str));
+};
+
+byte hextobyte(char *str) {
   /* FIXME this kinda sucks */
   return (int)strtol(str,NULL,16);
 };

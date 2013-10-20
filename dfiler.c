@@ -13,7 +13,7 @@ dfile_t *dfile_load(char *filename) {
   char *data = load_file(filename);
   if(data == NULL) return NULL;
   dfile_t *d = dfile(data);
-  dfile_strip_quotes(d);
+//  dfile_strip_quotes(d);
   dfile_shrink(d);
   free(data);
   return d; 
@@ -50,17 +50,14 @@ dfile_t *dfile(char *data) {
   for(c=data;c<data+len;c++) { /* iterate through entire data set */
     if(c[0] == '=') {
       if(c == data || c == data + len) continue; /* handle first or last char */
-      /* set value starting point */
       out->v[out->n] = c + 1;
-      /* null the delimter */
       c[0] = 0;
-      /* find ending point */
-      cx = c + 1; /* initialize aux cursor */ 
+      cx = c + 1;
       while(is_whitespace(*cx) != 1) {
         if(*cx == '"') { /* skip quoted string */
           cx++;
-          while(cx[0] != '"') { /* until there's another quote or EOF */
-            if(cx == data + len) continue; /* end of file */
+          while(cx[0] != '"') {
+            if(cx == data + len) continue;
             cx++;
           };
         };
@@ -73,8 +70,8 @@ dfile_t *dfile(char *data) {
       while(is_whitespace(*cx) != 1) {
         if(*cx == '"') { /* skip quoted string */
           cx--;
-          while(cx[0] != '"') { /* until there's another quote or EOF */
-            if(cx == data + len) continue; /* end of file */
+          while(cx[0] != '"') {
+            if(cx == data + len) continue;
             cx--;
           };
         };
