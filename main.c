@@ -12,36 +12,26 @@
 #include "dfiler.h"
 #include "aldl-io/config.h"
 #include "aldl-io/aldl-io.h"
-#include "configfile/varstore.h"
-#include "configfile/configfile.h"
-
-/* TEMP remove me */
-/* end of line delimters */
-#define EOL '\n'
-#define DOSEOL '\r'
-
-/* copy the contents of field number f in *d to dst.  returns NULL if the
-   field cannot be located.  start and end define the field delimters,
-   or 0 for start/end of line. */
-char *brk_get_field(char *dst, char start, char end, int f, char *d);
-
-/* case sensitive string match the first field of every line until a
-   match is found, return a pointer to it, or NULL if can't be found. */
-char *brk_get_line(char end, char *d, char *str);
 
 /* ------- GLOBAL----------------------- */
 
 aldl_conf_t *aldl; /* aldl data structure */
 aldl_commdef_t *comm; /* comm specs */
-char *config_file; /* path to config file */
+dfile_t *config; /* configuration */
 
 /* ------- LOCAL FUNCTIONS ------------- */
 
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
 
+/* get a REQURIED config option, fatal error if it's missing */
+char *configopt(char *str);
+
+/* convert a 0xFF format string to a 'byte', or 00 on error... */
+byte hexstringtobyte(char *str);
+
 /* allocate all major structures and load config routines */
-void aldl_setup(dfile_t *config);
+void aldl_setup();
 
 /* initial memory allocation routines */
 void aldl_alloc_a(); /* fixed structures */
@@ -49,27 +39,25 @@ void aldl_alloc_b(); /* definition arrays */
 void aldl_alloc_c(); /* more data space */
 
 /* config file loading */
-void load_config_a(dfile_t *config); /* load data to alloc_a structures */
-void load_config_b(dfile_t *config); /* load data to alloc_b structures */
+void load_config_a(); /* load data to alloc_a structures */
+void load_config_b(); /* load data to alloc_b structures */
 
 int main() {
+  printf("%i\n",(int)strtol("0x55",NULL,16));
+  exit(1);
   /* initialize locking mechanisms */
   init_locks();
 
   /* parse config file ... never free this structure */
-  dfile_t *config = dfile_load("lt1.conf");
+  config = dfile_load("lt1.conf");
+  if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
 
   #ifdef VERBLOSITY
   print_config(config);
   #endif
 
-  char *val = value_by_parameter("ECMID", config);
-  if(val == NULL) fatalerror(ERROR_CONFIG,"not found");
-  printf("%s\n",val);
-  exit(1);
-
   /* allocate structures and parse config data */
-  aldl_setup(config);
+  aldl_setup();
 
   set_connstate(ALDL_LOADING,aldl); /* initial connection state */
 
@@ -84,11 +72,11 @@ int main() {
   return 0;
 }
 
-void aldl_setup(dfile_t *config) {
+void aldl_setup() {
   aldl_alloc_a();
-  load_config_a(config);
+  load_config_a();
   aldl_alloc_b();
-  load_config_b(config);
+  load_config_b();
   aldl_alloc_c();
 }
 
@@ -110,7 +98,7 @@ void aldl_alloc_a() {
   memset(aldl->stats,0,sizeof(aldl_stats_t));
 }
 
-void load_config_a(dfile_t *config) {
+void load_config_a() {
   sprintf(comm->ecmstring, "EE");
   comm->checksum_enable = 1;
   comm->pcm_address = 0xF4;
@@ -129,7 +117,7 @@ void aldl_alloc_b() {
   if(comm->packet == NULL) fatalerror(ERROR_MEMORY,"packet mem");
 }
 
-void load_config_b(dfile_t *config) {
+void load_config_b() {
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
   comm->packet[0].id = 0x00;
@@ -178,6 +166,17 @@ void aldl_alloc_c() {
 
   /* allocate space for records here ~ */
 }
+
+char *configopt(char *str) {
+  char *val = value_by_parameter(str, config);
+  if(val == NULL) fatalerror(ERROR_CONFIG_MISSING,str);
+  return val;
+};
+
+byte hexstringtobyte(char *str) {
+  /* FIXME this kinda sucks */
+  return (int)strtol(str,NULL,16);
+};
 
 int aldl_finish() {
   serial_close();

@@ -8,7 +8,7 @@
    error_t.  these will have ERROR printed AFTER them, so GENERAL will come
    out as GENERAL ERROR. */
 
-char errstr[N_ERRORCODES][20] = {
+char errstr[N_ERRORCODES][24] = {
 "GENERAL",
 "NULL",
 "OUT OF MEMORY",
@@ -16,7 +16,8 @@ char errstr[N_ERRORCODES][20] = {
 "OUT OF RANGE",
 "TIMING",
 "CONFIG",
-"BUFFER"
+"BUFFER",
+"CONFIG OPTION MISSING"
 };
 
 void fatalerror(error_t code, char *str) {

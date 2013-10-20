@@ -25,5 +25,8 @@ char *value_by_parameter(char *str, dfile_t *d);
    on mismatch. */
 inline int faststrcmp(char *a, char *b);
 
+/* strip quotes from quoted 'value' fields. */
+void dfile_strip_quotes(dfile_t *d);
+
 /* for debugging, print a list of all config pairs extracted. */
 void print_config(dfile_t *d);

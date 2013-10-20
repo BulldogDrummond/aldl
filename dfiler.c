@@ -13,9 +13,23 @@ dfile_t *dfile_load(char *filename) {
   char *data = load_file(filename);
   if(data == NULL) return NULL;
   dfile_t *d = dfile(data);
+  dfile_strip_quotes(d);
   dfile_shrink(d);
   free(data);
   return d; 
+};
+
+void dfile_strip_quotes(dfile_t *d) {
+  int x;
+  char *c; /* cursor*/
+  for(x=0;x<d->n;x++) {
+    if(d->v[x][0] == '"') {
+      d->v[x]++;
+      c = d->v[x];
+      while(*c != '"') c++;
+      c[0] = 0;
+    };
+  };
 };
 
 dfile_t *dfile(char *data) {
@@ -135,7 +149,6 @@ char *load_file(char *filename) {
 
 char *value_by_parameter(char *str, dfile_t *d) {
   int x;
-  int y;
   for(x=0;x<d->n;x++) {
     if(faststrcmp(str,d->p[x]) == 1) return d->v[x];
   };
