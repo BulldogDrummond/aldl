@@ -53,10 +53,15 @@ void load_config_a(dfile_t *config); /* load data to alloc_a structures */
 void load_config_b(dfile_t *config); /* load data to alloc_b structures */
 
 int main() {
+  /* initialize locking mechanisms */
   init_locks();
 
-  /* parse config file */
+  /* parse config file ... never free this structure */
   dfile_t *config = dfile_load("lt1.conf");
+
+  #ifdef VERBLOSITY
+  print_config(config);
+  #endif
 
   char *val = value_by_parameter("ECMID", config);
   if(val == NULL) fatalerror(ERROR_CONFIG,"not found");

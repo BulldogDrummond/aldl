@@ -4,7 +4,8 @@ typedef struct _dfile_t {
   char **v;  /* value */
 } dfile_t;
 
-/* loads file, shrinks, parses in one step */
+/* loads file, shrinks, parses in one step.. makes it fairly impossible to
+   free afterwards, though. */
 dfile_t *dfile_load(char *filename);
 
 /* read file into memory */
@@ -13,7 +14,8 @@ char *load_file(char *filename);
 /* split up data into parameters and values */
 dfile_t *dfile(char *data);
 
-/* reduce the data section and pointer arrays to reduce mem usage */
+/* reduce the data section and pointer arrays to reduce mem usage, returns
+   pointer to new data to be freed later. */
 char *dfile_shrink(dfile_t *d);
 
 /* get a value by parameter string */
