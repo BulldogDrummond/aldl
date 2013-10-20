@@ -56,8 +56,12 @@ int main() {
   init_locks();
 
   /* parse config file */
-  char *configfile = load_file("lt1.conf");
-  dfile_t *config = dfile(configfile);
+  dfile_t *config = dfile_load("lt1.conf");
+
+  char *val = value_by_parameter("ECMID", config);
+  if(val == NULL) fatalerror(ERROR_CONFIG,"not found");
+  printf("%s\n",val);
+  exit(1);
 
   /* allocate structures and parse config data */
   aldl_setup(config);

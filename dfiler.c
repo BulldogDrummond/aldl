@@ -5,9 +5,18 @@
 
 #include "dfiler.h"
 
-#define MAX_PARAMETERS 250
+#define MAX_PARAMETERS 500
 
 inline int is_whitespace(char ch);
+
+dfile_t *dfile_load(char *filename) {
+  char *data = load_file(filename);
+  if(data == NULL) return NULL;
+  dfile_t *d = dfile(data);
+  dfile_shrink(d);
+  free(data);
+  return d; 
+};
 
 dfile_t *dfile(char *data) {
   /* allocate base structure */
@@ -72,6 +81,9 @@ dfile_t *dfile(char *data) {
 
 /* reduce memory footprint */
 char *dfile_shrink(dfile_t *d) {
+  /* shrink arrays */
+  d->p = realloc(d->p,sizeof(char*) * d->n);
+  d->v = realloc(d->v,sizeof(char*) * d->n);
   /* calculate total size of new data storage */
   size_t ttl = 0;
   int x;
@@ -85,11 +97,13 @@ char *dfile_shrink(dfile_t *d) {
   char *newdata = malloc(ttl); /* new storage */
   char *c = newdata; /* cursor*/
   for(x=0;x<d->n;x++) {
+    /* copy parameter */
     strcpy(c,d->p[x]);
     d->p[x] = c;
     c += (strlen(c) + 1);
+    /* copy value */
     strcpy(c,d->v[x]);
-    d->p[x] = c;
+    d->v[x] = c;
     c += (strlen(c) + 1);
   };
   return newdata;
@@ -119,3 +133,33 @@ char *load_file(char *filename) {
   return buf;
 };
 
+char *value_by_parameter(char *str, dfile_t *d) {
+  int x;
+  int y;
+  for(x=0;x<d->n;x++) {
+    if(faststrcmp(str,d->p[x]) == 1) return d->v[x];
+  };
+  return NULL;
+};
+
+inline int faststrcmp(char *a, char *b) {
+  int x = 0;
+  while(a[x] == b[x]) {
+    x++;
+    if(a[x] == 0 || b[x] == 0) {
+      if(a[x] == 0 && b[x] == 0) {
+        return 1;
+      } else {
+        return 0;
+      };
+    };
+  };
+  return 0;
+};
+
+void print_config(dfile_t *d) {
+  printf("config list has %i parsed options:-------------\n",d->n);
+  int x;
+  for(x=0;x<d->n;x++) printf("p(arameter):%s v(alue):%s\n",d->p[x],d->v[x]);
+  printf("----------end config\n");
+};
