@@ -18,7 +18,7 @@ typedef struct _dfile_t {
 char *load_file(char *filename);
 
 /* split up data */
-dfile_t *dfilefile(char *data);
+dfile_t *dfile(char *data);
 
 /* reduce the data section and pointer arrays to reduce mem usage */
 char *dfile_shrink(dfile_t *d);

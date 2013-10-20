@@ -29,9 +29,6 @@ char *brk_get_field(char *dst, char start, char end, int f, char *d);
    match is found, return a pointer to it, or NULL if can't be found. */
 char *brk_get_line(char end, char *d, char *str);
 
-/* allocate and load a file, return a pointer to it */
-char *load_file(char *filename);
-
 /* ------- GLOBAL----------------------- */
 
 aldl_conf_t *aldl; /* aldl data structure */
@@ -44,7 +41,7 @@ char *config_file; /* path to config file */
 int aldl_finish();
 
 /* allocate all major structures and load config routines */
-void aldl_setup(char *configdata);
+void aldl_setup(dfile_t *config);
 
 /* initial memory allocation routines */
 void aldl_alloc_a(); /* fixed structures */
@@ -52,14 +49,18 @@ void aldl_alloc_b(); /* definition arrays */
 void aldl_alloc_c(); /* more data space */
 
 /* config file loading */
-void load_config_a(char *configdata); /* load data to alloc_a structures */
-void load_config_b(char *configdata); /* load data to alloc_b structures */
+void load_config_a(dfile_t *config); /* load data to alloc_a structures */
+void load_config_b(dfile_t *config); /* load data to alloc_b structures */
 
 int main() {
   init_locks();
 
+  /* parse config file */
+  char *configfile = load_file("lt1.conf");
+  dfile_t *config = dfile(configfile);
+
   /* allocate structures and parse config data */
-  aldl_setup(NULL);
+  aldl_setup(config);
 
   set_connstate(ALDL_LOADING,aldl); /* initial connection state */
 
@@ -74,11 +75,11 @@ int main() {
   return 0;
 }
 
-void aldl_setup(char *configdata) {
+void aldl_setup(dfile_t *config) {
   aldl_alloc_a();
-  load_config_a(configdata);
+  load_config_a(config);
   aldl_alloc_b();
-  load_config_b(configdata);
+  load_config_b(config);
   aldl_alloc_c();
 }
 
@@ -100,7 +101,7 @@ void aldl_alloc_a() {
   memset(aldl->stats,0,sizeof(aldl_stats_t));
 }
 
-void load_config_a(char *filename) {
+void load_config_a(dfile_t *config) {
   sprintf(comm->ecmstring, "EE");
   comm->checksum_enable = 1;
   comm->pcm_address = 0xF4;
@@ -119,7 +120,7 @@ void aldl_alloc_b() {
   if(comm->packet == NULL) fatalerror(ERROR_MEMORY,"packet mem");
 }
 
-void load_config_b(char *filename) {
+void load_config_b(dfile_t *config) {
   /* a placeholder packet, lt1 msg 0 */
   comm->packet[0].length = 64;
   comm->packet[0].id = 0x00;

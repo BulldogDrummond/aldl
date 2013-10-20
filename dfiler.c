@@ -22,7 +22,6 @@ dfile_t *dfile(char *data) {
   char *c; /* operating cursor within data */
   char *cx; /* auxiliary operating cursor */
   char *cz;
-  int x = 0; /* array index of parameter and value */
   int len = strlen(data);
 
   for(c=data;c<data+len;c++) { /* iterate through entire data set */
@@ -63,7 +62,6 @@ dfile_t *dfile(char *data) {
         };
       };
       out->p[out->n] = cx + 1;
-      printf("|%s|%s|\n",out->p[out->n],out->v[out->n]);
       out->n++;
       if(out->n == MAX_PARAMETERS) return out; /* out of space */
       c = cz;
@@ -80,7 +78,7 @@ char *dfile_shrink(dfile_t *d) {
   for(x=0;x<d->n;x++) {
     ttl += strlen(d->p[x]);
     ttl += strlen(d->v[x]);
-    ttl +2; /* for null terminators */
+    ttl += 2; /* for null terminators */
   };
   ttl++;
   /* move everything and update pointers */
