@@ -1,0 +1,57 @@
+configuration relies only on two values seperated by =
+they can be seperated by linefeeds or space, or whatever
+spaces in quoted strings are not considered whitespace
+comments don't need hashmarks, just don't put the equals sign in there.
+hex bytes must be specified as 0x00 to 0xFF.
+
+CONFIG OPTIONS:
+
+CHECKSUM_ENABLE=
+  0 disables checksum verification of packet replies.  not reccommended.
+  accepts only 0 or 1.
+  default=1
+   
+PCM_ADDRESS=
+  the address byte of the pcm, in hex
+  required.
+
+IDLE_ENABLE=
+  0 disables tracking of idle traffic.
+  accepts only 0 or 1.
+  default=1
+
+IDLE_DELAY=
+  a timing delay in milliseconds to wait after detecting idle traffic, before
+  attempting to enter diagnostic mode.
+
+SHUTUP_MODE=
+  the mode byte to disable idle traffic in hex
+  required.
+
+RETURN_MODE=
+  the mode byte to enable idle traffic in hex
+  required.
+
+SHUTUP_REPEAT=
+  how many times is the shutup mode request repeated before it's considered a
+  failure, and resume waiting for chatter.  0 disables shutup mode for ECMs that
+  have no idle traffic.
+  accepts integer range 0 to 5000.
+  default=3
+
+SHUTUP_DELAY=
+  a delay in milliseconds which is placed in between each repeated attempt to
+  disable normal traffic.
+  accepts integer range 0 to 5000.
+  default=75
+
+N_PACKETS=
+  the total number of specified packets.
+  accepts integer range 1-99
+  required.
+
+N_DEFS=
+  the total number of data definitions.
+  accepts integer range 1-512
+  required
+

@@ -105,7 +105,7 @@ void aldl_alloc_a() {
 }
 
 void load_config_a() {
-  comm->checksum_enable = configopt_int_fatal("CHECKSUM_ENABLE",0,1);;
+  comm->checksum_enable = configopt_int("CHECKSUM_ENABLE",0,1,1);;
   comm->pcm_address = configopt_byte_fatal("PCM_ADDRESS");
   comm->idledelay = configopt_int("IDLE_DELAY",0,5000,10);
   comm->chatterwait = configopt_int("IDLE_ENABLE",0,1,1);
