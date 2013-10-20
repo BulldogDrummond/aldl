@@ -9,6 +9,7 @@
 #include "config.h"
 #include "acquire.h"
 #include "error.h"
+#include "dfiler.h"
 #include "aldl-io/config.h"
 #include "aldl-io/aldl-io.h"
 #include "configfile/varstore.h"
@@ -58,7 +59,7 @@ int main() {
   init_locks();
 
   /* allocate structures and parse config data */
-  aldl_setup(configdata);
+  aldl_setup(NULL);
 
   set_connstate(ALDL_LOADING,aldl); /* initial connection state */
 

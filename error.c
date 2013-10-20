@@ -16,8 +16,7 @@ char errstr[N_ERRORCODES][20] = {
 "OUT OF RANGE",
 "TIMING",
 "CONFIG",
-"BUFFER",
-"CONFIG FILE"
+"BUFFER"
 };
 
 void fatalerror(error_t code, char *str) {
