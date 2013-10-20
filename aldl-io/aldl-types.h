@@ -82,7 +82,6 @@ typedef struct aldl_packetdef {
   byte id;         /* message number */
   int length;     /* how long the packet is, overall, including the header */
   byte *command;  /* the command string sent to retrieve the packet */
-  int commandlength; /* length of the command string in bytes */
   int offset;        /* the offset of the data in bytes, aka header size */
   int frequency;    /* retrieval frequency, or 0 to disable packet */
   byte *data;     /* pointer to the raw data buffer */

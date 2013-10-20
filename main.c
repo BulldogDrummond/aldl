@@ -24,14 +24,16 @@ dfile_t *config; /* configuration */
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
 
-/* self explanitory */
-int configopt_int(char *str, int min, int max);
-byte configopt_byte(char *str);
+/* get various config options by name */
+int configopt_int_fatal(char *str, int min, int max);
+int configopt_int(char *str, int min, int max, int def);
+byte configopt_byte(char *str, byte def);
+byte configopt_byte_fatal(char *str);
+char *configopt_fatal(char *str);
+char *configopt(char *str,char *def);
 
-char *csvbreak(char *buf, char *str, int f);
-
-/* get a REQURIED config option, fatal error if it's missing */
-char *configopt(char *str);
+/* get a packet config string */
+char *pktconfig(char *buf, char *parameter, int n);
 
 /* convert a 0xFF format string to a 'byte', or 00 on error... */
 byte hextobyte(char *str);
@@ -103,16 +105,16 @@ void aldl_alloc_a() {
 }
 
 void load_config_a() {
-  comm->checksum_enable = configopt_int("CHECKSUM_ENABLE",0,1);;
-  comm->pcm_address = configopt_byte("PCM_ADDRESS");
-  comm->idledelay = configopt_int("IDLE_DELAY",0,5000);
-  comm->chatterwait = configopt_int("IDLE_ENABLE",0,1);
-  comm->shutupcommand = generate_mode(configopt_byte("SHUTUP_MODE"),comm);
-  comm->returncommand = generate_mode(configopt_byte("RETURN_MODE"),comm);
-  comm->shutuprepeat = configopt_int("SHUTUP_REPEAT",0,5000);
-  comm->shutuprepeatdelay = configopt_int("SHUTUP_DELAY",0,5000);
-  comm->n_packets = configopt_int("N_PACKETS",1,99);
-  aldl->n_defs = configopt_int("N_DEFS",1,512);
+  comm->checksum_enable = configopt_int_fatal("CHECKSUM_ENABLE",0,1);;
+  comm->pcm_address = configopt_byte_fatal("PCM_ADDRESS");
+  comm->idledelay = configopt_int("IDLE_DELAY",0,5000,10);
+  comm->chatterwait = configopt_int("IDLE_ENABLE",0,1,1);
+  comm->shutupcommand = generate_mode(configopt_byte_fatal("SHUTUP_MODE"),comm);
+  comm->returncommand = generate_mode(configopt_byte_fatal("RETURN_MODE"),comm);
+  comm->shutuprepeat = configopt_int("SHUTUP_REPEAT",0,5000,1);
+  comm->shutuprepeatdelay = configopt_int("SHUTUP_DELAY",0,5000,75);
+  comm->n_packets = configopt_int("N_PACKETS",1,99,1);
+  aldl->n_defs = configopt_int_fatal("N_DEFS",1,512);
 }
 
 void aldl_alloc_b() {
@@ -123,20 +125,19 @@ void aldl_alloc_b() {
 
 void load_config_b() {
   int x;
-  char *pktname = malloc(9); /*PACKET99+0*/
-  char *cfgline = NULL;
-  char *tmp = NULL;
+  char *pktname = malloc(50);
   for(x=0;x<comm->n_packets;x++) {
-    /* packets in config file start at 1, array index starts at 0 ... */
-    sprintf(pktname,"PACKET%i",x + 1);
-    cfgline = configopt(pktname);
-    tmp = malloc(strlen(cfgline)); /* allocate some storage space */
-    comm->packet[x].commandlength = 5; /* FIXME remove from spec ... */
-    comm->packet[x].id = hextobyte(csvbreak(tmp,cfgline,0));
-    comm->packet[x].length = atoi(csvbreak(tmp,cfgline,1));
-    comm->packet[x].offset = atoi(csvbreak(tmp,cfgline,2));
-    comm->packet[x].frequency = atoi(csvbreak(tmp,cfgline,3));
+    comm->packet[x].id = configopt_byte_fatal(pktconfig(pktname,"ID",x));
+    comm->packet[x].length = configopt_int_fatal(pktconfig(pktname,
+                                                "SIZE",x),1,255);
+    comm->packet[x].offset = configopt_int(pktconfig(pktname,
+                                                 "OFFSET",x),0,254,3);
+    comm->packet[x].frequency = configopt_int(pktconfig(pktname,
+                                                 "FREQUENCY",x),0,1000,1);
     generate_pktcommand(&comm->packet[x],comm);
+    printf("id=%i len=%i offset=%i freq=%i\n",
+           comm->packet[x].id, comm->packet[x].length,
+           comm->packet[x].offset, comm->packet[x].frequency);
   };
   free(pktname);
 
@@ -165,31 +166,51 @@ void aldl_alloc_c() {
 
 }
 
-char *configopt(char *str) {
-  char *val = value_by_parameter(str, config);
+char *configopt_fatal(char *str) {
+  char *val = configopt(str,NULL);
   if(val == NULL) fatalerror(ERROR_CONFIG_MISSING,str);
   return val;
 };
 
-char *csvbreak(char *buf, char *str, int f) {
-  brk_field(buf,f,str);
-  if(buf == NULL) fatalerror(ERROR_CONFIG_MISSING,str);
-  return buf;
+char *configopt(char *str,char *def) {
+  char *val = value_by_parameter(str, config);
+  if(val == NULL) return def;
+  return val;
 };
 
-int configopt_int(char *str, int min, int max) {
-  int x = atoi(configopt(str));
+int configopt_int(char *str, int min, int max, int def) {
+  char *in = configopt(str,NULL);
+  if(in == NULL) return def;
+  int x = atoi(in);
   if(x < min || x > max) fatalerror(ERROR_RANGE,str);
   return x;
 };
 
-byte configopt_byte(char *str) {
-  return hextobyte(configopt(str));
+int configopt_int_fatal(char *str, int min, int max) {
+  int x = atoi(configopt_fatal(str));
+  if(x < min || x > max) fatalerror(ERROR_RANGE,str);
+  return x;
+};
+
+byte configopt_byte(char *str, byte def) {
+  char *in = configopt(str,NULL);
+  if(in == NULL) return def;
+  return hextobyte(in);
+};
+
+byte configopt_byte_fatal(char *str) {
+  char *in = configopt_fatal(str);
+  return hextobyte(in);
 };
 
 byte hextobyte(char *str) {
   /* FIXME this kinda sucks */
   return (int)strtol(str,NULL,16);
+};
+
+char *pktconfig(char *buf, char *parameter, int n) {
+  sprintf(buf,"P%i.%s",n,parameter);
+  return buf;
 };
 
 int aldl_finish() {

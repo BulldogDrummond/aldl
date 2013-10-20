@@ -105,7 +105,7 @@ int aldl_shutup(aldl_commdef_t *c) {
 }
 
 byte *aldl_get_packet(aldl_packetdef_t *p) {
-  if(aldl_request(p->command, p->commandlength) == 0) return NULL;
+  if(aldl_request(p->command, 5) == 0) return NULL;
   /* get actual data */
   if(read_bytes(p->data, p->length, aldl_timeout(p->length)) == 0) {
     /* failed to get data */
