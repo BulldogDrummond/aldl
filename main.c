@@ -29,11 +29,14 @@ int configopt_int_fatal(char *str, int min, int max);
 int configopt_int(char *str, int min, int max, int def);
 byte configopt_byte(char *str, byte def);
 byte configopt_byte_fatal(char *str);
+float configopt_float(char *str, float def);
+float configopt_float_fatal(char *str);
 char *configopt_fatal(char *str);
 char *configopt(char *str,char *def);
 
 /* get a packet config string */
 char *pktconfig(char *buf, char *parameter, int n);
+char *dconfig(char *buf, char *parameter, int n);
 
 /* convert a 0xFF format string to a 'byte', or 00 on error... */
 byte hextobyte(char *str);
@@ -157,6 +160,52 @@ void aldl_alloc_c() {
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n_defs);
   if(aldl->def == NULL) fatalerror(ERROR_MEMORY,"definition");
 
+  char *configstr = malloc(50);
+  char *tmp;
+  aldl_define_t *d;
+  int z;
+
+  for(x=0;x<aldl->n_defs;x++) {
+    d = &aldl->def[x]; /* shortcut to def */
+    tmp=configopt_fatal(dconfig(configstr,"TYPE",x));
+    if(faststrcmp(tmp,"BINARY") == 1) {
+      d->type=ALDL_BOOL;
+      d->binary=configopt_int_fatal(dconfig(configstr,"BINARY",x),0,7);
+      d->invert=configopt_int(dconfig(configstr,"INVERT",x),0,1,0);
+    } else {
+      if(faststrcmp(tmp,"FLOAT") == 1) {
+        d->type=ALDL_FLOAT;
+        d->precision=configopt_int(dconfig(configstr,"PRECISION",x),0,1000,0);
+      } else if(faststrcmp(tmp,"INT") == 1) {
+        d->type=ALDL_INT; 
+      } else if(faststrcmp(tmp,"UINT") == 1) {
+        d->type=ALDL_UINT;
+      } else {
+        fatalerror(ERROR_CONFIG,"invalid data type in def");
+      };
+      /* common numerical options */
+      d->uom=configopt(dconfig(configstr,"UOM",x),NULL);
+      d->size=configopt_byte(dconfig(configstr,"OFFSET",x),8);     
+      /* FIXME no support for signed input type */
+    };
+    d->id=configopt_int_fatal(dconfig(configstr,"ID",x),0,1000);
+    for(z=x-1;z>=0;z--) { /* check for duplicate unique id */
+      if(aldl->def[z].id == d->id) fatalerror(ERROR_CONFIG,"duplicate id");
+    };
+    d->offset=configopt_byte_fatal(dconfig(configstr,"OFFSET",x));
+    d->packet=configopt_byte_fatal(dconfig(configstr,"PACKET",x));
+    if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,"pkt range");
+    d->name=configopt_fatal(dconfig(configstr,"NAME",x));
+    d->description=configopt_fatal(dconfig(configstr,"DESC",x));
+
+    /* FIXME no support for:
+    d->min= aldl_data_t
+    d->max= aldl_data_t
+    d->adder= aldl_data_t
+    d->multiplier= aldl_data_t
+    */
+  };
+  free(configstr);
 }
 
 char *configopt_fatal(char *str) {
@@ -169,6 +218,18 @@ char *configopt(char *str,char *def) {
   char *val = value_by_parameter(str, config);
   if(val == NULL) return def;
   return val;
+};
+
+float configopt_float(char *str, float def) {
+  char *in = configopt(str,NULL);
+  if(in == NULL) return def;
+  int x = atof(in);
+  return x;
+};
+
+float configopt_float_fatal(char *str) {
+  int x = atof(configopt_fatal(str));
+  return x;
 };
 
 int configopt_int(char *str, int min, int max, int def) {
@@ -203,6 +264,11 @@ byte hextobyte(char *str) {
 
 char *pktconfig(char *buf, char *parameter, int n) {
   sprintf(buf,"P%i.%s",n,parameter);
+  return buf;
+};
+
+char *dconfig(char *buf, char *parameter, int n) {
+  sprintf(buf,"D%i.%s",n,parameter);
   return buf;
 };
 

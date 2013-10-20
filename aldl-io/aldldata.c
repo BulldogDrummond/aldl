@@ -155,16 +155,16 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* get value, this does need more work ... */
   switch(def->type) {
     case ALDL_INT:
-      out->i = (int)x + def->adder * def->multiplier;
+      out->i = (int)x + def->adder.i * def->multiplier.i;
       break;
     case ALDL_UINT:
-      out->u = (unsigned int)x + def->adder * def->multiplier;
+      out->u = (unsigned int)x + def->adder.u * def->multiplier.u;
       break;
     case ALDL_FLOAT:
-      out->f = (float)x + def->adder * def->multiplier;
+      out->f = (float)x + def->adder.f * def->multiplier.f;
       break;
     case ALDL_BOOL:
-      out->i = getbit(x,def->binary,def->invert) ;
+      out->i = getbit(x,def->binary,def->invert);
       break;
     /* raw or invalid bit just transfers the raw byte */
     case ALDL_RAW:

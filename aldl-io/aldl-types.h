@@ -48,12 +48,12 @@ typedef struct aldl_define {
   char *description;  /* description of each definition */
   /* ----- output definition -------------------------- */
   aldl_datatype_t type; /* the OUTPUT type */
-  unsigned int uom;     /* unit of measure */
+  char *uom;     /* unit of measure */
   byte precision;       /* floating point display precision */
   aldl_data_t min, max;  /* the low and high range of OUTPUT value */
   /* ----- conversion ----------------------------------*/
-  float adder;          /*  ... */
-  float multiplier;     /*  ... */
+  aldl_data_t adder;          /*  ... */
+  aldl_data_t multiplier;     /*  ... */
   /* ----- input definition --------------------------- */
   byte packet; /* selects which packet unique id the data comes from */
   byte offset; /* offset within packet in bytes */
