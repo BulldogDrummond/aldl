@@ -126,6 +126,28 @@ inline int is_whitespace(char ch) {
   return 0;
 };
 
+char *brk_field(char *dst, int f, char *in) {
+  if(dst == NULL || in == NULL) return NULL;
+  char *start = in;
+  int x = 0;
+  if(f != 0) { /* not first field */
+    for(x=0;x<f;x++) {
+      while(start[0] != ',') {
+        start++;
+        if(start[0] == 0 && x < f) return NULL;
+      };
+      start++;
+    };
+  };
+  strcpy(dst,start);
+  /* just terminate the end */
+  char *end = dst;
+  end++;
+  while(end[0] != ',' && end[0] != 0) end++;
+  end[0] = 0;
+  return dst;
+};
+
 /* read file into memory */
 char *load_file(char *filename) {
   FILE *fdesc;

@@ -28,6 +28,8 @@ int aldl_finish();
 int configopt_int(char *str, int min, int max);
 byte configopt_byte(char *str);
 
+char *csvbreak(char *buf, char *str, int f);
+
 /* get a REQURIED config option, fatal error if it's missing */
 char *configopt(char *str);
 
@@ -109,7 +111,8 @@ void load_config_a() {
   comm->returncommand = generate_mode(configopt_byte("RETURN_MODE"),comm);
   comm->shutuprepeat = configopt_int("SHUTUP_REPEAT",0,5000);
   comm->shutuprepeatdelay = configopt_int("SHUTUP_DELAY",0,5000);
-  comm->n_packets = 1;
+  comm->n_packets = configopt_int("N_PACKETS",1,99);
+  aldl->n_defs = configopt_int("N_DEFS",1,512);
 }
 
 void aldl_alloc_b() {
@@ -119,14 +122,23 @@ void aldl_alloc_b() {
 }
 
 void load_config_b() {
-  /* a placeholder packet, lt1 msg 0 */
-  comm->packet[0].length = 64;
-  comm->packet[0].id = 0x00;
-  comm->packet[0].msg_mode = 0x01;
-  comm->packet[0].commandlength = 5;
-  comm->packet[0].offset = 3;
-  comm->packet[0].frequency = 1;
-  generate_pktcommand(&comm->packet[0],comm);
+  int x;
+  char *pktname = malloc(9); /*PACKET99+0*/
+  char *cfgline = NULL;
+  char *tmp = NULL;
+  for(x=0;x<comm->n_packets;x++) {
+    /* packets in config file start at 1, array index starts at 0 ... */
+    sprintf(pktname,"PACKET%i",x + 1);
+    cfgline = configopt(pktname);
+    tmp = malloc(strlen(cfgline)); /* allocate some storage space */
+    comm->packet[x].commandlength = 5; /* FIXME remove from spec ... */
+    comm->packet[x].id = hextobyte(csvbreak(tmp,cfgline,0));
+    comm->packet[x].length = atoi(csvbreak(tmp,cfgline,1));
+    comm->packet[x].offset = atoi(csvbreak(tmp,cfgline,2));
+    comm->packet[x].frequency = atoi(csvbreak(tmp,cfgline,3));
+    generate_pktcommand(&comm->packet[x],comm);
+  };
+  free(pktname);
 
   /* sanity checks for single packet mode */
   #ifndef ALDL_MULTIPACKET
@@ -137,17 +149,6 @@ void load_config_b() {
     fatalerror(ERROR_CONFIG,"this config requires multipacket capabilities");
   };
   #endif
-  
-  /* a placeholder packet, lt1 msg 2 */
-//  comm->packet[1].length = 57;
-//  comm->packet[1].id = 0x02;
-//  comm->packet[1].msg_len = 0x57;
-//  comm->packet[1].msg_mode = 0x01;
-//  comm->packet[1].commandlength = 5;
-//  comm->packet[1].offset = 3;
-//  comm->packet[1].frequency = 50;
-//  generate_pktcommand(&comm->packet[1],comm);
-
 }
 
 void aldl_alloc_c() {
@@ -162,15 +163,18 @@ void aldl_alloc_c() {
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n_defs);
   if(aldl->def == NULL) fatalerror(ERROR_MEMORY,"definition");
 
-  /* get data definitions here !! */
-
-  /* allocate space for records here ~ */
 }
 
 char *configopt(char *str) {
   char *val = value_by_parameter(str, config);
   if(val == NULL) fatalerror(ERROR_CONFIG_MISSING,str);
   return val;
+};
+
+char *csvbreak(char *buf, char *str, int f) {
+  brk_field(buf,f,str);
+  if(buf == NULL) fatalerror(ERROR_CONFIG_MISSING,str);
+  return buf;
 };
 
 int configopt_int(char *str, int min, int max) {

@@ -80,7 +80,6 @@ typedef struct aldl_record {
 
 typedef struct aldl_packetdef {
   byte id;         /* message number */
-  byte msg_mode;   /* message mode */
   int length;     /* how long the packet is, overall, including the header */
   byte *command;  /* the command string sent to retrieve the packet */
   int commandlength; /* length of the command string in bytes */

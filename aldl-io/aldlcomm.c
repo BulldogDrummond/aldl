@@ -224,8 +224,8 @@ int checksum_test(byte *buf, int len) {
 byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
   packet->command = malloc(5);
   packet->command[0] = comm->pcm_address;
-  packet->command[1] = 0x57;
-  packet->command[2] = packet->msg_mode;
+  packet->command[1] = 0x57; /* msg length */
+  packet->command[2] = 0x01; /* msg mode */
   packet->command[3] = packet->id;
   packet->command[4] = checksum_generate(packet->command,4);
   return packet->command;
