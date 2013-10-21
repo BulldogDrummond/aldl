@@ -1,5 +1,6 @@
 # compiler flags
 CFLAGS= -g -Wall
+#CFLAGS= -O2 -Wall
 OBJS= debugif/debugif.o acquire.o error.o loadconfig.o
 FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
@@ -16,9 +17,6 @@ acquire.o: acquire.h
 
 error.o: error.c error.h
 	gcc $(CFLAGS) -c error.c -o error.o
-
-configfile_:
-	cd configfile ; make ; cd ..
 
 aldl-io-ftdi:
 	cd aldl-io ; make ; cd ..
@@ -43,4 +41,4 @@ clean:
 	cd debugif ; make clean ; cd ..
 
 stats:
-	wc -l *.c *.h */*.c */*.h
+	wc -l *.c *.h

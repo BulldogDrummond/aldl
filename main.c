@@ -14,8 +14,6 @@
 #include "aldl-io.h"
 #include "debugif/debugif.h"
 
-aldl_conf_t *aldl; /* main config structure */
-
 /* ------ local functions ------------- */
 
 /* run cleanup rountines for aldl and serial crap */
@@ -30,7 +28,7 @@ int main() { /*-------------------------------------------------- */
 
   /* allocate everything and parse config */
   /* FIXME this static config file thing has to go */
-  aldl = aldl_setup();
+  aldl_conf_t *aldl = aldl_setup();
 
   /* set initial connection state */
   set_connstate(ALDL_LOADING,aldl);
@@ -48,9 +46,12 @@ int main() { /*-------------------------------------------------- */
   pthread_create(&threads[0],NULL,aldl_acq,(void *)aldl);
   pthread_create(&threads[1],NULL,debugif_loop,(void *)aldl);
 
+  /* ----- CLEANUP ---------------------------------------------*/
+
   pthread_exit(NULL);
   //aldl_finish();
   return 0;
+
 } /*-----------------------------------------------------------*/
 
 int aldl_finish() {
