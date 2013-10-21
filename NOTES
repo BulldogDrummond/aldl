@@ -1,3 +1,15 @@
+Configuration:
+
+The configuration file format is based around '=', anything to the left of an
+equals char = is considered a parameter name, and anything to the right is
+considered the value.  The fields are terminated by whitespace OR linefeed,
+with the exception of quoted strings, inside which whitespace is ignored.
+
+This means fancy layout and comments are allowed, as long as they are NOT
+adjacent to an equals sign.
+
+Some parameters can be omitted, and default values will be put in place.
+
 Access of Data:
 
 - A linked list of aldl_record_t structures is constructed as fixed length

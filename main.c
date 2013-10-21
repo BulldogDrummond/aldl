@@ -176,10 +176,22 @@ void aldl_alloc_c() {
       if(faststrcmp(tmp,"FLOAT") == 1) {
         d->type=ALDL_FLOAT;
         d->precision=configopt_int(dconfig(configstr,"PRECISION",x),0,1000,0);
+        d->min.f=configopt_float(dconfig(configstr,"MIN",x),0);
+        d->max.f=configopt_float(dconfig(configstr,"MAX",x),9999999);
+        d->adder.f=configopt_float(dconfig(configstr,"ADDER",x),0);
+        d->multiplier.f=configopt_float(dconfig(configstr,"MULTIPLIER",x),1);
       } else if(faststrcmp(tmp,"INT") == 1) {
         d->type=ALDL_INT; 
+        d->min.i=configopt_int(dconfig(configstr,"MIN",x),-65535,65535,0);
+        d->max.i=configopt_int(dconfig(configstr,"MAX",x),-65535,65535,65535);
+        d->adder.i=configopt_int(dconfig(configstr,"ADDER",x),-65535,65535,0);
+        d->multiplier.i=configopt_int(dconfig(configstr,"MULTIPLIER",x),-65535,65535,1);
       } else if(faststrcmp(tmp,"UINT") == 1) {
         d->type=ALDL_UINT;
+        d->min.u=(unsigned int)configopt_int(dconfig(configstr,"MIN",x),0,65535,0);
+        d->max.u=(unsigned int)configopt_int(dconfig(configstr,"MAX",x),0,65535,65535);
+        d->adder.u=(unsigned int)configopt_int(dconfig(configstr,"ADDER",x),0,65535,0);
+        d->multiplier.u=(unsigned int)configopt_int(dconfig(configstr,"MULTIPLIER",x),0,65535,1);
       } else {
         fatalerror(ERROR_CONFIG,"invalid data type in def");
       };
@@ -197,13 +209,6 @@ void aldl_alloc_c() {
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,"pkt range");
     d->name=configopt_fatal(dconfig(configstr,"NAME",x));
     d->description=configopt_fatal(dconfig(configstr,"DESC",x));
-
-    /* FIXME no support for:
-    d->min= aldl_data_t
-    d->max= aldl_data_t
-    d->adder= aldl_data_t
-    d->multiplier= aldl_data_t
-    */
   };
   free(configstr);
 }
