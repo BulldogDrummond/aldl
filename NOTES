@@ -27,25 +27,22 @@ Access of Data:
 
 /*------------------------------------------------------------------------*/
 
-#define RPM_FIELD_ID 22
-
 void display_rpm(aldl_conf_t *aldl) {
 
   /* get the index and store it, to avoid repeated lookups */
-  int rpmindex = get_index_by_id(aldl,RPM_FIELD_ID);
-  aldl_record_t *rec = NULL; /* pointer to the most current record */
+  int rpmindex = get_index_by_name(aldl,"RPM");
 
   pause_until_connected(aldl);
 
-  while(1) {
+  aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
 
-    /* pause until new data is available, then retrieve it. */
-    rec = next_record_wait(aldl);
+  while(1) {
+    /* pause until new data is available, then point to new record */
+    rec = next_record_wait(rec);
 
     /* in that record, get data field rpmindex, and the floating point value
        contained within ... also get the short name from the definition. */
-    printf("%s: %f",aldl->def[rpmindex]->name, rec->data[rpmindex].f);
-
+    printf("%s: %f\n",aldl->def[rpmindex].name, rec->data[rpmindex].f);
   };
 };
 
