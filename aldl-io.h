@@ -46,8 +46,9 @@ aldl_record_t *next_record_wait(aldl_record_t *rec);
 /* get next record in the list, returns NULL if none is available */
 aldl_record_t *next_record(aldl_record_t *rec);
 
-/* get definition or data array index by id number, returns -1 if not found */
+/* get definition or data array index, returns -1 if not found */
 int get_index_by_id(aldl_conf_t *aldl, int id);
+int get_index_by_name(aldl_conf_t *aldl, char *name);
 
 /* this pauses until a 'connected' state is detected */
 void pause_until_connected(aldl_conf_t *aldl);
