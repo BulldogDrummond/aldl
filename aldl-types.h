@@ -6,7 +6,7 @@
 /* output data type enumeration */
 
 typedef enum aldl_datatype {
-  ALDL_INT, ALDL_UINT, ALDL_FLOAT, ALDL_BOOL, ALDL_RAW
+  ALDL_INT, ALDL_FLOAT, ALDL_BOOL
 } aldl_datatype_t;
 
 /* connection state tracking */
@@ -34,8 +34,6 @@ typedef unsigned char byte;
 typedef union aldl_data {
   float f;
   int i;
-  unsigned int u;
-  byte raw;
 } aldl_data_t;
 
 /* each data record will be associated with a static definition.  this will
