@@ -12,7 +12,7 @@
 #include "error.h"
 #include "config.h"
 #include "aldl-io.h"
-#include "loadconfig.h"
+#include "useful.h"
 
 /* -------- globalstuffs ------------------ */
 
@@ -36,12 +36,6 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl);
 
 /* fill a prepared record with data */
 aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
-
-/* turn two 8 bit bytes into a 16 bit int */
-unsigned int sixteenbit(byte *p);
-
-/* get a single bit from a byte */
-int getbit(byte p, int bpos, int flip);
 
 void init_locks() {
   lock.connstate = malloc(sizeof(pthread_mutex_t));
@@ -168,15 +162,6 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   };
 
   return out;
-};
-
-int getbit(byte p, int bpos, int flip) {
-  if(bpos < 0 || bpos > 7) fatalerror(ERROR_RANGE,"bit field number");
-  return flip ^ ( p >> ( bpos + 1 ) & 0x01 );
-};
-
-unsigned int sixteenbit(byte *p) {
-  return (unsigned int)((*p<<8)|*(p+1));
 };
 
 aldl_state_t get_connstate(aldl_conf_t *aldl) {

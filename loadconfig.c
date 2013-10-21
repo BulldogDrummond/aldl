@@ -11,6 +11,7 @@
 #include "config.h"
 #include "error.h"
 #include "aldl-io.h"
+#include "useful.h"
 
 /* ------- GLOBAL----------------------- */
 
@@ -280,11 +281,6 @@ byte configopt_byte_fatal(char *str) {
   return hextobyte(in);
 };
 
-byte hextobyte(char *str) {
-  /* FIXME this kinda sucks */
-  return (int)strtol(str,NULL,16);
-};
-
 char *pktconfig(char *buf, char *parameter, int n) {
   sprintf(buf,"P%i.%s",n,parameter);
   return buf;
@@ -458,21 +454,6 @@ char *value_by_parameter(char *str, dfile_t *d) {
     if(faststrcmp(str,d->p[x]) == 1) return d->v[x];
   };
   return NULL;
-};
-
-inline int faststrcmp(char *a, char *b) {
-  int x = 0;
-  while(a[x] == b[x]) {
-    x++;
-    if(a[x] == 0 || b[x] == 0) {
-      if(a[x] == 0 && b[x] == 0) {
-        return 1;
-      } else {
-        return 0;
-      };
-    };
-  };
-  return 0;
 };
 
 void print_config(dfile_t *d) {

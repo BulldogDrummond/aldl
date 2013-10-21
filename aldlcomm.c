@@ -10,8 +10,6 @@
 #include "config.h"
 #include "aldl-io.h"
 
-typedef unsigned int sum_t;
-
 /* local functions -----*/
 int aldl_shutup(); /* repeatedly attempt to make the ecm shut up */
 
@@ -115,23 +113,6 @@ byte *aldl_get_packet(aldl_packetdef_t *p) {
   return p->data;
 }
 
-int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
-  if(nsize > hsize) return 0; /* needle is larger than haystack */
-  if(hsize < 1 || nsize < 1) return 0;
-  int cursor = 0; /* haystack compare cursor */
-  int matched = 0; /* needle compare cursor */
-  while(cursor <= hsize) {
-    if(nsize == matched) return 1;
-    if(h[cursor] != n[matched]) { /* reset match */
-      matched = 0;
-    } else {
-      matched++;
-    };
-    cursor++;
-  };
-  return 0;
-};
-
 inline int read_bytes(byte *str, int bytes, int timeout) {
   int bytes_read = 0;
   int timespent = 0;
@@ -206,21 +187,6 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
   return 0; /* got max chars with no result */
 }
 
-byte checksum_generate(byte *buf, int len) {
-  int x = 0;
-  sum_t sum = 0;
-  for(x=0;x<len;x++) sum += buf[x];
-  return ( 256 - ( sum % 256 ) );
-};
-
-int checksum_test(byte *buf, int len) {
-  int x = 0;
-  sum_t sum = 0;
-  for(x=0;x<len;x++) sum += buf[x];
-  if(( sum & 0xFF ) == 0) return 1;
-  return 0;
-};
-
 byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
   packet->command = malloc(5);
   packet->command[0] = comm->pcm_address;
@@ -238,9 +204,5 @@ byte *generate_mode(byte mode, aldl_commdef_t *comm) {
   tmp[2] = mode;
   tmp[3] = checksum_generate(tmp,SHUTUP_LENGTH - 1);
   return tmp;
-};
-
-inline void msleep(int ms) {
-  usleep(ms * 1000); /* just use usleep and convert from ms in unix */
 };
 

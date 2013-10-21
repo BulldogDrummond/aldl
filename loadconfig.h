@@ -34,13 +34,6 @@ char *value_by_parameter(char *str, dfile_t *d);
 /* strip all starting and ending quotes from quoted 'value' fields. */
 void dfile_strip_quotes(dfile_t *d);
 
-/* a fast string compare function, returns 1 on match 0 on fail, bails instantly
-   on mismatch. */
-inline int faststrcmp(char *a, char *b);
-
-/* convert a 0xFF format string to a 'byte'... */
-byte hextobyte(char *str);
-
 /* for debugging, print a list of all config pairs extracted. */
 void print_config(dfile_t *d);
 

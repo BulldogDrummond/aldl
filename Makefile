@@ -1,13 +1,16 @@
 # compiler flags
 CFLAGS= -g -Wall
 #CFLAGS= -O2 -Wall
-OBJS= debugif/debugif.o acquire.o error.o loadconfig.o
+OBJS= debugif/debugif.o acquire.o error.o loadconfig.o useful.o
 FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
 all: aldl-ftdi
 
-aldl-ftdi: main.c aldl-io-ftdi.a debugif_ acquire.o error.o loadconfig.o
+aldl-ftdi: main.c aldl-io-ftdi.a debugif_ $(OBJS)
 	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io-ftdi.a
+
+useful.o: useful.c useful.h
+	gcc $(CFLAGS) -c useful.c -o useful.o
 
 loadconfig.o: loadconfig.c loadconfig.h
 	gcc $(CFLAGS) -c loadconfig.c -o loadconfig.o
