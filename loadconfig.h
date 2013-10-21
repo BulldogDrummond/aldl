@@ -1,0 +1,1 @@
+void loadconfig(char *configfile);

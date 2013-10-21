@@ -4,12 +4,8 @@
 
 #define VERBLOSITY
 
-/* build in preproduction code */
-
-#define PREPRODUCTION
-
 /* debug structures and buffering */
-#define DEBUGSTRUCT
+//#define DEBUGSTRUCT
 
 /* the maximum failed packets before the connection is marked failed */
 #define MAX_FAIL_DISCONNECT 6
@@ -24,7 +20,7 @@
 #define CHECK_HEADER_SANITY
 
 /* support multiple packets */
-#define ALDL_MULTIPACKET
+//#define ALDL_MULTIPACKET
 
 /* track connection state for shutup lag */
 #define LAGCHECK
