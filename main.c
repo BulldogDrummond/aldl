@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <pthread.h>
+#include <limits.h>
 
 /* local objects */
 #include "config.h"
@@ -38,7 +39,7 @@ char *configopt(char *str,char *def);
 char *pktconfig(char *buf, char *parameter, int n);
 char *dconfig(char *buf, char *parameter, int n);
 
-/* convert a 0xFF format string to a 'byte', or 00 on error... */
+/* convert a 0xFF format string to a 'byte'... */
 byte hextobyte(char *str);
 
 /* allocate all major structures and load config routines */
@@ -182,15 +183,19 @@ void aldl_alloc_c() {
         d->multiplier.f=configopt_float(dconfig(configstr,"MULTIPLIER",x),1);
       } else if(faststrcmp(tmp,"INT") == 1) {
         d->type=ALDL_INT; 
-        d->min.i=configopt_int(dconfig(configstr,"MIN",x),-65535,65535,0);
-        d->max.i=configopt_int(dconfig(configstr,"MAX",x),-65535,65535,65535);
-        d->adder.i=configopt_int(dconfig(configstr,"ADDER",x),-65535,65535,0);
-        d->multiplier.i=configopt_int(dconfig(configstr,"MULTIPLIER",x),-65535,65535,1);
+        d->min.i=configopt_int(dconfig(configstr,"MIN",x),-32678,32767,0);
+        d->max.i=configopt_int(dconfig(configstr,"MAX",x),-32678,32767,65535);
+        d->adder.i=configopt_int(dconfig(configstr,"ADDER",x),-32678,32767,0);
+        d->multiplier.i=configopt_int(dconfig(configstr,"MULTIPLIER",x),
+                                         -32678,32767,1);
       } else if(faststrcmp(tmp,"UINT") == 1) {
         d->type=ALDL_UINT;
-        d->min.u=(unsigned int)configopt_int(dconfig(configstr,"MIN",x),0,65535,0);
-        d->max.u=(unsigned int)configopt_int(dconfig(configstr,"MAX",x),0,65535,65535);
-        d->adder.u=(unsigned int)configopt_int(dconfig(configstr,"ADDER",x),0,65535,0);
+        d->min.u=(unsigned int)configopt_int(dconfig(configstr,"MIN",x),
+                                                0,65535,0);
+        d->max.u=(unsigned int)configopt_int(dconfig(configstr,"MAX",x),
+                                                0,65535,65535);
+        d->adder.u=(unsigned int)configopt_int(dconfig(configstr,"ADDER",x),
+                                               0,65535,0);
         d->multiplier.u=(unsigned int)configopt_int(dconfig(configstr,"MULTIPLIER",x),0,65535,1);
       } else {
         fatalerror(ERROR_CONFIG,"invalid data type in def");
