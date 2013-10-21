@@ -10,6 +10,10 @@
 #include "config.h"
 #include "aldl-io.h"
 
+/* length of an aldl mode change request string */
+/* FIXME this might not be good for other ECMS */
+#define SHUTUP_LENGTH 4
+
 /* local functions -----*/
 int aldl_shutup(); /* repeatedly attempt to make the ecm shut up */
 

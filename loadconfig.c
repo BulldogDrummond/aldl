@@ -59,13 +59,13 @@ aldl_conf_t *aldl_setup() {
   /* load root config file ... */
   config = dfile_load(ROOT_CONFIG_FILE);
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
-  #ifdef VERBLOSITY
+  #ifdef DEBUGCONFIG
   print_config(config);
   #endif
 
   /* allocate main (predictable) structures */
   aldl_alloc_a(); /* creates aldl_conf_t structure ... */
-  #ifdef VERBLOSITY
+  #ifdef DEBUGCONFIG
   printf("loading root config...\n");
   #endif
 
@@ -74,23 +74,23 @@ aldl_conf_t *aldl_setup() {
   /* load def config file ... */
   config = dfile_load(configfile);
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load definition file");
-  #ifdef VERBLOSITY
+  #ifdef DEBUGCONFIG
   print_config(config);
   printf("configuration, stage A...\n");
   #endif
   load_config_a();
 
-  #ifdef VERBLOSITY
+  #ifdef DEBUGCONFIG
   printf("configuration, stage B...\n");
   #endif
   aldl_alloc_b();
   load_config_b();
-  #ifdef VERBLOSITY
+  #ifdef DEBUGCONFIG
   printf("configuration, stage C...\n");
   #endif
   aldl_alloc_c();
   load_config_c();
-  #ifdef VERBLOSITY
+  #ifdef DEBUGCONFIG
   printf("configuration complete.\n");
   #endif
   return aldl;
@@ -150,7 +150,7 @@ void load_config_b() {
     comm->packet[x].frequency = configopt_int(pktconfig(pktname,
                                                  "FREQUENCY",x),0,1000,1);
     generate_pktcommand(&comm->packet[x],comm);
-    #ifdef VERBLOSITY
+    #ifdef DEBUGCONFIG
     printf("loaded packet %i\n",x);
     #endif
   };
@@ -225,7 +225,7 @@ void load_config_c() {
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,"pkt range");
     d->name=configopt_fatal(dconfig(configstr,"NAME",x));
     d->description=configopt_fatal(dconfig(configstr,"DESC",x));
-    #ifdef VERBLOSITY
+    #ifdef DEBUGCONFIG
     printf("loaded definition %i\n",x);
     #endif
   };
