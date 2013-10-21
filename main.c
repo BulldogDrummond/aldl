@@ -12,6 +12,7 @@
 #include "acquire.h"
 #include "error.h"
 #include "aldl-io.h"
+#include "debugif/debugif.h"
 
 aldl_conf_t *aldl; /* main config structure */
 
@@ -45,6 +46,7 @@ int main() { /*-------------------------------------------------- */
   
   /* spawn acq thread */
   pthread_create(&threads[0],NULL,aldl_acq,(void *)aldl);
+  pthread_create(&threads[1],NULL,debugif_loop,(void *)aldl);
 
   pthread_exit(NULL);
   //aldl_finish();
