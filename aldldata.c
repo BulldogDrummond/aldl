@@ -12,6 +12,7 @@
 #include "error.h"
 #include "config.h"
 #include "aldl-io.h"
+#include "loadconfig.h"
 
 /* -------- globalstuffs ------------------ */
 
@@ -156,19 +157,14 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
     case ALDL_INT:
       out->i = (int)x + def->adder.i * def->multiplier.i;
       break;
-    case ALDL_UINT:
-      out->u = (unsigned int)x + def->adder.u * def->multiplier.u;
-      break;
     case ALDL_FLOAT:
       out->f = (float)x + def->adder.f * def->multiplier.f;
       break;
     case ALDL_BOOL:
       out->i = getbit(x,def->binary,def->invert);
       break;
-    /* raw or invalid bit just transfers the raw byte */
-    case ALDL_RAW:
     default:
-      out->raw = x;
+      fatalerror(ERROR_RANGE,"invalid type spec");
   };
 
   return out;
@@ -231,14 +227,6 @@ aldl_record_t *next_record(aldl_record_t *rec) {
   return next;
 };
 
-int get_index_by_id(aldl_conf_t *aldl, int id) {
-  int x;
-  for(x=0;x<aldl->n_defs;x++) {
-    if(id == aldl->def[x].id) return x;
-  };
-  return -1; /* not found */
-};
-
 void pause_until_connected(aldl_conf_t *aldl) {
   while(get_connstate(aldl) > 10) usleep(100);
 };
@@ -253,4 +241,23 @@ void printhexstring(byte *str, int length) {
   for(x=0;x<length;x++) printf("%X ",(unsigned int)str[x]);
   printf("\n");
 };
+
+/*-------------- data retrieval functions -------------*/
+
+int get_index_by_id(aldl_conf_t *aldl, int id) {
+  int x;
+  for(x=0;x<aldl->n_defs;x++) {
+    if(id == aldl->def[x].id) return x;
+  };
+  return -1; /* not found */
+};
+
+int get_index_by_name(aldl_conf_t *aldl, char *name) {
+  int x;
+  for(x=0;x<aldl->n_defs;x++) {
+    if(faststrcmp(name,aldl->def[x].name) == 1) return x;
+  };
+  return -1; /* not found */
+};
+
 

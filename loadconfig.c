@@ -208,16 +208,6 @@ void load_config_c() {
         d->adder.i=configopt_int(dconfig(configstr,"ADDER",x),-32678,32767,0);
         d->multiplier.i=configopt_int(dconfig(configstr,"MULTIPLIER",x),
                                          -32678,32767,1);
-      } else if(faststrcmp(tmp,"UINT") == 1) {
-        d->type=ALDL_UINT;
-        d->min.u=(unsigned int)configopt_int(dconfig(configstr,"MIN",x),
-                                                0,65535,0);
-        d->max.u=(unsigned int)configopt_int(dconfig(configstr,"MAX",x),
-                                                0,65535,65535);
-        d->adder.u=(unsigned int)configopt_int(dconfig(configstr,"ADDER",x),
-                                               0,65535,0);
-        d->multiplier.u=(unsigned int)configopt_int(dconfig(configstr,
-                                           "MULTIPLIER",x),0,65535,1);
       } else {
         fatalerror(ERROR_CONFIG,"invalid data type in def");
       };
