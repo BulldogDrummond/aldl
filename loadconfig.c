@@ -11,8 +11,7 @@
 #include "config.h"
 #include "error.h"
 #include "dfiler.h"
-#include "aldl-io/config.h"
-#include "aldl-io/aldl-io.h"
+#include "aldl-io.h"
 
 /* ------- GLOBAL----------------------- */
 

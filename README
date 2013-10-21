@@ -9,18 +9,37 @@ contents:
 
 main.c: sets up initial structures and spawns some threads, to get things going
 
-aldl-io/  a static library that manages all retrieval of serial data, parsing,
-          and placing it into structures to be used by all other modules of
-          this program.
-
 acquire.c: an object that runs an event loop full of functions from aldl-io,
            maintaining connection state and constructing a linked list buffer
            of parsed and verified aldl data.
 
 error.c: a global error handling object.
 
-configfile/  a library for loading and managing defintion and config files
-
 debugif/  a testing display module just to spit out raw data to make sure it's
           working.
+
+aldl-io.h: all public functions are exported here.  this also explicitly
+           includes aldl-types.h.
+
+aldl-types.h: defines all public data structures used in this library.
+
+aldldata.c: provides functions for data management, including construction of
+            the linked list of records, parsing and conversion of raw data, and
+            thread-safe read/write of critical data.
+
+aldlcomm.c: provides communication protocols for dealing with the ECM, including
+            sending and generating requests, retrieving raw packets of data,
+            and verifying them.
+
+serio-ftdi.c: an object that allows serial communications using the libftdi
+              userland driver (via libusb).  this is the reccommended and only
+              currently supported interface.
+
+NOTES:
+
+string to identify your ftdi interface (pick one):
+   d:devicenode (usually at /proc/bus/usb)
+   i:vendor:product
+   i:vendor:product:index
+   s:vendor:product:serial
 

@@ -5,7 +5,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "../error.h"
+#include "error.h"
 #include "serio.h"
 #include "config.h"
 #include "aldl-io.h"

@@ -12,7 +12,7 @@
 
 #include "serio.h"
 #include "aldl-io.h"
-#include "../error.h"
+#include "error.h"
 #include "config.h"
 
 /****************GLOBALSn'STRUCTURES*****************************/

@@ -7,8 +7,8 @@
 /* local objects */
 #include "error.h"
 #include "config.h"
-#include "aldl-io/config.h"
-#include "aldl-io/aldl-io.h"
+#include "config.h"
+#include "aldl-io.h"
 #include "acquire.h"
 
 /* plugins */

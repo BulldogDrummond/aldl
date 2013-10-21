@@ -9,10 +9,9 @@
 #include "serio.h"
 #include "config.h"
 
-#include "../error.h"
-#include "../config.h"
+#include "error.h"
+#include "config.h"
 #include "aldl-io.h"
-#include "../configfile/configfile.h"
 
 /* -------- globalstuffs ------------------ */
 

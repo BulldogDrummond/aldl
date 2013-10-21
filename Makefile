@@ -5,8 +5,8 @@ FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
 all: aldl-ftdi
 
-aldl-ftdi: main.c aldl-io-ftdi debugif_ acquire.o error.o dfiler.o loadconfig.o
-	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io/aldl-io-ftdi.a
+aldl-ftdi: main.c aldl-io-ftdi.a debugif_ acquire.o error.o dfiler.o loadconfig.o
+	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io-ftdi.a
 
 loadconfig.o: loadconfig.c loadconfig.h
 	gcc $(CFLAGS) -c loadconfig.c -o loadconfig.o
@@ -29,10 +29,20 @@ aldl-io-ftdi:
 debugif_:
 	cd debugif ; make ; cd ..
 
+serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h
+	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
+
+aldlcomm.o: aldl-io.h aldl-types.h serio-ftdi.o
+	gcc $(CFLAGS) -c aldlcomm.c -o aldlcomm.o
+
+aldldata.o: aldl-io.h aldl-types.h aldldata.c aldlcomm.o
+	gcc $(CFLAGS) -c aldldata.c -o aldldata.o
+
+aldl-io-ftdi.a: serio-ftdi.o aldlcomm.o aldldata.o
+	ar rcs aldl-io-ftdi.a serio-ftdi.o aldlcomm.o aldldata.o
+
 clean:
-	rm -f *.o aldl-ftdi
-	cd aldl-io ; make clean ; cd ..
-	cd configfile ; make clean ; cd ..
+	rm -f *.o *.a aldl-ftdi
 	cd debugif ; make clean ; cd ..
 
 stats:
