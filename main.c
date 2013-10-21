@@ -29,14 +29,13 @@ int main() { /*-------------------------------------------------- */
 
   /* allocate everything and parse config */
   /* FIXME this static config file thing has to go */
-  aldl = aldl_setup("lt1.conf");
+  aldl = aldl_setup();
 
-  set_connstate(ALDL_LOADING,aldl); /* initial connection state */
+  /* set initial connection state */
+  set_connstate(ALDL_LOADING,aldl);
 
   /* configure port and initialize */
-  /* FIXME this needs to come from load_config or switch to autodetct */
-  char *serialport = "d:002/002";
-  serial_init(serialport); /* init serial port */
+  serial_init(aldl->serialstr);
 
   /* ------ THREAD SPAWNING -------------------------------------*/
 

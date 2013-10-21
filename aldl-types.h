@@ -122,6 +122,7 @@ typedef struct aldl_stats {
 
 typedef struct aldl_conf {
   char ecmtype; /* the type of ecm being read */
+  char *serialstr; /* string to init serial port */
   int n_defs;   /* number of definitions */
   int bufsize;  /* the minimum number of records to maintain */
   aldl_state_t state; /* connection state, do not touch */

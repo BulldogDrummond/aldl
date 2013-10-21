@@ -1,3 +1,6 @@
+/* path to the root config file */
+
+#define ROOT_CONFIG_FILE "./main.conf"
 
 /* enable debug level verbosity in the main program.  probably disable this if
    you're using a display plugin ... */

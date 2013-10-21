@@ -82,17 +82,33 @@ void aldl_alloc_c(); /* more data space */
 void load_config_a(); /* load data to alloc_a structures */
 void load_config_b(); /* load data to alloc_b structures */
 void load_config_c();
+char *load_config_root(); /* returns path to sub config */
 
-aldl_conf_t *aldl_setup(char *configfile) {
-  /* parse config file ... never free this structure */
-  config = dfile_load(configfile);
+aldl_conf_t *aldl_setup() {
+  /* load root config file ... */
+  config = dfile_load(ROOT_CONFIG_FILE);
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
+  #ifdef VERBLOSITY
+  print_config(rconfig);
+  #endif
+
+  /* allocate main (predictable) structures */
+  aldl_alloc_a(); /* creates aldl_conf_t structure ... */
+  #ifdef VERBLOSITY
+  printf("loading root config...\n");
+  #endif
+
+  char *configfile = load_config_root();
+
+  /* load def config file ... */
+  config = dfile_load(configfile);
+  if(config == NULL) fatalerror(ERROR_CONFIG,"cant load definition file");
   #ifdef VERBLOSITY
   print_config(config);
   printf("configuration, stage A...\n");
   #endif
-  aldl_alloc_a();
   load_config_a();
+
   #ifdef VERBLOSITY
   printf("configuration, stage B...\n");
   #endif
@@ -126,6 +142,11 @@ void aldl_alloc_a() {
   if(aldl->stats == NULL) fatalerror(ERROR_MEMORY,"stats alloc");
   memset(aldl->stats,0,sizeof(aldl_stats_t));
 }
+
+char *load_config_root() {
+  aldl->serialstr = configopt("PORT",NULL);
+  return configopt_fatal("DEFINITION"); /* path not stored ... */
+};
 
 void load_config_a() {
   comm->checksum_enable = configopt_int("CHECKSUM_ENABLE",0,1,1);;
