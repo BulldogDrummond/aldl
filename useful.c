@@ -67,3 +67,10 @@ int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
 void msleep(int ms) {
   usleep(ms * 1000); /* just use usleep and convert from ms in unix */
 };
+
+void printhexstring(byte *str, int length) {
+  int x;
+  for(x=0;x<length;x++) printf("%X ",(unsigned int)str[x]);
+  printf("\n");
+};
+

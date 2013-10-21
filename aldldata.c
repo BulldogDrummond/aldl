@@ -220,15 +220,6 @@ void pause_until_buffered(aldl_conf_t *aldl) {
   while(aldl->ready ==0) usleep(50);
 };
 
-/* a debug output function ... */
-void printhexstring(byte *str, int length) {
-  int x;
-  for(x=0;x<length;x++) printf("%X ",(unsigned int)str[x]);
-  printf("\n");
-};
-
-/*-------------- data retrieval functions -------------*/
-
 int get_index_by_id(aldl_conf_t *aldl, int id) {
   int x;
   for(x=0;x<aldl->n_defs;x++) {
