@@ -14,14 +14,6 @@
 
 /* ------- GLOBAL----------------------- */
 
-#define MAX_PARAMETERS 65535
-
-typedef struct _dfile_t {
-  unsigned int n; /* number of parameters */
-  char **p;  /* parameter */
-  char **v;  /* value */
-} dfile_t;
-
 aldl_conf_t *aldl; /* aldl data structure */
 aldl_commdef_t *comm; /* comm specs */
 dfile_t *config; /* configuration */
@@ -31,30 +23,11 @@ dfile_t *config; /* configuration */
 /* is a char whitespace ...? */
 inline int is_whitespace(char ch);
 
-/* loads file, strips quotes, shrinks, parses in one step.. */
-dfile_t *dfile_load(char *filename);
-
-/* read file into memory */
-char *load_file(char *filename);
-
-/* split up data into parameters and values */
-dfile_t *dfile(char *data);
-
-/* reduce the data section and pointer arrays to reduce mem usage, returns
-   pointer to new data to be freed later. */
-char *dfile_shrink(dfile_t *d);
-
-/* get a value by parameter string */
-char *value_by_parameter(char *str, dfile_t *d);
-
-/* strip all starting and ending quotes from quoted 'value' fields. */
-void dfile_strip_quotes(dfile_t *d);
-
 /* copy data contained in field f of d to dst, delimted by start and end */
 char *brk_field(char *dst, int f, char *in);
 
-/* for debugging, print a list of all config pairs extracted. */
-void print_config(dfile_t *d);
+/* following functions use internally stored config and should never be
+   exported ... */
 
 /* get various config options by name */
 int configopt_int_fatal(char *str, int min, int max);
@@ -69,9 +42,6 @@ char *configopt(char *str,char *def);
 /* get a packet config string */
 char *pktconfig(char *buf, char *parameter, int n);
 char *dconfig(char *buf, char *parameter, int n);
-
-/* convert a 0xFF format string to a 'byte'... */
-byte hextobyte(char *str);
 
 /* initial memory allocation routines */
 void aldl_alloc_a(); /* fixed structures */
