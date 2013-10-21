@@ -6,8 +6,26 @@
 /* local objects */
 #include "../aldl-io.h"
 
-void debugif_loop(aldl_conf_t *c) {
+void *debugif_loop(void *aldl_in) {
+  aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
+
   printf("-------DEBUG DISPLAY INTERFACE ACTIVE--------\n"); 
+
+  /* get the index and store it, to avoid repeated lookups */
+  int rpmindex = get_index_by_id(aldl,0);
+  aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
+
+  pause_until_connected(aldl);
+
+  while(1) {
+    /* pause until new data is available, then retrieve it. */
+    rec = next_record_wait(rec);
+
+    /* in that record, get data field rpmindex, and the floating point value
+       contained within ... also get the short name from the definition. */
+    printf("%s: %f\n",aldl->def[rpmindex].name, rec->data[rpmindex].f);
+  };
+  return aldl;
 };
 
 void debugif_iterate(aldl_conf_t *c) {

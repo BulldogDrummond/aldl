@@ -11,9 +11,6 @@
 #include "aldl-io.h"
 #include "acquire.h"
 
-/* plugins */
-#include "debugif/debugif.h"
-
 /* primary data acqusition event loop */
 
 void *aldl_acq(void *aldl_in) {
@@ -193,8 +190,6 @@ void *aldl_acq(void *aldl_in) {
       aldl->ready = 1; /* set readyness bit */
       remove_record(oldest_record(aldl));
     };
-
-    debugif_iterate(aldl);
   };
   return NULL;
 }
