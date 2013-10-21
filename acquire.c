@@ -16,8 +16,9 @@
 
 /* primary data acqusition event loop */
 
-int aldl_acq(aldl_conf_t *aldl) {
+void *aldl_acq(void *aldl_in) {
   /* ---- main variables --------------- */
+  aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
   aldl_commdef_t *comm = aldl->comm; /* direct reference to commdef */
   aldl_packetdef_t *pkt = NULL; /* temporary pointer to the packet def */
   int pktfail = 0; /* marker for a failed packet in event loop */
@@ -195,6 +196,6 @@ int aldl_acq(aldl_conf_t *aldl) {
 
     debugif_iterate(aldl);
   };
-  return 0;
+  return NULL;
 }
 
