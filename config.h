@@ -2,7 +2,7 @@
 /* enable debug level verbosity in the main program.  probably disable this if
    you're using a display plugin ... */
 
-#define VERBLOSITY
+//#define VERBLOSITY
 
 /* debug structures and buffering */
 //#define DEBUGSTRUCT

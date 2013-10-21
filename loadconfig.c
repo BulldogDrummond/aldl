@@ -10,16 +10,51 @@
 #include "loadconfig.h"
 #include "config.h"
 #include "error.h"
-#include "dfiler.h"
 #include "aldl-io.h"
 
 /* ------- GLOBAL----------------------- */
 
-extern aldl_conf_t *aldl; /* aldl data structure */
-extern aldl_commdef_t *comm; /* comm specs */
+#define MAX_PARAMETERS 65535
+
+typedef struct _dfile_t {
+  unsigned int n; /* number of parameters */
+  char **p;  /* parameter */
+  char **v;  /* value */
+} dfile_t;
+
+aldl_conf_t *aldl; /* aldl data structure */
+aldl_commdef_t *comm; /* comm specs */
 dfile_t *config; /* configuration */
 
 /* ------- LOCAL FUNCTIONS ------------- */
+
+/* is a char whitespace ...? */
+inline int is_whitespace(char ch);
+
+/* loads file, strips quotes, shrinks, parses in one step.. */
+dfile_t *dfile_load(char *filename);
+
+/* read file into memory */
+char *load_file(char *filename);
+
+/* split up data into parameters and values */
+dfile_t *dfile(char *data);
+
+/* reduce the data section and pointer arrays to reduce mem usage, returns
+   pointer to new data to be freed later. */
+char *dfile_shrink(dfile_t *d);
+
+/* get a value by parameter string */
+char *value_by_parameter(char *str, dfile_t *d);
+
+/* strip all starting and ending quotes from quoted 'value' fields. */
+void dfile_strip_quotes(dfile_t *d);
+
+/* copy data contained in field f of d to dst, delimted by start and end */
+char *brk_field(char *dst, int f, char *in);
+
+/* for debugging, print a list of all config pairs extracted. */
+void print_config(dfile_t *d);
 
 /* get various config options by name */
 int configopt_int_fatal(char *str, int min, int max);
@@ -48,11 +83,12 @@ void load_config_a(); /* load data to alloc_a structures */
 void load_config_b(); /* load data to alloc_b structures */
 void load_config_c();
 
-void loadconfig(char *configfile) {
+aldl_conf_t *aldl_setup(char *configfile) {
   /* parse config file ... never free this structure */
   config = dfile_load(configfile);
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
   #ifdef VERBLOSITY
+  print_config(config);
   printf("configuration, stage A...\n");
   #endif
   aldl_alloc_a();
@@ -70,6 +106,7 @@ void loadconfig(char *configfile) {
   #ifdef VERBLOSITY
   printf("configuration complete.\n");
   #endif
+  return aldl;
 }
 
 void aldl_alloc_a() {
@@ -277,3 +314,189 @@ char *dconfig(char *buf, char *parameter, int n) {
   return buf;
 };
 
+dfile_t *dfile_load(char *filename) {
+  char *data = load_file(filename);
+  if(data == NULL) return NULL;
+  dfile_t *d = dfile(data);
+  dfile_strip_quotes(d);
+  dfile_shrink(d);
+  free(data);
+  return d; 
+};
+
+void dfile_strip_quotes(dfile_t *d) {
+  int x;
+  char *c; /* cursor*/
+  for(x=0;x<d->n;x++) {
+    if(d->v[x][0] == '"') {
+      d->v[x]++;
+      c = d->v[x];
+      while(*c != '"') c++;
+      c[0] = 0;
+    };
+  };
+};
+
+dfile_t *dfile(char *data) {
+  /* allocate base structure */
+  dfile_t *out = malloc(sizeof(dfile_t));
+
+  /* initial allocation of pointer array */
+  out->p = malloc(sizeof(char*) * MAX_PARAMETERS);
+  out->v = malloc(sizeof(char*) * MAX_PARAMETERS);
+  out->n = 0;
+
+  /* more useful variables */
+  char *c; /* operating cursor within data */
+  char *cx; /* auxiliary operating cursor */
+  char *cz;
+  int len = strlen(data);
+
+  for(c=data;c<data+len;c++) { /* iterate through entire data set */
+    if(c[0] == '=') {
+      if(c == data || c == data + len) continue; /* handle first or last char */
+      out->v[out->n] = c + 1;
+      c[0] = 0;
+      cx = c + 1;
+      while(is_whitespace(*cx) != 1) {
+        if(*cx == '"') { /* skip quoted string */
+          cx++;
+          while(cx[0] != '"') {
+            if(cx == data + len) continue;
+            cx++;
+          };
+        };
+        cx++;
+      };
+      cx[0] = 0; /* null end */
+      cz = cx; /* rememeber end point */
+      /* find starting point */
+      cx = c - 1;
+      while(is_whitespace(*cx) != 1) {
+        if(*cx == '"') { /* skip quoted string */
+          cx--;
+          while(cx[0] != '"') {
+            if(cx == data + len) continue;
+            cx--;
+          };
+        };
+        cx--;
+        if(cx == data) { /* handle case of beginning of file */
+          cx--;
+          break;
+        };
+      };
+      out->p[out->n] = cx + 1;
+      out->n++;
+      if(out->n == MAX_PARAMETERS) return out; /* out of space */
+      c = cz;
+    };
+  };
+  return out;
+};
+
+/* reduce memory footprint */
+char *dfile_shrink(dfile_t *d) {
+  /* shrink arrays */
+  d->p = realloc(d->p,sizeof(char*) * d->n);
+  d->v = realloc(d->v,sizeof(char*) * d->n);
+  /* calculate total size of new data storage */
+  size_t ttl = 0;
+  int x;
+  for(x=0;x<d->n;x++) {
+    ttl += strlen(d->p[x]);
+    ttl += strlen(d->v[x]);
+    ttl += 2; /* for null terminators */
+  };
+  ttl++;
+  /* move everything and update pointers */
+  char *newdata = malloc(ttl); /* new storage */
+  char *c = newdata; /* cursor*/
+  for(x=0;x<d->n;x++) {
+    /* copy parameter */
+    strcpy(c,d->p[x]);
+    d->p[x] = c;
+    c += (strlen(c) + 1);
+    /* copy value */
+    strcpy(c,d->v[x]);
+    d->v[x] = c;
+    c += (strlen(c) + 1);
+  };
+  return newdata;
+};
+
+
+inline int is_whitespace(char ch) {
+  if(ch == 0 || ch == ' ' || ch == '\n') return 1;
+  return 0;
+};
+
+char *brk_field(char *dst, int f, char *in) {
+  if(dst == NULL || in == NULL) return NULL;
+  char *start = in;
+  int x = 0;
+  if(f != 0) { /* not first field */
+    for(x=0;x<f;x++) {
+      while(start[0] != ',') {
+        start++;
+        if(start[0] == 0 && x < f) return NULL;
+      };
+      start++;
+    };
+  };
+  strcpy(dst,start);
+  /* just terminate the end */
+  char *end = dst;
+  end++;
+  while(end[0] != ',' && end[0] != 0) end++;
+  end[0] = 0;
+  return dst;
+};
+
+/* read file into memory */
+char *load_file(char *filename) {
+  FILE *fdesc;
+  if(filename == NULL) return NULL;
+  fdesc = fopen(filename, "r");
+  if(fdesc == NULL) return NULL;
+  fseek(fdesc, 0L, SEEK_END);
+  int flength = ftell(fdesc);
+  if(flength == -1) return NULL;
+  rewind(fdesc);
+  char *buf = malloc(sizeof(char) * ( flength + 1));
+  if(buf == NULL) return NULL;
+  if(fread(buf,1,flength,fdesc) != flength) return NULL;
+  fclose(fdesc);
+  buf[flength] = 0;
+  return buf;
+};
+
+char *value_by_parameter(char *str, dfile_t *d) {
+  int x;
+  for(x=0;x<d->n;x++) {
+    if(faststrcmp(str,d->p[x]) == 1) return d->v[x];
+  };
+  return NULL;
+};
+
+inline int faststrcmp(char *a, char *b) {
+  int x = 0;
+  while(a[x] == b[x]) {
+    x++;
+    if(a[x] == 0 || b[x] == 0) {
+      if(a[x] == 0 && b[x] == 0) {
+        return 1;
+      } else {
+        return 0;
+      };
+    };
+  };
+  return 0;
+};
+
+void print_config(dfile_t *d) {
+  printf("config list has %i parsed options:-------------\n",d->n);
+  int x;
+  for(x=0;x<d->n;x++) printf("p(arameter):%s v(alue):%s\n",d->p[x],d->v[x]);
+  printf("----------end config\n");
+};

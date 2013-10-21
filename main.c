@@ -13,22 +13,19 @@
 #include "error.h"
 #include "aldl-io.h"
 
-/* ------- GLOBAL----------------------- */
+aldl_conf_t *aldl; /* main config structure */
 
-aldl_conf_t *aldl; /* aldl data structure */
-aldl_commdef_t *comm; /* comm specs */
-
-/* ------- LOCAL FUNCTIONS ------------- */
+/* ------ local functions ------------- */
 
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
 
-int main() {
+int main() { /*-------------------------------------------------- */
   /* initialize locking mechanisms */
   init_locks();
 
-  /* parse config file ... never free this structure */
-  loadconfig("lt1.conf");
+  /* allocate everything and parse config */
+  aldl = aldl_setup("lt1.conf");
 
   set_connstate(ALDL_LOADING,aldl); /* initial connection state */
 
@@ -38,10 +35,10 @@ int main() {
 
   aldl_acq(aldl); /* start main event loop */
 
-  aldl_finish(comm);
+  aldl_finish();
 
   return 0;
-}
+} /*-----------------------------------------------------------*/
 
 int aldl_finish() {
   serial_close();
