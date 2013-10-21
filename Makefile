@@ -6,37 +6,34 @@ FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
 all: aldl-ftdi
 
-aldl-ftdi: main.c aldl-io-ftdi.a debugif_ $(OBJS)
+aldl-ftdi: main.c aldl-io-ftdi.a config.h aldl-io.h aldl-types.h debugif_ $(OBJS)
 	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io-ftdi.a
 
-useful.o: useful.c useful.h
+useful.o: useful.c useful.h config.h aldl-types.h
 	gcc $(CFLAGS) -c useful.c -o useful.o
 
-loadconfig.o: loadconfig.c loadconfig.h
+loadconfig.o: loadconfig.c loadconfig.h config.h aldl-types.h
 	gcc $(CFLAGS) -c loadconfig.c -o loadconfig.o
 
-acquire.o: acquire.h
+acquire.o: acquire.c acquire.h config.h aldl-io.h aldl-types.h
 	gcc $(CFLAGS) -c acquire.c -o acquire.o
 
-error.o: error.c error.h
+error.o: error.c error.h config.h aldl-types.h
 	gcc $(CFLAGS) -c error.c -o error.o
-
-aldl-io-ftdi:
-	cd aldl-io ; make ; cd ..
 
 debugif_:
 	cd debugif ; make ; cd ..
 
-serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h
+serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h config.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
 
-aldlcomm.o: aldl-io.h aldl-types.h serio-ftdi.o
+aldlcomm.o: aldl-io.h aldl-types.h serio-ftdi.o config.h
 	gcc $(CFLAGS) -c aldlcomm.c -o aldlcomm.o
 
-aldldata.o: aldl-io.h aldl-types.h aldldata.c aldlcomm.o
+aldldata.o: aldl-io.h aldl-types.h aldldata.c aldlcomm.o config.h
 	gcc $(CFLAGS) -c aldldata.c -o aldldata.o
 
-aldl-io-ftdi.a: serio-ftdi.o aldlcomm.o aldldata.o
+aldl-io-ftdi.a: serio-ftdi.o aldlcomm.o aldldata.o config.h
 	ar rcs aldl-io-ftdi.a serio-ftdi.o aldlcomm.o aldldata.o
 
 clean:
