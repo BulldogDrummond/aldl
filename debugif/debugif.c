@@ -8,21 +8,27 @@
 
 void *debugif_loop(void *aldl_in) {
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
-
   printf("-------DEBUG DISPLAY INTERFACE ACTIVE--------\n"); 
-
-  /* get the index and store it, to avoid repeated lookups */
-  int rpmindex = get_index_by_id(aldl,0);
+  int x;
+  int rpmindex = get_index_by_name(aldl,"RPM");
   aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
-
   pause_until_connected(aldl);
-
   while(1) {
-    /* pause until new data is available, then retrieve it. */
     rec = next_record_wait(rec);
-
-    /* in that record, get data field rpmindex, and the floating point value
-       contained within ... also get the short name from the definition. */
+    for(x=0;x<aldl->n_defs;x++) {
+      printf("%s: ",aldl->def[x].name);
+      switch(aldl->def[x].type) {
+        case ALDL_FLOAT:
+          printf("%f ",rec->data[x].f); 
+          break;
+        case ALDL_INT:
+        case ALDL_BOOL:
+          printf("%i ",rec->data[x].i);
+          break;
+        default:
+          printf("WTF ");
+      }
+    };
     printf("%s: %f\n",aldl->def[rpmindex].name, rec->data[rpmindex].f);
   };
   return aldl;
