@@ -60,7 +60,7 @@ aldl_conf_t *aldl_setup() {
   config = dfile_load(ROOT_CONFIG_FILE);
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
   #ifdef VERBLOSITY
-  print_config(rconfig);
+  print_config(config);
   #endif
 
   /* allocate main (predictable) structures */
