@@ -39,17 +39,21 @@ int main() { /*-------------------------------------------------- */
   /* ------ THREAD SPAWNING -------------------------------------*/
 
   /* configure threading */
-  pthread_t threads[3];
+  pthread_t thread_acq; 
+  pthread_t thread_debugif; /* temporary */
+
   /* FIXME doesnt check for pthread error ... */
   
   /* spawn acq thread */
-  pthread_create(&threads[0],NULL,aldl_acq,(void *)aldl);
-  pthread_create(&threads[1],NULL,debugif_loop,(void *)aldl);
+  pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
+  pthread_create(&thread_debugif,NULL,debugif_loop,(void *)aldl); /* temp */
+
+  /* wait for acq thread to finish ... */
+  pthread_join(thread_acq,NULL);
 
   /* ----- CLEANUP ---------------------------------------------*/
 
-  pthread_exit(NULL);
-  //aldl_finish();
+  aldl_finish();
   return 0;
 
 } /*-----------------------------------------------------------*/

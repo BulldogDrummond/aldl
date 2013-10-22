@@ -15,6 +15,9 @@
 
 /****************GLOBALSn'STRUCTURES*****************************/
 
+char *databuff;
+char txmode;
+
 /****************FUNCTIONS**************************************/
 
 void serial_close() {
@@ -23,7 +26,7 @@ void serial_close() {
 
 int serial_init(char *port) {
   printf("serial dummy driver active\n");
-
+  txmode=0;
   return 1;
 };
 
@@ -40,10 +43,15 @@ void serial_purge_tx() {
 }
 
 int serial_write(byte *str, int len) {
+  txmode++;
   return 0;
 }
 
 inline int serial_read(byte *str, int len) {
-
+  /* initial idle traffic */
+  if(txmode == 0) {
+    str[0] = 0x33;
+    return 1;
+  };
 }
 

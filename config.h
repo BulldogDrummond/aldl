@@ -7,10 +7,10 @@
 /* ----------- DEBUG OUTPUT --------------------------*/
 
 /* generally verbose behavior */
-//#define VERBLOSITY
+#define VERBLOSITY
 
 /* debug structural functions, such as record link list management */
-//#define DEBUGSTRUCT
+#define DEBUGSTRUCT
 
 /* debug configuration file loading */
 #define DEBUGCONFIG
@@ -19,16 +19,16 @@
 #define DEBUGMEM
 
 /* verbosity levels in raw serial handlers */
-//#define SERIAL_VERBOSE
-//#define SERIAL_SUPERVERBOSE
+#define SERIAL_VERBOSE
+#define SERIAL_SUPERVERBOSE
 
 /* verbose aldl protocol level comms on stdout */
-//#define ALDL_VERBOSE
+#define ALDL_VERBOSE
 
 /* --------- GLOBAL FEATURE CONFIG -----------------*/
 
 /* support multiple packets, required by some definition files */
-//#define ALDL_MULTIPACKET
+#define ALDL_MULTIPACKET
 
 /* --------- TIMING CONSTANTS ------------------------*/
 

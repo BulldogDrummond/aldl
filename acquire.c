@@ -14,6 +14,9 @@
 /* primary data acqusition event loop */
 
 void *aldl_acq(void *aldl_in) {
+  #ifdef VERBLOSITY
+  printf("aldl_acq thread active\n");
+  #endif
   /* ---- main variables --------------- */
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
   aldl_commdef_t *comm = aldl->comm; /* direct reference to commdef */

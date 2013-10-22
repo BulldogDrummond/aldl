@@ -4,13 +4,13 @@ CFLAGS= -g -Wall
 OBJS= debugif/debugif.o acquire.o error.o loadconfig.o useful.o
 FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
-all: aldl-ftdi
+all: aldl-ftdi aldl-dummy
 
 aldl-ftdi: main.c aldl-io-ftdi.a config.h aldl-io.h aldl-types.h debugif_ $(OBJS)
 	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io-ftdi.a
 
 aldl-dummy: main.c aldl-io-dummy.a config.h aldl-io.h aldl-types.h debugif_ $(OBJS)
-	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io-dummy.a
+	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-dummy $(OBJS) aldl-io-dummy.a
 
 useful.o: useful.c useful.h config.h aldl-types.h
 	gcc $(CFLAGS) -c useful.c -o useful.o
@@ -43,10 +43,10 @@ aldl-io-ftdi.a: serio-ftdi.o aldlcomm.o aldldata.o config.h
 	ar rcs aldl-io-ftdi.a serio-ftdi.o aldlcomm.o aldldata.o
 
 aldl-io-dummy.a: serio-dummy.o aldlcomm.o aldldata.o config.h
-	ar rcs aldl-io-dummy.a serio-ftdi.o aldlcomm.o aldldata.o
+	ar rcs aldl-io-dummy.a serio-dummy.o aldlcomm.o aldldata.o
 
 clean:
-	rm -fv *.o *.a aldl-ftdi
+	rm -fv *.o *.a aldl-ftdi aldl-dummy
 	cd debugif ; make clean ; cd ..
 
 stats:
