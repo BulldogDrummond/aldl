@@ -102,16 +102,29 @@ void aldl_alloc_a() {
   if(aldl == NULL) fatalerror(ERROR_MEMORY,"conf_t alloc");
   memset(aldl,0,sizeof(aldl_conf_t));
 
+  #ifdef DEBUGMEM
+  printf("aldl_conf_t: %i bytes\n",(int)sizeof(aldl_conf_t));
+  #endif
+
   /* communication definition */
   comm = malloc(sizeof(aldl_commdef_t));
   if(comm == NULL) fatalerror(ERROR_MEMORY,"commdef alloc");
   memset(comm,0,sizeof(aldl_commdef_t));
   aldl->comm = comm; /* link to conf */
 
+  #ifdef DEBUGMEM
+  printf("aldl_commdef_t: %i bytes\n",(int)sizeof(aldl_commdef_t));
+  #endif
+
   /* stats tracking structure */
   aldl->stats = malloc(sizeof(aldl_stats_t));
   if(aldl->stats == NULL) fatalerror(ERROR_MEMORY,"stats alloc");
   memset(aldl->stats,0,sizeof(aldl_stats_t));
+
+  #ifdef DEBUGMEM
+  printf("aldl_stats_t: %i bytes\n",(int)sizeof(aldl_stats_t));
+  #endif
+
 }
 
 char *load_config_root() {
@@ -136,6 +149,10 @@ void aldl_alloc_b() {
   /* allocate space to store packet definitions */
   comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
   if(comm->packet == NULL) fatalerror(ERROR_MEMORY,"packet mem");
+
+  #ifdef DEBUGMEM
+  printf("aldl_commdef_t: %i bytes\n",(int)sizeof(aldl_commdef_t));
+  #endif
 }
 
 void load_config_b() {
@@ -172,12 +189,19 @@ void aldl_alloc_c() {
   int x = 0;
   for(x=0;x<comm->n_packets;x++) {
     comm->packet[x].data = malloc(comm->packet[x].length);
+    #ifdef DEBUGMEM
+    printf("packet %i raw storage: %i bytes\n",x,comm->packet[x].length);
+    #endif
     if(comm->packet[x].data == NULL) fatalerror(ERROR_MEMORY,"pkt data");
   };
 
   /* storage for data definitions */
   aldl->def = malloc(sizeof(aldl_define_t) * aldl->n_defs);
   if(aldl->def == NULL) fatalerror(ERROR_MEMORY,"definition");
+  #ifdef DEBUGMEM
+  printf("aldl_define_t definition storage: %i bytes\n",
+              (int)sizeof(aldl_define_t) * aldl->n_defs);
+  #endif
 };
 
 void load_config_c() {
@@ -221,7 +245,7 @@ void load_config_c() {
       if(aldl->def[z].id == d->id) fatalerror(ERROR_CONFIG,"duplicate id");
     };
     d->offset=configopt_byte_fatal(dconfig(configstr,"OFFSET",x));
-    d->packet=configopt_byte_fatal(dconfig(configstr,"PACKET",x));
+    d->packet=configopt_byte(dconfig(configstr,"PACKET",x),0x00);
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,"pkt range");
     d->name=configopt_fatal(dconfig(configstr,"NAME",x));
     d->description=configopt_fatal(dconfig(configstr,"DESC",x));
@@ -246,7 +270,14 @@ char *configopt(char *str,char *def) {
 
 float configopt_float(char *str, float def) {
   char *in = configopt(str,NULL);
+  #ifdef DEBUGCONFIG
+  if(in == NULL) {
+    printf("caught default value for %s: %f\n",str,def);
+    return def;
+  };
+  #else
   if(in == NULL) return def;
+  #endif
   int x = atof(in);
   return x;
 };
@@ -258,7 +289,14 @@ float configopt_float_fatal(char *str) {
 
 int configopt_int(char *str, int min, int max, int def) {
   char *in = configopt(str,NULL);
+  #ifdef DEBUGCONFIG
+  if(in == NULL) {
+    printf("caught default value for %s: %i\n",str,def);
+    return def;
+  };
+  #else
   if(in == NULL) return def;
+  #endif
   int x = atoi(in);
   if(x < min || x > max) fatalerror(ERROR_RANGE,str);
   return x;
@@ -272,7 +310,15 @@ int configopt_int_fatal(char *str, int min, int max) {
 
 byte configopt_byte(char *str, byte def) {
   char *in = configopt(str,NULL);
+  #ifdef DEBUGCONFIG
+  if(in == NULL) {
+    printf("caught default value for %s: ",str);
+    printhexstring(&def,1);
+    return def;
+  };
+  #else
   if(in == NULL) return def;
+  #endif
   return hextobyte(in);
 };
 

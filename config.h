@@ -13,7 +13,10 @@
 //#define DEBUGSTRUCT
 
 /* debug configuration file loading */
-//#define DEBUGCONFIG
+#define DEBUGCONFIG
+
+/* print debugging info for memory */
+#define DEBUGMEM
 
 /* verbosity levels in raw serial handlers */
 //#define SERIAL_VERBOSE
