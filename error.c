@@ -28,3 +28,10 @@ void fatalerror(error_t code, char *str) {
   exit(1);
 };
 
+void nonfatalerror(error_t code, char *str) {
+  fprintf(stderr,"ERROR: %s ERROR (%i)\n",errstr[code],code);
+  if(str != NULL) {
+    fprintf(stderr,"NOTES: %s\n",str);
+  };
+};
+
