@@ -13,17 +13,17 @@
 #define DEBUGSTRUCT
 
 /* debug configuration file loading */
-#define DEBUGCONFIG
+//#define DEBUGCONFIG
 
 /* print debugging info for memory */
-#define DEBUGMEM
+//#define DEBUGMEM
 
 /* verbosity levels in raw serial handlers */
-#define SERIAL_VERBOSE
-#define SERIAL_SUPERVERBOSE
+//#define SERIAL_VERBOSE
+//#define SERIAL_SUPERVERBOSE
 
 /* verbose aldl protocol level comms on stdout */
-#define ALDL_VERBOSE
+//#define ALDL_VERBOSE
 
 /* --------- GLOBAL FEATURE CONFIG -----------------*/
 
