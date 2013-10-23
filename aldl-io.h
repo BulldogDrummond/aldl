@@ -17,29 +17,25 @@ byte *generate_mode(byte mode, aldl_commdef_t *comm);
 
 int serial_init(char *port); /* initalize the serial handler */
 
-void serial_close(); /* close the serial port */
-
-/* data mgmt ----------------------------------*/
-
 /* set up lock structures */
 void init_locks();
+
+/* creates a dummy record so the linked list isn't broken when we want to start
+   using it, call once at the beginning before acq starts */
+void aldl_init_record(aldl_conf_t *aldl);
+
+/* buffer management --------------------------------------*/
 
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
 
-/* creates a dummy record so the linked list isn't broken when we want to start
-   using it ... */
-void aldl_init_record(aldl_conf_t *aldl);
-
 /* remove a record from the linked list and deallocate */
 void remove_record(aldl_record_t *rec);
 
+/* record selection ---------------------------------------*/
+
 /* return a pointer to the oldest record in the linked list */
 aldl_record_t *oldest_record(aldl_conf_t *aldl);
-
-/* get/set connection state */
-aldl_state_t get_connstate(aldl_conf_t *aldl);
-void set_connstate(aldl_state_t s, aldl_conf_t *aldl);
 
 /* get newest record in the list */
 aldl_record_t *newest_record(aldl_conf_t *aldl);
@@ -54,11 +50,27 @@ aldl_record_t *next_record(aldl_record_t *rec);
 int get_index_by_id(aldl_conf_t *aldl, int id);
 int get_index_by_name(aldl_conf_t *aldl, char *name);
 
+/* connection state management ----------------------------*/
+
 /* this pauses until a 'connected' state is detected */
 void pause_until_connected(aldl_conf_t *aldl);
 
 /* this pauses until the buffer is full */
 void pause_until_buffered(aldl_conf_t *aldl);
+
+/* get/set connection state */
+aldl_state_t get_connstate(aldl_conf_t *aldl);
+void set_connstate(aldl_state_t s, aldl_conf_t *aldl);
+
+/* misc locking -------------------------------------------*/
+
+/* lock and unlock the statistics structure */
+void lock_stats();
+void unlock_stats();
+
+/* terminating functions -------------------------------*/
+
+void serial_close(); /* close the serial port */
 
 /* misc. useful functions ----------------------*/
 
