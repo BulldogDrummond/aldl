@@ -32,7 +32,7 @@ void display_rpm(aldl_conf_t *aldl) {
   /* get the index and store it, to avoid repeated lookups */
   int rpmindex = get_index_by_name(aldl,"RPM");
 
-  pause_until_connected(aldl);
+  pause_until_buffered(aldl);
 
   aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
 
@@ -80,10 +80,5 @@ RULES FOR PLUGIN DEVELOPERS:
   operates so slowly is a display routine, that will want frame skipping
   anyway.
 
-- If you are using next_record_wait or next_record, you must always call
-  pause_until_buffered() before entering your event loop to ensure you have
-  sufficient buffering.  If using newest_record(), you must always call
-  pause_until_connected() before entering your event loop.  If you are using
-  both functions, you should call pause_until_connected() and THEN call
-  pause_until_buffered().
-
+- All plugins must call pause_until_buffered(), just once, before ever using
+  the data structures, otherwise data might not be there..
