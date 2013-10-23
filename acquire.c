@@ -108,7 +108,9 @@ void *aldl_acq(void *aldl_in) {
        statistical purposes */
     #ifdef TRACK_PKTRATE
     if(time(NULL) - timestamp >= PKTRATE_DURATION) {
+      lock_stats();
       aldl->stats->packetspersecond = (float)pktcounter / PKTRATE_DURATION;
+      unlock_stats();
       timestamp = time(NULL);
       pktcounter = 0;
     };
@@ -125,7 +127,9 @@ void *aldl_acq(void *aldl_in) {
     /* send request and get packet data (from aldlcomm.c); if NULL is
        returned, it's because it timed out waiting for data. */
     if(aldl_get_packet(pkt) == NULL) {
+      lock_stats();
       aldl->stats->packetrecvtimeout++;
+      unlock_stats();
       pktfail = 1;
       #ifdef VERBLOSITY
       printf("packet %i failed due to timeout...\n",npkt);
@@ -137,7 +141,9 @@ void *aldl_acq(void *aldl_in) {
     #ifdef CHECK_HEADER_SANITY
     } else if (pkt->data[0] != comm->pcm_address) {
       pktfail = 1;
+      lock_stats();
       aldl->stats->packetheaderfail++;
+      unlock_stats();
       #ifdef VERBLOSITY
       printf("header failed @ pkt %i...\n",npkt);
       #endif
@@ -147,7 +153,9 @@ void *aldl_acq(void *aldl_in) {
     } else if(comm->checksum_enable == 1 &&
        checksum_test(pkt->data, pkt->length) == 0) {
       pktfail = 1;
+      lock_stats();
       aldl->stats->packetchecksumfail++;
+      unlock_stats();
       #ifdef VERBLOSITY
       printf("checksum failed @ pkt %i...\n",npkt);
       #endif
@@ -155,6 +163,7 @@ void *aldl_acq(void *aldl_in) {
 
     /* handle condition of a bad packet */
     if(pktfail == 1) {
+      lock_stats();
       aldl->stats->failcounter++; /* increment failed pkt counter */
       #ifdef VERBLOSITY
       printf("packet fail counter: %i\n",aldl->stats->failcounter);
@@ -164,6 +173,7 @@ void *aldl_acq(void *aldl_in) {
       if(aldl->stats->failcounter > aldl->maxfail) {
         set_connstate(ALDL_DESYNC,aldl);
       };
+      unlock_stats();
 
       pktfail = 0; /* reset fail state */
       goto PKTRETRY; /* jump back to earlier in the loop, no increment */
@@ -173,7 +183,9 @@ void *aldl_acq(void *aldl_in) {
       #ifdef TRACK_PKTRATE
       pktcounter++; /* increment packet counter */
       #endif
+      lock_stats();
       aldl->stats->failcounter = 0; /* reset failcounter */
+      unlock_stats();
     };
 
     /* check if lagtime exceeded, and set lag state.  obviously this is a
