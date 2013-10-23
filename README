@@ -35,6 +35,10 @@ serio-ftdi.c: an object that allows serial communications using the libftdi
               userland driver (via libusb).  this is the reccommended and only
               currently supported interface.
 
+serio-dummy.c: a really stupid fake serial driver for debugging, that pretends
+               to be an LT1 ecm.  seriously, it's really stupid, doesn't even
+               check input, just spits out data in a serialized operation scope
+
 NOTES:
 
 string to identify your ftdi interface (pick one):
