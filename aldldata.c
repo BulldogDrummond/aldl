@@ -53,7 +53,7 @@ aldl_record_t *process_data(aldl_conf_t *aldl) {
 
 aldl_record_t *oldest_record(aldl_conf_t *aldl) {
   aldl_record_t *last = aldl->r;
-  while(last->prev != NULL) last++;
+  while(last->prev != NULL) last = last->prev;
   return last;
 };
 
@@ -72,6 +72,15 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
   pthread_mutex_lock(lock.recordptr);
   aldl->r->next = rec; /* attach to linked list */
   aldl->r = rec; /* fix master link */
+  pthread_mutex_unlock(lock.recordptr);
+};
+
+void aldl_init_record(aldl_conf_t *aldl) {
+  aldl_record_t *rec = aldl_create_record(aldl);
+  pthread_mutex_lock(lock.recordptr);
+  rec->next = NULL;
+  rec->prev = NULL;
+  aldl->r = rec;
   pthread_mutex_unlock(lock.recordptr);
 };
 
@@ -166,8 +175,9 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
 
 aldl_state_t get_connstate(aldl_conf_t *aldl) {
   pthread_mutex_lock(lock.connstate);
-  return aldl->state;
+  aldl_state_t st = aldl->state;
   pthread_mutex_unlock(lock.connstate);
+  return st;
 };
 
 void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
@@ -202,7 +212,7 @@ aldl_record_t *next_record_wait(aldl_record_t *rec) {
 /* get next record in the list, returns NULL if none is available */
 aldl_record_t *next_record(aldl_record_t *rec) {
   /* check for underrun ... */
-  if(rec->prev == NULL || rec->prev->prev == NULL) {
+  if(rec->prev == NULL) {
      fatalerror(ERROR_BUFFER,"underrun in record retrieve");
   };
   aldl_record_t *next;
