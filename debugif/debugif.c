@@ -23,7 +23,7 @@ void *debugif_loop(void *aldl_in) {
       printf("%s: ",aldl->def[x].name);
       switch(aldl->def[x].type) {
         case ALDL_FLOAT:
-          printf("%f ",rec->data[x].f); 
+          printf("%.2f ",rec->data[x].f);
           break;
         case ALDL_INT:
         case ALDL_BOOL:
