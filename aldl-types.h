@@ -137,6 +137,7 @@ typedef struct aldl_conf {
   aldl_record_t *r; /* link to the latest record */
   aldl_commdef_t *comm; /* link back to the communication spec */
   aldl_stats_t *stats;   /* statistics */
+  time_t uptime;   /* time stamp for acq loop */
   int ready:1; /* mark this flag when the buffer is full enough */
 } aldl_conf_t;
 

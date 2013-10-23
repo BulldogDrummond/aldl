@@ -94,7 +94,7 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   if(aldl->n_defs < 1) return rec;
 
   /* timestamp record */
-  rec->t = time(NULL);
+  rec->t = time(NULL) - aldl->uptime;
 
   /* allocate data memory */
   rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);

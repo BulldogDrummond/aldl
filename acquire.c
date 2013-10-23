@@ -47,9 +47,12 @@ void *aldl_acq(void *aldl_in) {
   };
   #endif
 
+  /* set timestamp */
+  aldl->uptime = time(NULL);
+
   /* config vars and get initial stamp if packet rate tracking is enabled */
   #ifdef TRACK_PKTRATE
-  time_t timestamp = time(NULL);
+  time_t timestamp = aldl->uptime;
   int pktcounter = 0; /* how many packets between timestamps */
   #endif
 
