@@ -129,6 +129,8 @@ void aldl_alloc_a() {
 
 char *load_config_root() {
   aldl->serialstr = configopt("PORT",NULL);
+  aldl->bufsize = configopt_int("BUFFER",10,10000,200);
+  aldl->bufstart = configopt_int("START",10,10000,aldl->bufsize / 2);
   return configopt_fatal("DEFINITION"); /* path not stored ... */
 };
 
