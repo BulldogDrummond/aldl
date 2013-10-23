@@ -16,6 +16,7 @@
 void *aldl_acq(void *aldl_in) {
   #ifdef VERBLOSITY
   printf("aldl_acq thread active\n");
+  int ttlpkts = 0;
   #endif
   /* ---- main variables --------------- */
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
@@ -24,6 +25,7 @@ void *aldl_acq(void *aldl_in) {
   int pktfail = 0; /* marker for a failed packet in event loop */
   int npkt = 0; /* array index of packet to operate on */
   int buffered = 0;
+  aldl->ready = 0;
 
   /* sanity checks */
   if(aldl->rate * 1000 > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
@@ -111,7 +113,8 @@ void *aldl_acq(void *aldl_in) {
 
     /* print debugging info */
     #ifdef VERBLOSITY
-    printf("ACQUIRE pkt# %i\n",npkt);
+    printf("ACQUIRE pkt# %i, total %i\n",npkt,ttlpkts);
+    ttlpkts++;
     #endif
 
     /* ------- sanity checks and retrieve packet ------------ */
@@ -183,16 +186,20 @@ void *aldl_acq(void *aldl_in) {
     /* process the packet */
     process_data(aldl);
 
-    /* buffering logic for removal of records */
+    /* buffering logic for removal of records.  the buffer is fairly static,
+       so once the buffer is full, one record will always be removed for each
+       record added. */
     if(buffered < aldl->bufsize) { /* buffer not full, dont remove records */
       #ifdef DEBUGSTRUCT
       printf("filling buffer %i of %i\n",buffered,aldl->bufsize);
       #endif
       buffered++;
     } else { /* buffer is full, delete oldest record */
-      aldl->ready = 1; /* set readyness bit */
       remove_record(oldest_record(aldl));
     };
+
+    /* set readiness bit */
+    if(buffered >= aldl->bufstart) aldl->ready = 1;
   };
   return NULL;
 }
