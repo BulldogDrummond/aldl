@@ -123,6 +123,7 @@ typedef struct aldl_conf {
   char *serialstr; /* string to init serial port */
   int n_defs;   /* number of definitions */
   int bufsize;  /* the minimum number of records to maintain */
+  int bufstart; /* start plugins when this many records are present */
   aldl_state_t state; /* connection state, do not touch */
   aldl_define_t *def; /* link to the definition set */
   aldl_record_t *r; /* link to the latest record */
