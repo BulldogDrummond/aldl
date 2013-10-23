@@ -27,6 +27,10 @@ void init_locks();
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
 
+/* creates a dummy record so the linked list isn't broken when we want to start
+   using it ... */
+void aldl_init_record(aldl_conf_t *aldl);
+
 /* remove a record from the linked list and deallocate */
 void remove_record(aldl_record_t *rec);
 
