@@ -57,10 +57,10 @@ typedef struct aldl_define {
   byte packet; /* selects which packet unique id the data comes from */
   byte offset; /* offset within packet in bytes */
   byte size;   /* size in bits.  8,16,32 only... */
-  byte sig:1;    /* 1 if signed */
+  byte sig;    /* 1 if signed */
   /* binary stuff only */
   byte binary; /* offset in bits.  only works for 1 bit fields */
-  byte invert:1; /* invert (0 means no) */
+  byte invert; /* invert (0 means no) */
 } aldl_define_t;
 
 /* definition of a record, which is a sequential linked-list type structure,
@@ -94,7 +94,7 @@ typedef struct aldl_commdef {
                               packet data. */
   byte pcm_address;        /* the address of the PCM */
   /* ------- idle traffic stuff ---------- */
-  int chatterwait:1;        /* 1 enables chatter checking.  if this is
+  int chatterwait;        /* 1 enables chatter checking.  if this is
                               disabled, it'll immediately and constanty
                               send shutup requests. */
   int idledelay;           /* a ms delay at the end of idle traffic, before
@@ -130,7 +130,7 @@ typedef struct aldl_conf {
                   one second, or connection quality may suffer.. */
   int maxfail; /* maximum packet retrieve fails before it's assumed that the
                   connection is no longer synchronized */
-  int minmax:1;  /* enforce min/max values during conversion */
+  int minmax;  /* enforce min/max values during conversion */
   /* structures -----------*/
   aldl_state_t state; /* connection state, do not touch */
   aldl_define_t *def; /* link to the definition set */
@@ -138,7 +138,7 @@ typedef struct aldl_conf {
   aldl_commdef_t *comm; /* link back to the communication spec */
   aldl_stats_t *stats;   /* statistics */
   time_t uptime;   /* time stamp for acq loop */
-  int ready:1; /* mark this flag when the buffer is full enough */
+  int ready; /* mark this flag when the buffer is full enough */
 } aldl_conf_t;
 
 #endif
