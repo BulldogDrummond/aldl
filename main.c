@@ -30,6 +30,9 @@ int main() { /*-------------------------------------------------- */
   /* FIXME this static config file thing has to go */
   aldl_conf_t *aldl = aldl_setup();
 
+  /* initial record so linked list isnt broken */
+  aldl_init_record(aldl);
+
   /* set initial connection state */
   set_connstate(ALDL_LOADING,aldl);
 
