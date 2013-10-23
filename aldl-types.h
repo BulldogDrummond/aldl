@@ -128,6 +128,8 @@ typedef struct aldl_conf {
   int bufstart; /* start plugins when this many records are present */
   int rate;    /* slow down data collection, in microseconds.  never exceed
                   one second, or connection quality may suffer.. */
+  int maxfail; /* maximum packet retrieve fails before it's assumed that the
+                  connection is no longer synchronized */
   int minmax:1;  /* enforce min/max values during conversion */
   /* structures -----------*/
   aldl_state_t state; /* connection state, do not touch */

@@ -158,7 +158,7 @@ void *aldl_acq(void *aldl_in) {
       #endif
 
       /* --- set a desync state if we're getting lots of fails in a row */
-      if(aldl->stats->failcounter > MAX_FAIL_DISCONNECT) {
+      if(aldl->stats->failcounter > aldl->maxfail) {
         set_connstate(ALDL_DESYNC,aldl);
       };
 

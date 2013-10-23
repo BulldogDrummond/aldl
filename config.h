@@ -47,9 +47,6 @@
 
 /* --------- DATA ACQ. CONFIG ----------------------*/
 
-/* the maximum failed packets before the connection is marked failed */
-#define MAX_FAIL_DISCONNECT 6
-
 /* track packet retrieval rate */
 #define TRACK_PKTRATE
 
