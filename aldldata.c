@@ -143,7 +143,6 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   aldl_data_t *out = &r->data[n];
 
   /* FIXME doesn't deal with signed input */
-  /* FIXME doesn't deal with min/max */
 
   unsigned int x; /* converted value */
   switch(def->size) {
@@ -159,9 +158,17 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   switch(def->type) {
     case ALDL_INT:
       out->i = ( (int)x * def->multiplier.i ) + def->adder.i;
+      if(aldl->minmax == 1) {
+        if(out->i < def->min.i) out->i = def->min.i;
+        if(out->i > def->max.i) out->i = def->max.i;
+      };
       break;
     case ALDL_FLOAT:
       out->f = ( (float)x * def->multiplier.f ) + def->adder.f;
+      if(aldl->minmax == 1) {
+        if(out->f < def->min.f) out->f = def->min.f;
+        if(out->f > def->max.f) out->f = def->max.f;
+      };
       break;
     case ALDL_BOOL:
       out->i = getbit(x,def->binary,def->invert);

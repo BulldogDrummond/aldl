@@ -47,7 +47,8 @@ typedef struct aldl_define {
   /* ----- output definition -------------------------- */
   aldl_datatype_t type; /* the OUTPUT type */
   char *uom;     /* unit of measure */
-  byte precision;       /* floating point display precision */
+  byte precision;       /* floating point display precision.  not used in
+                           conversion; only for display plugins. */
   aldl_data_t min, max;  /* the low and high range of OUTPUT value */
   /* ----- conversion ----------------------------------*/
   aldl_data_t adder;          /*  ... */
@@ -120,17 +121,20 @@ typedef struct aldl_stats {
 
 typedef struct aldl_conf {
   char ecmtype; /* the type of ecm being read */
+  /* settings ------------ */
   char *serialstr; /* string to init serial port */
   int n_defs;   /* number of definitions */
   int bufsize;  /* the minimum number of records to maintain */
   int bufstart; /* start plugins when this many records are present */
+  int rate;    /* slow down data collection, in microseconds.  never exceed
+                  one second, or connection quality may suffer.. */
+  int minmax:1;  /* enforce min/max values during conversion */
+  /* structures -----------*/
   aldl_state_t state; /* connection state, do not touch */
   aldl_define_t *def; /* link to the definition set */
   aldl_record_t *r; /* link to the latest record */
   aldl_commdef_t *comm; /* link back to the communication spec */
   aldl_stats_t *stats;   /* statistics */
-  int rate;    /* slow down data collection, in microseconds.  never exceed
-                  one second, or connection quality may suffer.. */
   int ready:1; /* mark this flag when the buffer is full enough */
 } aldl_conf_t;
 

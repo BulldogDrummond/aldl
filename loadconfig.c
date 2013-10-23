@@ -131,6 +131,7 @@ char *load_config_root() {
   aldl->serialstr = configopt("PORT",NULL);
   aldl->bufsize = configopt_int("BUFFER",10,10000,200);
   aldl->bufstart = configopt_int("START",10,10000,aldl->bufsize / 2);
+  aldl->minmax = configopt_int("MINMAX",0,1,1);
   return configopt_fatal("DEFINITION"); /* path not stored ... */
 };
 
@@ -281,7 +282,6 @@ float configopt_float(char *str, float def) {
   if(in == NULL) return def;
   #endif
   float x = atof(in);
-  printf("CONFIG got float %f\n",x);
   return x;
 };
 
