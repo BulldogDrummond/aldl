@@ -18,7 +18,7 @@ void *debugif_loop(void *aldl_in) {
   aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
   while(1) {
     rec = next_record_wait(rec);
-    printf("--- record @ time %u ---\n",rec->t);
+    printf("--- record @ time %u ---\n",(unsigned int)rec->t);
     for(x=0;x<aldl->n_defs;x++) {
       printf("%s: ",aldl->def[x].name);
       switch(aldl->def[x].type) {

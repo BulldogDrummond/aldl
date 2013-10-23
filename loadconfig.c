@@ -280,12 +280,13 @@ float configopt_float(char *str, float def) {
   #else
   if(in == NULL) return def;
   #endif
-  int x = atof(in);
+  float x = atof(in);
+  printf("CONFIG got float %f\n",x);
   return x;
 };
 
 float configopt_float_fatal(char *str) {
-  int x = atof(configopt_fatal(str));
+  float x = atof(configopt_fatal(str));
   return x;
 };
 

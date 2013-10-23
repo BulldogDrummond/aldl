@@ -158,10 +158,10 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* get value, this does need more work ... */
   switch(def->type) {
     case ALDL_INT:
-      out->i = (int)x + def->adder.i * def->multiplier.i;
+      out->i = ( (int)x * def->multiplier.i ) + def->adder.i;
       break;
     case ALDL_FLOAT:
-      out->f = (float)x + def->adder.f * def->multiplier.f;
+      out->f = ( (float)x * def->multiplier.f ) + def->adder.f;
       break;
     case ALDL_BOOL:
       out->i = getbit(x,def->binary,def->invert);

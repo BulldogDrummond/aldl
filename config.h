@@ -7,10 +7,10 @@
 /* ----------- DEBUG OUTPUT --------------------------*/
 
 /* generally verbose behavior */
-#define VERBLOSITY
+//#define VERBLOSITY
 
 /* debug structural functions, such as record link list management */
-#define DEBUGSTRUCT
+//#define DEBUGSTRUCT
 
 /* debug configuration file loading */
 //#define DEBUGCONFIG
@@ -28,7 +28,7 @@
 /* --------- GLOBAL FEATURE CONFIG -----------------*/
 
 /* support multiple packets, required by some definition files */
-#define ALDL_MULTIPACKET
+//#define ALDL_MULTIPACKET
 
 /* --------- TIMING CONSTANTS ------------------------*/
 
