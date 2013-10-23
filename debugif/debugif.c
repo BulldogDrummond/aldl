@@ -10,9 +10,12 @@ void *debugif_loop(void *aldl_in) {
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
   printf("-------DEBUG DISPLAY INTERFACE ACTIVE--------\n"); 
   int x;
-  int rpmindex = get_index_by_name(aldl,"RPM");
-  aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
   pause_until_connected(aldl);
+  printf("got connected state\n");
+  pause_until_buffered(aldl);
+  printf("got buffered state\n");
+  
+  aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
   while(1) {
     rec = next_record_wait(rec);
     for(x=0;x<aldl->n_defs;x++) {
@@ -28,8 +31,8 @@ void *debugif_loop(void *aldl_in) {
         default:
           printf("WTF ");
       }
+      printf("\n");
     };
-    printf("%s: %f\n",aldl->def[rpmindex].name, rec->data[rpmindex].f);
   };
   return aldl;
 };
