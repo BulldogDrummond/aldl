@@ -1,6 +1,6 @@
 for detailed project overview, see: http://resflter.github.io/aldl
 
-dependancies: libftdi, bison, flex, pthreads
+dependancies: libftdi, pthreads
 
 the build is now statically compiled with a serial driver.  right now, the ftdi
 driver is the only one supported.  to build: make aldl-ftdi
