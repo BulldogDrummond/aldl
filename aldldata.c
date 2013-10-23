@@ -19,6 +19,7 @@
 typedef struct aldl_lock {
   pthread_mutex_t *connstate; /* locks connection state */
   pthread_mutex_t *recordptr; /* locks linked list links in records */
+  pthread_mutex_t *stats; /* stats structure */
 } aldl_lock_t;
 
 aldl_lock_t lock;
@@ -42,6 +43,16 @@ void init_locks() {
   pthread_mutex_init(lock.connstate,NULL);
   lock.recordptr = malloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(lock.recordptr,NULL);
+  lock.stats = malloc(sizeof(pthread_mutex_t));
+  pthread_mutex_init(lock.stats,NULL);
+};
+
+void lock_stats() {
+  pthread_mutex_lock(lock.stats);
+};
+
+void unlock_stats() {
+  pthread_mutex_unlock(lock.stats);
 };
 
 aldl_record_t *process_data(aldl_conf_t *aldl) {
