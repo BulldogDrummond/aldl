@@ -239,7 +239,7 @@ void load_config_c() {
         fatalerror(ERROR_CONFIG,"invalid data type in def");
       };
       d->uom=configopt(dconfig(configstr,"UOM",x),NULL);
-      d->size=configopt_byte(dconfig(configstr,"OFFSET",x),8);     
+      d->size=configopt_int(dconfig(configstr,"SIZE",x),1,32,8);     
       /* FIXME no support for signed input type */
     };
     d->id=configopt_int(dconfig(configstr,"ID",x),0,32767,x);
