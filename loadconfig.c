@@ -29,16 +29,6 @@ char *brk_field(char *dst, int f, char *in);
 /* following functions use internally stored config and should never be
    exported ... */
 
-/* get various config options by name */
-int configopt_int_fatal(dfile_t *config, char *str, int min, int max);
-int configopt_int(dfile_t *config, char *str, int min, int max, int def);
-byte configopt_byte(dfile_t *config, char *str, byte def);
-byte configopt_byte_fatal(dfile_t *config, char *str);
-float configopt_float(dfile_t *config, char *str, float def);
-float configopt_float_fatal(dfile_t *config, char *str);
-char *configopt_fatal(dfile_t *config, char *str);
-char *configopt(dfile_t *config, char *str,char *def);
-
 /* get a packet config string */
 char *pktconfig(char *buf, char *parameter, int n);
 char *dconfig(char *buf, char *parameter, int n);
@@ -137,6 +127,7 @@ char *load_config_root(dfile_t *config) {
   aldl->debugif_enable = configopt_int(config,"DEBUGIF_ENABLE",0,1,0);
   aldl->consoleif_enable = configopt_int(config,"CONSOLEIF_ENABLE",0,1,0);
   aldl->datalogger_enable = configopt_int(config,"DATALOGGER_ENABLE",0,1,0);
+  aldl->datalogger_config = configopt(config,"DATALOGGER_CONFIG",NULL);
   /* return definition file path */
   return configopt_fatal(config,"DEFINITION"); /* path not stored ... */
 };

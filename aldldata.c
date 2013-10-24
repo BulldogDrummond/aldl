@@ -234,7 +234,9 @@ aldl_record_t *newest_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
     } else if(get_connstate(aldl) > 10) {
       return NULL;
     } else {
+      #ifndef AGGRESSIVE
       usleep(500);
+      #endif
     };
   }; 
 };
@@ -245,7 +247,9 @@ aldl_record_t *next_record_wait(aldl_record_t *rec) {
   while(next == NULL) {
     /* just call next_record repeatedly until one shows up */
     next = next_record(rec);
+    #ifndef AGGRESSIVE
     usleep(500); /* throttling ... */
+    #endif
   };
   return next;
 };

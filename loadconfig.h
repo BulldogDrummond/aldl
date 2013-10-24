@@ -37,4 +37,14 @@ void dfile_strip_quotes(dfile_t *d);
 /* for debugging, print a list of all config pairs extracted. */
 void print_config(dfile_t *d);
 
+/* get various config options by name */
+int configopt_int_fatal(dfile_t *config, char *str, int min, int max);
+int configopt_int(dfile_t *config, char *str, int min, int max, int def);
+byte configopt_byte(dfile_t *config, char *str, byte def);
+byte configopt_byte_fatal(dfile_t *config, char *str);
+float configopt_float(dfile_t *config, char *str, float def);
+float configopt_float_fatal(dfile_t *config, char *str);
+char *configopt_fatal(dfile_t *config, char *str);
+char *configopt(dfile_t *config, char *str,char *def);
+
 #endif
