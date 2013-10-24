@@ -2,8 +2,12 @@ for detailed project overview, see: http://resflter.github.io/aldl
 
 dependancies: libftdi, pthreads
 
-the build is now statically compiled with a serial driver.  right now, the ftdi
-driver is the only one supported.  to build: make aldl-ftdi
+the build is now statically compiled with a serial driver.
+
+to build a version with an ftdi driver: make aldl-ftdi
+
+there is a rough 'demo simulator' serial driver that pretends to be an LT1 ECM.
+to use it, make aldl-dummy
 
 contents:
 
