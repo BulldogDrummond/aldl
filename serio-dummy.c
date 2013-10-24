@@ -18,22 +18,27 @@
 unsigned char *databuff;
 char txmode;
 
+void gen_pkt();
+
 /****************FUNCTIONS**************************************/
 
 void serial_close() {
   return;
 }
 
-int serial_init(char *port) {
-  printf("serial dummy driver active\n");
-  txmode=0;
-  databuff=malloc(64);
+void gen_pkt() {
   int x;
   databuff[0]=0xF4;
   databuff[1]=0x92;
   databuff[2]=0x01;
-  for(x=3;x<63;x++) databuff[x] = 0xF3;
+  for(x=3;x<63;x++) databuff[x] = (byte)rand() % 254;
   databuff[63] = checksum_generate(databuff,63);
+};
+
+int serial_init(char *port) {
+  printf("serial dummy driver active\n");
+  txmode=0;
+  databuff=malloc(64);
   return 1;
 };
 
@@ -54,6 +59,7 @@ int serial_write(byte *str, int len) {
 }
 
 inline int serial_read(byte *str, int len) {
+  usleep(2000);
   if(txmode == 0) { /* idle traffic req */
     str[0] = 0x33;
     txmode++;
@@ -75,6 +81,7 @@ inline int serial_read(byte *str, int len) {
     return 5;
   } if(txmode == 3) { /* data send */
     txmode = 2;
+    gen_pkt();
     int x;
     for(x=0;x<len;x++) {
       str[x] = databuff[x]; 
