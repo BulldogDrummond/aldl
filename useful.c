@@ -1,9 +1,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 #include "aldl-types.h"
 #include "useful.h"
+
+timespec_t get_time() {
+  timespec_t currenttime;
+  clock_gettime(_CLOCKSOURCE, &currenttime);
+  return currenttime;
+};
+
+unsigned long get_elapsed_ms(timespec_t timestamp) {
+  timespec_t currenttime;
+  clock_gettime(_CLOCKSOURCE, &currenttime);
+  return ((currenttime.tv_sec - timestamp.tv_sec) * 
+       1000 + ( ( currenttime.tv_nsec - timestamp.tv_nsec ) / 1000 ) / 1000 )
+           + 0.5;
+};
 
 inline int faststrcmp(char *a, char *b) {
   int x = 0;

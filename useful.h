@@ -1,6 +1,16 @@
 #ifndef _USEFUL_H
 #define _USEFUL_H
 
+#include <time.h>
+#define _CLOCKSOURCE CLOCK_MONOTONIC
+typedef struct timespec timespec_t;
+
+/* get current time */
+timespec_t get_time();
+
+/* get the difference between the current time and the timestamp */
+unsigned long get_elapsed_ms(timespec_t timestamp);
+
 /* a fast string compare function, returns 1 on match.  this is much faster
    than using strcmp for searches, as it doesn't count chars, and bails
    instantly on mismatch */

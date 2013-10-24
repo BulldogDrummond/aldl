@@ -14,6 +14,7 @@
 #include "aldl-io.h"
 #include "debugif/debugif.h"
 #include "consoleif/consoleif.h"
+#include "useful.h"
 
 /* ------ local functions ------------- */
 
