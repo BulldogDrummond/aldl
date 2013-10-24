@@ -89,4 +89,7 @@ int cmp_bytestring(byte *h, int hsize, byte *n, int nsize);
 /* print a string of bytes in hex format */
 void printhexstring(byte *str, int length);
 
+/* return a string that describes a connection state */
+char *get_state_string(aldl_state_t s);
+
 #endif

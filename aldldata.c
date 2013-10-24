@@ -278,4 +278,26 @@ int get_index_by_name(aldl_conf_t *aldl, char *name) {
   return -1; /* not found */
 };
 
+char *get_state_string(aldl_state_t s) {
+  switch(s) {
+    case ALDL_CONNECTED:
+      return "Connected";
+    case ALDL_CONNECTING:
+      return "Connecting";
+    case ALDL_LOADING:
+      return "Loading";
+    case ALDL_DESYNC:
+      return "Lost Sync";
+    case ALDL_ERROR:
+      return "Error";
+    case ALDL_LAGGY:
+      return "Laggy";
+    case ALDL_QUIT:
+      return "Quit";
+    case ALDL_PAUSE:
+      return "Paused";
+    default:
+      return "Undefined";
+  };
+};
 
