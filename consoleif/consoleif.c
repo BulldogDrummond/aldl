@@ -145,8 +145,14 @@ void statusmessage(char *str) {
 };
 
 void cons_wait_for_connection() {
-  statusmessage("Connecting to ECM...");
-  pause_until_connected(aldl);
+  aldl_state_t s = ALDL_LOADING;
+  aldl_state_t s_cache = ALDL_LOADING; /* cache to avoid redraws */
+  while(s > 10) {
+    s = get_connstate(aldl);
+    if(s != s_cache) statusmessage(get_state_string(s));
+    s_cache = s;
+    usleep(2000);
+  };
 
   statusmessage("Buffering...");
   pause_until_buffered(aldl);

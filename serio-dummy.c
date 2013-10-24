@@ -61,6 +61,7 @@ int serial_write(byte *str, int len) {
 inline int serial_read(byte *str, int len) {
   usleep(2000);
   if(txmode == 0) { /* idle traffic req */
+    usleep(500000);
     str[0] = 0x33;
     txmode++;
     return 1;
