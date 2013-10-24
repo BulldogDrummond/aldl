@@ -216,6 +216,18 @@ aldl_record_t *newest_record(aldl_conf_t *aldl) {
   return rec;
 };
 
+aldl_record_t *newest_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
+  aldl_record_t *next = NULL;
+  while(1) {
+    next = newest_record(aldl);
+    if(next != rec) {
+      return next;
+    } else {
+      usleep(100);
+    };
+  }; 
+};
+
 /* get next record in the list, waits until one is available */
 aldl_record_t *next_record_wait(aldl_record_t *rec) {
   aldl_record_t *next = NULL;
