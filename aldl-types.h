@@ -70,7 +70,7 @@ typedef struct aldl_record {
      necessarily be thread-safe ... there are functions for that. */
   struct aldl_record *next; /* linked list traversal, newer record or NULL */
   struct aldl_record *prev; /* linked list traversal, older record or NULL */
-  time_t t;            /* timestamp of the record */
+  unsigned long t;            /* timestamp of the record */
   aldl_data_t *data;   /* pointer to the first data record. */
 } aldl_record_t;
 

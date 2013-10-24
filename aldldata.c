@@ -24,6 +24,8 @@ typedef struct aldl_lock {
 
 aldl_lock_t lock;
 
+timespec_t firstrecordtime;
+
 /* --------- local functions ---------------- */
 
 /* update the value in the record from definition n */
@@ -93,6 +95,7 @@ void aldl_init_record(aldl_conf_t *aldl) {
   rec->prev = NULL;
   aldl->r = rec;
   pthread_mutex_unlock(lock.recordptr);
+  firstrecordtime = get_time();
 };
 
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
@@ -105,7 +108,7 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   if(aldl->n_defs < 1) return rec;
 
   /* timestamp record */
-  rec->t = time(NULL) - aldl->uptime;
+  rec->t = get_elapsed_ms(firstrecordtime);
 
   /* allocate data memory */
   rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);
