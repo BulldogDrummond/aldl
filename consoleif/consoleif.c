@@ -101,6 +101,10 @@ void *consoleif(void *aldl_in) {
 
   while(1) {
     rec = newest_record_wait(aldl,rec);
+    if(rec == NULL) { /* disconnected */
+      cons_wait_for_connection();
+      continue;
+    };
     sprintf(bigbuf,"TIMESTAMP: %i",(int)rec->t);
     mvaddstr(ycenter(0)+1,xcenter(strlen(bigbuf)),bigbuf);
     draw_h_progressbar(demogauge);
