@@ -146,6 +146,7 @@ void load_config_a() {
   comm->shutuprepeat = configopt_int("SHUTUP_REPEAT",0,5000,1);
   comm->shutuprepeatdelay = configopt_int("SHUTUP_DELAY",0,5000,75);
   comm->n_packets = configopt_int("N_PACKETS",1,99,1);
+  aldl->shutup_time = configopt_int("SHUTUP_TIME",10,50000,2500);
   aldl->n_defs = configopt_int_fatal("N_DEFS",1,512);
 }
 

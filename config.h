@@ -59,9 +59,6 @@
 /* track connection state for expiry of disable comms mode */
 #define LAGCHECK
 
-/* seconds of acceptable lag time before disable comms has likely expired */
-#define LAGTIME 2
-
 /* ------- FTDI DRIVER CONFIG ------------------------*/
 
 /* the baud rate to set for the ftdi usb userland driver.  reccommend 8192. */
