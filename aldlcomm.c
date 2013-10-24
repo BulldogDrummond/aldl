@@ -9,6 +9,7 @@
 #include "serio.h"
 #include "config.h"
 #include "aldl-io.h"
+#include "useful.h"
 
 /* length of an aldl mode change request string */
 /* FIXME this might not be good for other ECMS */
@@ -86,14 +87,16 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
 int aldl_request(byte *pkt, int len) {
   serial_purge();
   serial_write(pkt,len);
+  #ifndef AGGRESSIVE
   msleep(aldl_timeout(len));
+  #endif
   int result = listen_bytes(pkt,len,len,aldl_timeout(len));
   return result;
 }
 
 int aldl_timeout(int len) {
   int timeout = ( len * SERIAL_BYTES_PER_MS ) + ( len * ECMLAGTIME );
-  if(timeout < SLEEPYTIME) timeout = SLEEPYTIME * 2;
+  if(timeout < SLEEPYTIME * 1000) timeout = SLEEPYTIME * 2000;
   return(timeout);
 }
 
@@ -119,7 +122,7 @@ byte *aldl_get_packet(aldl_packetdef_t *p) {
 
 inline int read_bytes(byte *str, int bytes, int timeout) {
   int bytes_read = 0;
-  int timespent = 0;
+  timespec_t timestamp = get_time();
   #ifdef SERIAL_VERBOSE
   printf("**READ_BYTES %i bytes %i timeout : ",bytes,timeout);
   #endif
@@ -131,9 +134,10 @@ inline int read_bytes(byte *str, int bytes, int timeout) {
       #endif
       return 1;
     }
-    msleep(SLEEPYTIME);
-    timespent += SLEEPYTIME;
-  } while (timespent <= timeout);
+    #ifndef AGGRESSIVE
+    usleep(SLEEPYTIME);
+    #endif
+  } while (get_elapsed_ms(timestamp) <= timeout);
   #ifdef SERIAL_VERBOSE
   printf("TIMEOUT TRYING TO READ %i BYTES, GOT: ",bytes);
   printhexstring(str,bytes_read);
@@ -154,7 +158,7 @@ inline int skip_bytes(int bytes, int timeout) {
 int listen_bytes(byte *str, int len, int max, int timeout) {
   int chars_read = 0; /* total chars read into buffer */
   int chars_in = 0; /* chars added to buffer */
-  int timespent = 0; /* estimation of time spent */
+  timespec_t timestamp = get_time(); /* timestamp beginning of op */
   byte *buf = malloc(max); /* buffer for incoming data */
   memset(buf,0,max);
   #ifdef SERIAL_VERBOSE
@@ -171,10 +175,11 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
       };
     };
     /* timeout and throttling routine */
-    msleep(SLEEPYTIME); /* timing delay */
+    #ifndef AGGRESSIVE
+    usleep(SLEEPYTIME); /* timing delay */
+    #endif
     if(timeout > 0) { /* timeout is enabled, we arent waiting forever */
-      timespent += SLEEPYTIME; /* increment est. time */
-      if(timespent >= timeout) { /* timeout exceeded */
+      if(get_elapsed_ms(timestamp) >= timeout) { /* timeout exceeded */
         #ifdef SERIAL_VERBOSE
         printf("LISTEN TIMEOUT\n");
         #endif
