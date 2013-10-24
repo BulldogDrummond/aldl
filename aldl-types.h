@@ -12,15 +12,14 @@ typedef enum aldl_datatype {
 /* connection state tracking */
 
 typedef enum aldl_state {
-  /* connected states <=10 */
   ALDL_CONNECTED = 0,
-  /* disconnected states >=10 */
+  /* states < 11 reserved for connected states */
   ALDL_CONNECTING = 11,
   ALDL_LOADING = 12,
   ALDL_DESYNC = 13,
   ALDL_ERROR = 14,
   ALDL_LAGGY = 15,
-  /* special disconnected states >=50 */
+  /* states > 50 reserved for special states */
   ALDL_QUIT = 51,
   ALDL_PAUSE = 52
 } aldl_state_t;
