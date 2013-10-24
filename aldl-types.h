@@ -43,6 +43,8 @@ typedef struct aldl_define {
   int id;             /* unique identifier for each definition */
   char *name;         /* short name */
   char *description;  /* description of each definition */
+  int log;            /* log data from this definition */
+  int display;        /* display data from this definition */
   /* ----- output definition -------------------------- */
   aldl_datatype_t type; /* the OUTPUT type */
   char *uom;     /* unit of measure */

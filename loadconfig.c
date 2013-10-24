@@ -250,6 +250,8 @@ void load_config_c(dfile_t *config) {
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,"pkt range");
     d->name=configopt_fatal(config,dconfig(configstr,"NAME",x));
     d->description=configopt_fatal(config,dconfig(configstr,"DESC",x));
+    d->log=configopt_int(config,dconfig(configstr,"LOG",x),0,1,0);
+    d->display=configopt_int(config,dconfig(configstr,"DISPLAY",x),0,1,0);
     #ifdef DEBUGCONFIG
     printf("loaded definition %i\n",x);
     #endif
