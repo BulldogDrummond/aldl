@@ -39,7 +39,7 @@
 /* a static delay in microseconds.  used for waiting in between grabbing
    serial chunks, and other throttling.  if AGGRESSIVE is defined, this is
    generally ignored ... */
-#define SLEEPYTIME 1200
+#define SLEEPYTIME 500
 
 /* a theoretical maximum multiplier per byte that the ECM may take to generate
    data under any circumstance ... */

@@ -125,8 +125,7 @@ typedef struct aldl_conf {
   int n_defs;   /* number of definitions */
   int bufsize;  /* the minimum number of records to maintain */
   int bufstart; /* start plugins when this many records are present */
-  int rate;    /* slow down data collection, in microseconds.  never exceed
-                  one second, or connection quality may suffer.. */
+  int rate;    /* slow down data collection, in microseconds. */
   int maxfail; /* maximum packet retrieve fails before it's assumed that the
                   connection is no longer synchronized */
   int minmax;  /* enforce min/max values during conversion */

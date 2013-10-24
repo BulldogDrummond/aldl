@@ -29,7 +29,7 @@ void *aldl_acq(void *aldl_in) {
   aldl->ready = 0;
 
   /* sanity checks */
-  if(aldl->rate * 1000 > 2000) fatalerror(ERROR_TIMING,"acq delay too high");
+  if(aldl->rate > 200000) fatalerror(ERROR_TIMING,"acq delay too high");
   if(comm->n_packets < 1) fatalerror(ERROR_RANGE,"no packets in acq");
 
   /* timestamp for lag check */
@@ -87,16 +87,18 @@ void *aldl_acq(void *aldl_in) {
     PKTRETRY:
 
     /* handle pause condition */
-    while(get_connstate(aldl) == ALDL_PAUSE) usleep(50000);
+    while(get_connstate(aldl) == ALDL_PAUSE) usleep(5000);
 
     /* this would seem an appropriate time to maintain the connection if it
        drops, or if it never existed ... if not, time for a delay */
     if(get_connstate(aldl) >= 10) { /* if in any sort of disconnected state */
       aldl_reconnect(comm); /* main connection happens here */
       set_connstate(ALDL_CONNECTED,aldl);
+    #ifndef AGGRESSIVE
     } else {
       /* delay between data collection iterations */
       usleep(aldl->rate);
+    #endif
     };
 
     /* reset lag check timer, note that the above instructions are not covered

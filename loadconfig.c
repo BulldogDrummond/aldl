@@ -133,6 +133,7 @@ char *load_config_root() {
   aldl->bufstart = configopt_int("START",10,10000,aldl->bufsize / 2);
   aldl->minmax = configopt_int("MINMAX",0,1,1);
   aldl->maxfail = configopt_int("MAXFAIL",1,1000,6);
+  aldl->rate = configopt_int("ACQRATE",0,100000,0);
   return configopt_fatal("DEFINITION"); /* path not stored ... */
 };
 
