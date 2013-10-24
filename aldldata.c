@@ -222,8 +222,10 @@ aldl_record_t *newest_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
     next = newest_record(aldl);
     if(next != rec) {
       return next;
+    } else if(get_connstate(aldl) > 10) {
+      return NULL;
     } else {
-      usleep(100);
+      usleep(500);
     };
   }; 
 };
@@ -234,7 +236,7 @@ aldl_record_t *next_record_wait(aldl_record_t *rec) {
   while(next == NULL) {
     /* just call next_record repeatedly until one shows up */
     next = next_record(rec);
-    usleep(100); /* throttling ... */
+    usleep(500); /* throttling ... */
   };
   return next;
 };
