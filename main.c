@@ -43,15 +43,26 @@ int main() { /*-------------------------------------------------- */
 
   /* ------ THREAD SPAWNING -------------------------------------*/
 
+  /* error checking */
+  if(aldl->debugif_enable == 1 && aldl->consoleif_enable == 1) {
+    fatalerror(ERROR_PLUGIN,"consoleif and debugif plugins are incompat");
+  };
+
   /* configure threading */
   pthread_t thread_acq; 
-  //pthread_t thread_debugif; /* temporary */
+  pthread_t thread_debugif;
   pthread_t thread_consoleif;
 
   /* spawn acq thread */
   pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
-  //pthread_create(&thread_debugif,NULL,debugif_loop,(void *)aldl); /* temp */
-  pthread_create(&thread_consoleif,NULL,consoleif,(void *) aldl);
+
+  if(aldl->debugif_enable == 1) {
+    pthread_create(&thread_debugif,NULL,debugif_loop,(void *)aldl);
+  };
+
+  if(aldl->consoleif_enable == 1) {
+    pthread_create(&thread_consoleif,NULL,consoleif,(void *) aldl);
+  };
 
   /* wait for acq thread to finish ... */
   pthread_join(thread_acq,NULL);

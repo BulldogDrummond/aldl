@@ -17,7 +17,8 @@ char errstr[N_ERRORCODES][24] = {
 "TIMING",
 "CONFIG",
 "BUFFER",
-"CONFIG OPTION MISSING"
+"CONFIG OPTION MISSING",
+"PLUGIN LOADING"
 };
 
 void fatalerror(error_t code, char *str) {

@@ -129,6 +129,8 @@ typedef struct aldl_conf {
                   connection is no longer synchronized */
   int minmax;  /* enforce min/max values during conversion */
   int shutup_time; /* time in ms that a shutup state lasts */
+  /* plugin enables -------*/
+  int debugif_enable, consoleif_enable;
   /* structures -----------*/
   aldl_state_t state; /* connection state, do not touch */
   aldl_define_t *def; /* link to the definition set */

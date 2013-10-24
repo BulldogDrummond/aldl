@@ -134,6 +134,10 @@ char *load_config_root() {
   aldl->minmax = configopt_int("MINMAX",0,1,1);
   aldl->maxfail = configopt_int("MAXFAIL",1,1000,6);
   aldl->rate = configopt_int("ACQRATE",0,100000,0);
+  /* plugins */
+  aldl->debugif_enable = configopt_int("DEBUGIF_ENABLE",0,1,0);
+  aldl->consoleif_enable = configopt_int("CONSOLEIF_ENABLE",0,1,0);
+  /* return definition file path */
   return configopt_fatal("DEFINITION"); /* path not stored ... */
 };
 
