@@ -59,6 +59,11 @@
 /* track connection state for expiry of disable comms mode */
 #define LAGCHECK
 
+/* attempt to handle cases where runtime may exceed ULONG_MAX by wrapping back
+   to zero.  this is at least 49 days of runtime or more depending on host
+   system; so the check should not be necessary ... and results are undefined */
+#define TIMESTAMP_WRAPAROUND
+
 /* ------- FTDI DRIVER CONFIG ------------------------*/
 
 /* the baud rate to set for the ftdi usb userland driver.  reccommend 8192. */

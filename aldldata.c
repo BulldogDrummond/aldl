@@ -5,6 +5,7 @@
 #include <string.h>
 #include <time.h>
 #include <pthread.h>
+#include <limits.h>
 
 #include "serio.h"
 #include "config.h"
@@ -109,6 +110,11 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
 
   /* timestamp record */
   rec->t = get_elapsed_ms(firstrecordtime);
+
+  #ifdef TIMESTAMP_WRAPAROUND
+  /* handle wraparound if we're 100 seconds before time limit */
+  if(rec->t > ULONG_MAX - 100000) firstrecordtime = get_time();
+  #endif
 
   /* allocate data memory */
   rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);
