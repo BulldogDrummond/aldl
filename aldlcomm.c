@@ -88,7 +88,7 @@ int aldl_request(byte *pkt, int len) {
   serial_purge();
   serial_write(pkt,len);
   #ifndef AGGRESSIVE
-  msleep(aldl_timeout(len));
+  usleep(aldl_timeout(len));
   #endif
   int result = listen_bytes(pkt,len,len,aldl_timeout(len));
   return result;
