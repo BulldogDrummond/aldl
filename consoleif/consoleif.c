@@ -72,9 +72,11 @@ void *consoleif(void *aldl_in) {
   if(rpmid == -1) fatalerror(ERROR_NULL,"rpm not found");
 
   while(1) {
-    rec = next_record_wait(rec);
-    sprintf(bigbuf,"RPM: %f",rec->data[rpmid].f);
+    rec = newest_record_wait(aldl,rec);
+    sprintf(bigbuf,"RPM: %.2f",rec->data[rpmid].f);
     mvaddstr(ycenter(0),xcenter(strlen(bigbuf)),bigbuf);
+    sprintf(bigbuf,"TIMESTAMP: %i",rec->t);
+    mvaddstr(ycenter(0)+1,xcenter(strlen(bigbuf)),bigbuf);
     refresh();
 
   };
