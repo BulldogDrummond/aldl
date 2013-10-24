@@ -53,6 +53,8 @@ void cons_wait_for_connection();
 
 void draw_h_progressbar(gauge_t *g);
 
+void draw_statusbar();
+
 /* --------------------------------------------*/
 
 void *consoleif(void *aldl_in) {
@@ -105,10 +107,9 @@ void *consoleif(void *aldl_in) {
       cons_wait_for_connection();
       continue;
     };
-    sprintf(bigbuf,"TIMESTAMP: %i",(int)rec->t);
-    mvaddstr(ycenter(0)+1,xcenter(strlen(bigbuf)),bigbuf);
     draw_h_progressbar(demogauge);
     draw_h_progressbar(rpmgauge);
+    draw_statusbar();
     refresh();
     usleep(10000);
   };
@@ -132,6 +133,15 @@ int ycenter(int height) {
 
 void print_centered_string(char *str) {
   mvaddstr(ycenter(0),xcenter(strlen(str)),str);
+};
+
+void draw_statusbar() {
+  lock_stats();
+  float pps = aldl->stats->packetspersecond;
+  unsigned int failcounter = aldl->stats->failcounter;
+  unlock_stats();
+  mvprintw(w_height - 1,1,"%s  TIMESTAMP: %i  PKT/S: %.1f  FAILED: %u  ",
+           VERSION, rec->t, pps, failcounter);
 };
 
 void statusmessage(char *str) {
