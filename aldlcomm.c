@@ -88,7 +88,7 @@ int aldl_request(byte *pkt, int len) {
   serial_purge();
   serial_write(pkt,len);
   #ifndef AGGRESSIVE
-  usleep(aldl_timeout(len));
+  msleep(aldl_timeout(len));
   #endif
   int result = listen_bytes(pkt,len,len,aldl_timeout(len));
   return result;
@@ -96,7 +96,8 @@ int aldl_request(byte *pkt, int len) {
 
 int aldl_timeout(int len) {
   int timeout = ( len * SERIAL_BYTES_PER_MS ) + ( len * ECMLAGTIME );
-  if(timeout < SLEEPYTIME * 1000) timeout = SLEEPYTIME * 2000;
+  /* if the timeout is too short, set it higher */
+  if(timeout < SLEEPYTIME / 1000) timeout = SLEEPYTIME * 2 / 1000;
   return(timeout);
 }
 
