@@ -13,6 +13,7 @@ typedef struct _datalogger_conf {
   dfile_t *dconf; /* raw config data */
   int autostart;
   char *log_path;
+  int log_all;
   FILE *fdesc;
 } datalogger_conf_t;
 
@@ -44,6 +45,9 @@ void *datalogger_init(void *aldl_in) {
   int x;
   cursor += sprintf(cursor,"TIMESTAMP");
   for(x=0;x<aldl->n_defs;x++) {
+    if(conf->log_all == 0) {
+      if(aldl->def[x].log == 0) continue;
+    };
     cursor += sprintf(cursor,",%s",aldl->def[x].name);
   };
   cursor += sprintf(cursor,"\n");
@@ -56,6 +60,9 @@ void *datalogger_init(void *aldl_in) {
     cursor=linebuf; /* reset cursor */
     cursor += sprintf(cursor,"%lu",rec->t);
     for(x=0;x<aldl->n_defs;x++) {
+      if(conf->log_all == 0) {
+        if(aldl->def[x].log == 0) continue;
+      };
       switch(aldl->def[x].type) {
         case ALDL_FLOAT:
           cursor += sprintf(cursor,",%.2f",rec->data[x].f);
@@ -85,6 +92,7 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
                                   "datalogger config file missing");
   dfile_t *config = conf->dconf;
   conf->autostart = configopt_int(config,"AUTOSTART",0,1,1);
+  conf->log_all = configopt_int(config,"LOG_ALL",0,1,0);
   conf->log_path = configopt_fatal(config,"LOG_PATH");
   return conf;
 };
