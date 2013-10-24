@@ -1,7 +1,7 @@
 # compiler flags
 #CFLAGS= -g -Wall
 CFLAGS= -O2 -Wall
-OBJS= debugif/debugif.o consoleif/consoleif.o acquire.o error.o loadconfig.o useful.o
+OBJS= datalogger/datalogger.o debugif/debugif.o consoleif/consoleif.o acquire.o error.o loadconfig.o useful.o
 FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 LIBS= -lpthread -lrt -lncurses
 
@@ -31,6 +31,9 @@ debugif_:
 consoleif_:
 	cd consoleif ; make ; cd ..
 
+datalogger_:
+	cd datalogger ; make ; cd ..
+
 serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h config.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
 
@@ -53,6 +56,7 @@ clean:
 	rm -fv *.o *.a aldl-ftdi aldl-dummy
 	cd debugif ; make clean ; cd ..
 	cd consoleif ; make clean ; cd ..
+	cd datalogger ; make clean ; cd ..
 
 stats:
 	wc -l *.c *.h

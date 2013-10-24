@@ -14,6 +14,7 @@
 #include "aldl-io.h"
 #include "debugif/debugif.h"
 #include "consoleif/consoleif.h"
+#include "datalogger/datalogger.h"
 #include "useful.h"
 
 /* ------ local functions ------------- */
@@ -52,6 +53,7 @@ int main() { /*-------------------------------------------------- */
   pthread_t thread_acq; 
   pthread_t thread_debugif;
   pthread_t thread_consoleif;
+  pthread_t thread_datalogger;
 
   /* spawn acq thread */
   pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
@@ -62,6 +64,10 @@ int main() { /*-------------------------------------------------- */
 
   if(aldl->consoleif_enable == 1) {
     pthread_create(&thread_consoleif,NULL,consoleif,(void *) aldl);
+  };
+
+  if(aldl->datalogger_enable == 1) {
+    pthread_create(&thread_datalogger,NULL,datalogger_init,(void *) aldl);
   };
 
   /* wait for acq thread to finish ... */

@@ -136,6 +136,7 @@ char *load_config_root(dfile_t *config) {
   /* plugins */
   aldl->debugif_enable = configopt_int(config,"DEBUGIF_ENABLE",0,1,0);
   aldl->consoleif_enable = configopt_int(config,"CONSOLEIF_ENABLE",0,1,0);
+  aldl->datalogger_enable = configopt_int(config,"DATALOGGER_ENABLE",0,1,0);
   /* return definition file path */
   return configopt_fatal(config,"DEFINITION"); /* path not stored ... */
 };
