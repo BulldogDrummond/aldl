@@ -10,6 +10,7 @@
 #include "config.h"
 #include "aldl-io.h"
 #include "acquire.h"
+#include "useful.h"
 
 /* primary data acqusition event loop */
 
@@ -33,7 +34,7 @@ void *aldl_acq(void *aldl_in) {
 
   /* timestamp for lag check */
   #ifdef LAGCHECK
-  time_t lagtime;
+  timespec_t lagtime;
   #endif
 
   #ifdef ALDL_MULTIPACKET
@@ -52,7 +53,7 @@ void *aldl_acq(void *aldl_in) {
 
   /* config vars and get initial stamp if packet rate tracking is enabled */
   #ifdef TRACK_PKTRATE
-  time_t timestamp = aldl->uptime;
+  timespec_t timestamp = get_time();
   int pktcounter = 0; /* how many packets between timestamps */
   #endif
 
@@ -101,17 +102,17 @@ void *aldl_acq(void *aldl_in) {
     /* reset lag check timer, note that the above instructions are not covered
        in lagtime measurement, so they need to be FAST .... */
     #ifdef LAGCHECK
-    lagtime = time(NULL); 
+    lagtime = get_time(); 
     #endif
 
     /* check if we're @ duration, and average the number of packets for
        statistical purposes */
     #ifdef TRACK_PKTRATE
-    if(time(NULL) - timestamp >= PKTRATE_DURATION) {
+    if(get_elapsed_ms(timestamp) >= PKTRATE_DURATION * 1000) {
       lock_stats();
       aldl->stats->packetspersecond = (float)pktcounter / PKTRATE_DURATION;
       unlock_stats();
-      timestamp = time(NULL);
+      timestamp = get_time();
       pktcounter = 0;
     };
     #endif
@@ -188,10 +189,11 @@ void *aldl_acq(void *aldl_in) {
       unlock_stats();
     };
 
-    /* check if lagtime exceeded, and set lag state.  obviously this is a
-       rough estimate, but good enough to maintain shutup state*/
+    /* check if lagtime exceeded, and set lag state. */
     #ifdef LAGCHECK
-    if(time(NULL) >= lagtime + LAGTIME) set_connstate(ALDL_LAGGY,aldl);
+    if(get_elapsed_ms(lagtime) >= aldl->shutup_time) {
+      set_connstate(ALDL_LAGGY,aldl);
+    };
     #endif
 
     }; /* end packet iterator */
