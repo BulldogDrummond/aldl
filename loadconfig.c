@@ -17,7 +17,6 @@
 
 aldl_conf_t *aldl; /* aldl data structure */
 aldl_commdef_t *comm; /* comm specs */
-dfile_t *config; /* configuration */
 
 /* ------- LOCAL FUNCTIONS ------------- */
 
@@ -31,14 +30,14 @@ char *brk_field(char *dst, int f, char *in);
    exported ... */
 
 /* get various config options by name */
-int configopt_int_fatal(char *str, int min, int max);
-int configopt_int(char *str, int min, int max, int def);
-byte configopt_byte(char *str, byte def);
-byte configopt_byte_fatal(char *str);
-float configopt_float(char *str, float def);
-float configopt_float_fatal(char *str);
-char *configopt_fatal(char *str);
-char *configopt(char *str,char *def);
+int configopt_int_fatal(dfile_t *config, char *str, int min, int max);
+int configopt_int(dfile_t *config, char *str, int min, int max, int def);
+byte configopt_byte(dfile_t *config, char *str, byte def);
+byte configopt_byte_fatal(dfile_t *config, char *str);
+float configopt_float(dfile_t *config, char *str, float def);
+float configopt_float_fatal(dfile_t *config, char *str);
+char *configopt_fatal(dfile_t *config, char *str);
+char *configopt(dfile_t *config, char *str,char *def);
 
 /* get a packet config string */
 char *pktconfig(char *buf, char *parameter, int n);
@@ -50,14 +49,14 @@ void aldl_alloc_b(); /* definition arrays */
 void aldl_alloc_c(); /* more data space */
 
 /* config file loading */
-void load_config_a(); /* load data to alloc_a structures */
-void load_config_b(); /* load data to alloc_b structures */
-void load_config_c();
-char *load_config_root(); /* returns path to sub config */
+void load_config_a(dfile_t *config); /* load data to alloc_a structures */
+void load_config_b(dfile_t *config); /* load data to alloc_b structures */
+void load_config_c(dfile_t *config);
+char *load_config_root(dfile_t *config); /* returns path to sub config */
 
 aldl_conf_t *aldl_setup() {
   /* load root config file ... */
-  config = dfile_load(ROOT_CONFIG_FILE);
+  dfile_t *config = dfile_load(ROOT_CONFIG_FILE);
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
   #ifdef DEBUGCONFIG
   print_config(config);
@@ -69,27 +68,27 @@ aldl_conf_t *aldl_setup() {
   printf("loading root config...\n");
   #endif
 
-  char *configfile = load_config_root();
+  char *configfile = load_config_root(config);
 
   /* load def config file ... */
-  config = dfile_load(configfile);
+  config = dfile_load(configfile); /* re-use pointer */
   if(config == NULL) fatalerror(ERROR_CONFIG,"cant load definition file");
   #ifdef DEBUGCONFIG
   print_config(config);
   printf("configuration, stage A...\n");
   #endif
-  load_config_a();
+  load_config_a(config);
 
   #ifdef DEBUGCONFIG
   printf("configuration, stage B...\n");
   #endif
   aldl_alloc_b();
-  load_config_b();
+  load_config_b(config);
   #ifdef DEBUGCONFIG
   printf("configuration, stage C...\n");
   #endif
   aldl_alloc_c();
-  load_config_c();
+  load_config_c(config);
   #ifdef DEBUGCONFIG
   printf("configuration complete.\n");
   #endif
@@ -127,32 +126,32 @@ void aldl_alloc_a() {
 
 }
 
-char *load_config_root() {
-  aldl->serialstr = configopt("PORT",NULL);
-  aldl->bufsize = configopt_int("BUFFER",10,10000,200);
-  aldl->bufstart = configopt_int("START",10,10000,aldl->bufsize / 2);
-  aldl->minmax = configopt_int("MINMAX",0,1,1);
-  aldl->maxfail = configopt_int("MAXFAIL",1,1000,6);
-  aldl->rate = configopt_int("ACQRATE",0,100000,0);
+char *load_config_root(dfile_t *config) {
+  aldl->serialstr = configopt(config,"PORT",NULL);
+  aldl->bufsize = configopt_int(config,"BUFFER",10,10000,200);
+  aldl->bufstart = configopt_int(config,"START",10,10000,aldl->bufsize / 2);
+  aldl->minmax = configopt_int(config,"MINMAX",0,1,1);
+  aldl->maxfail = configopt_int(config,"MAXFAIL",1,1000,6);
+  aldl->rate = configopt_int(config,"ACQRATE",0,100000,0);
   /* plugins */
-  aldl->debugif_enable = configopt_int("DEBUGIF_ENABLE",0,1,0);
-  aldl->consoleif_enable = configopt_int("CONSOLEIF_ENABLE",0,1,0);
+  aldl->debugif_enable = configopt_int(config,"DEBUGIF_ENABLE",0,1,0);
+  aldl->consoleif_enable = configopt_int(config,"CONSOLEIF_ENABLE",0,1,0);
   /* return definition file path */
-  return configopt_fatal("DEFINITION"); /* path not stored ... */
+  return configopt_fatal(config,"DEFINITION"); /* path not stored ... */
 };
 
-void load_config_a() {
-  comm->checksum_enable = configopt_int("CHECKSUM_ENABLE",0,1,1);;
-  comm->pcm_address = configopt_byte_fatal("PCM_ADDRESS");
-  comm->idledelay = configopt_int("IDLE_DELAY",0,5000,10);
-  comm->chatterwait = configopt_int("IDLE_ENABLE",0,1,1);
-  comm->shutupcommand = generate_mode(configopt_byte_fatal("SHUTUP_MODE"),comm);
-  comm->returncommand = generate_mode(configopt_byte_fatal("RETURN_MODE"),comm);
-  comm->shutuprepeat = configopt_int("SHUTUP_REPEAT",0,5000,1);
-  comm->shutuprepeatdelay = configopt_int("SHUTUP_DELAY",0,5000,75);
-  comm->n_packets = configopt_int("N_PACKETS",1,99,1);
-  aldl->shutup_time = configopt_int("SHUTUP_TIME",10,50000,2500);
-  aldl->n_defs = configopt_int_fatal("N_DEFS",1,512);
+void load_config_a(dfile_t *config) {
+  comm->checksum_enable = configopt_int(config,"CHECKSUM_ENABLE",0,1,1);;
+  comm->pcm_address = configopt_byte_fatal(config,"PCM_ADDRESS");
+  comm->idledelay = configopt_int(config,"IDLE_DELAY",0,5000,10);
+  comm->chatterwait = configopt_int(config,"IDLE_ENABLE",0,1,1);
+  comm->shutupcommand = generate_mode(configopt_byte_fatal(config,"SHUTUP_MODE"),comm);
+  comm->returncommand = generate_mode(configopt_byte_fatal(config,"RETURN_MODE"),comm);
+  comm->shutuprepeat = configopt_int(config,"SHUTUP_REPEAT",0,5000,1);
+  comm->shutuprepeatdelay = configopt_int(config,"SHUTUP_DELAY",0,5000,75);
+  comm->n_packets = configopt_int(config,"N_PACKETS",1,99,1);
+  aldl->shutup_time = configopt_int(config,"SHUTUP_TIME",10,50000,2500);
+  aldl->n_defs = configopt_int_fatal(config,"N_DEFS",1,512);
 }
 
 void aldl_alloc_b() {
@@ -165,16 +164,16 @@ void aldl_alloc_b() {
   #endif
 }
 
-void load_config_b() {
+void load_config_b(dfile_t *config) {
   int x;
   char *pktname = malloc(50);
   for(x=0;x<comm->n_packets;x++) {
-    comm->packet[x].id = configopt_byte_fatal(pktconfig(pktname,"ID",x));
-    comm->packet[x].length = configopt_int_fatal(pktconfig(pktname,
+    comm->packet[x].id = configopt_byte_fatal(config,pktconfig(pktname,"ID",x));
+    comm->packet[x].length = configopt_int_fatal(config,pktconfig(pktname,
                                                 "SIZE",x),1,255);
-    comm->packet[x].offset = configopt_int(pktconfig(pktname,
+    comm->packet[x].offset = configopt_int(config,pktconfig(pktname,
                                                  "OFFSET",x),0,254,3);
-    comm->packet[x].frequency = configopt_int(pktconfig(pktname,
+    comm->packet[x].frequency = configopt_int(config,pktconfig(pktname,
                                                  "FREQUENCY",x),0,1000,1);
     generate_pktcommand(&comm->packet[x],comm);
     #ifdef DEBUGCONFIG
@@ -214,7 +213,7 @@ void aldl_alloc_c() {
   #endif
 };
 
-void load_config_c() {
+void load_config_c(dfile_t *config) {
   int x=0;
   char *configstr = malloc(50);
   char *tmp;
@@ -223,42 +222,42 @@ void load_config_c() {
 
   for(x=0;x<aldl->n_defs;x++) {
     d = &aldl->def[x]; /* shortcut to def */
-    tmp=configopt_fatal(dconfig(configstr,"TYPE",x));
+    tmp=configopt_fatal(config,dconfig(configstr,"TYPE",x));
     if(faststrcmp(tmp,"BINARY") == 1) {
       d->type=ALDL_BOOL;
-      d->binary=configopt_int_fatal(dconfig(configstr,"BINARY",x),0,7);
-      d->invert=configopt_int(dconfig(configstr,"INVERT",x),0,1,0);
+      d->binary=configopt_int_fatal(config,dconfig(configstr,"BINARY",x),0,7);
+      d->invert=configopt_int(config,dconfig(configstr,"INVERT",x),0,1,0);
     } else {
       if(faststrcmp(tmp,"FLOAT") == 1) {
         d->type=ALDL_FLOAT;
-        d->precision=configopt_int(dconfig(configstr,"PRECISION",x),0,1000,0);
-        d->min.f=configopt_float(dconfig(configstr,"MIN",x),0);
-        d->max.f=configopt_float(dconfig(configstr,"MAX",x),9999999);
-        d->adder.f=configopt_float(dconfig(configstr,"ADDER",x),0);
-        d->multiplier.f=configopt_float(dconfig(configstr,"MULTIPLIER",x),1);
+        d->precision=configopt_int(config,dconfig(configstr,"PRECISION",x),0,1000,0);
+        d->min.f=configopt_float(config,dconfig(configstr,"MIN",x),0);
+        d->max.f=configopt_float(config,dconfig(configstr,"MAX",x),9999999);
+        d->adder.f=configopt_float(config,dconfig(configstr,"ADDER",x),0);
+        d->multiplier.f=configopt_float(config,dconfig(configstr,"MULTIPLIER",x),1);
       } else if(faststrcmp(tmp,"INT") == 1) {
         d->type=ALDL_INT; 
-        d->min.i=configopt_int(dconfig(configstr,"MIN",x),-32678,32767,0);
-        d->max.i=configopt_int(dconfig(configstr,"MAX",x),-32678,32767,65535);
-        d->adder.i=configopt_int(dconfig(configstr,"ADDER",x),-32678,32767,0);
-        d->multiplier.i=configopt_int(dconfig(configstr,"MULTIPLIER",x),
+        d->min.i=configopt_int(config,dconfig(configstr,"MIN",x),-32678,32767,0);
+        d->max.i=configopt_int(config,dconfig(configstr,"MAX",x),-32678,32767,65535);
+        d->adder.i=configopt_int(config,dconfig(configstr,"ADDER",x),-32678,32767,0);
+        d->multiplier.i=configopt_int(config,dconfig(configstr,"MULTIPLIER",x),
                                          -32678,32767,1);
       } else {
         fatalerror(ERROR_CONFIG,"invalid data type in def");
       };
-      d->uom=configopt(dconfig(configstr,"UOM",x),NULL);
-      d->size=configopt_int(dconfig(configstr,"SIZE",x),1,32,8);     
+      d->uom=configopt(config,dconfig(configstr,"UOM",x),NULL);
+      d->size=configopt_int(config,dconfig(configstr,"SIZE",x),1,32,8);     
       /* FIXME no support for signed input type */
     };
-    d->id=configopt_int(dconfig(configstr,"ID",x),0,32767,x);
+    d->id=configopt_int(config,dconfig(configstr,"ID",x),0,32767,x);
     for(z=x-1;z>=0;z--) { /* check for duplicate unique id */
       if(aldl->def[z].id == d->id) fatalerror(ERROR_CONFIG,"duplicate id");
     };
-    d->offset=configopt_byte_fatal(dconfig(configstr,"OFFSET",x));
-    d->packet=configopt_byte(dconfig(configstr,"PACKET",x),0x00);
+    d->offset=configopt_byte_fatal(config,dconfig(configstr,"OFFSET",x));
+    d->packet=configopt_byte(config,dconfig(configstr,"PACKET",x),0x00);
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,"pkt range");
-    d->name=configopt_fatal(dconfig(configstr,"NAME",x));
-    d->description=configopt_fatal(dconfig(configstr,"DESC",x));
+    d->name=configopt_fatal(config,dconfig(configstr,"NAME",x));
+    d->description=configopt_fatal(config,dconfig(configstr,"DESC",x));
     #ifdef DEBUGCONFIG
     printf("loaded definition %i\n",x);
     #endif
@@ -266,20 +265,20 @@ void load_config_c() {
   free(configstr);
 }
 
-char *configopt_fatal(char *str) {
-  char *val = configopt(str,NULL);
+char *configopt_fatal(dfile_t *config, char *str) {
+  char *val = configopt(config,str,NULL);
   if(val == NULL) fatalerror(ERROR_CONFIG_MISSING,str);
   return val;
 };
 
-char *configopt(char *str,char *def) {
+char *configopt(dfile_t *config,char *str,char *def) {
   char *val = value_by_parameter(str, config);
   if(val == NULL) return def;
   return val;
 };
 
-float configopt_float(char *str, float def) {
-  char *in = configopt(str,NULL);
+float configopt_float(dfile_t *config, char *str, float def) {
+  char *in = configopt(config,str,NULL);
   #ifdef DEBUGCONFIG
   if(in == NULL) {
     printf("caught default value for %s: %f\n",str,def);
@@ -292,13 +291,13 @@ float configopt_float(char *str, float def) {
   return x;
 };
 
-float configopt_float_fatal(char *str) {
-  float x = atof(configopt_fatal(str));
+float configopt_float_fatal(dfile_t *config,char *str) {
+  float x = atof(configopt_fatal(config,str));
   return x;
 };
 
-int configopt_int(char *str, int min, int max, int def) {
-  char *in = configopt(str,NULL);
+int configopt_int(dfile_t *config,char *str, int min, int max, int def) {
+  char *in = configopt(config,str,NULL);
   #ifdef DEBUGCONFIG
   if(in == NULL) {
     printf("caught default value for %s: %i\n",str,def);
@@ -312,14 +311,14 @@ int configopt_int(char *str, int min, int max, int def) {
   return x;
 };
 
-int configopt_int_fatal(char *str, int min, int max) {
-  int x = atoi(configopt_fatal(str));
+int configopt_int_fatal(dfile_t *config,char *str, int min, int max) {
+  int x = atoi(configopt_fatal(config,str));
   if(x < min || x > max) fatalerror(ERROR_RANGE,str);
   return x;
 };
 
-byte configopt_byte(char *str, byte def) {
-  char *in = configopt(str,NULL);
+byte configopt_byte(dfile_t *config,char *str, byte def) {
+  char *in = configopt(config,str,NULL);
   #ifdef DEBUGCONFIG
   if(in == NULL) {
     printf("caught default value for %s: ",str);
@@ -332,8 +331,8 @@ byte configopt_byte(char *str, byte def) {
   return hextobyte(in);
 };
 
-byte configopt_byte_fatal(char *str) {
-  char *in = configopt_fatal(str);
+byte configopt_byte_fatal(dfile_t *config,char *str) {
+  char *in = configopt_fatal(config,str);
   return hextobyte(in);
 };
 
