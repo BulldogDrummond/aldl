@@ -1,16 +1,16 @@
 # compiler flags
 CFLAGS= -g -Wall
 #CFLAGS= -O2 -Wall
-OBJS= debugif/debugif.o acquire.o error.o loadconfig.o useful.o
+OBJS= debugif/debugif.o consoleif/consoleif.o acquire.o error.o loadconfig.o useful.o
 FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
 
-all: aldl-ftdi aldl-dummy
+all: clean aldl-ftdi aldl-dummy
 
 aldl-ftdi: main.c aldl-io-ftdi.a config.h aldl-io.h aldl-types.h debugif_ $(OBJS)
-	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-ftdi $(OBJS) aldl-io-ftdi.a
+	gcc $(CFLAGS) -lftdi -lpthread -lncurses main.c -o aldl-ftdi $(OBJS) aldl-io-ftdi.a
 
 aldl-dummy: main.c aldl-io-dummy.a config.h aldl-io.h aldl-types.h debugif_ $(OBJS)
-	gcc $(CFLAGS) -lftdi -lpthread main.c -o aldl-dummy $(OBJS) aldl-io-dummy.a
+	gcc $(CFLAGS) -lftdi -lpthread -lncurses main.c -o aldl-dummy $(OBJS) aldl-io-dummy.a
 
 useful.o: useful.c useful.h config.h aldl-types.h
 	gcc $(CFLAGS) -c useful.c -o useful.o
@@ -26,6 +26,9 @@ error.o: error.c error.h config.h aldl-types.h
 
 debugif_:
 	cd debugif ; make ; cd ..
+
+consoleif_:
+	cd consoleif ; make ; cd ..
 
 serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h config.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
@@ -48,6 +51,7 @@ aldl-io-dummy.a: serio-dummy.o aldlcomm.o aldldata.o config.h
 clean:
 	rm -fv *.o *.a aldl-ftdi aldl-dummy
 	cd debugif ; make clean ; cd ..
+	cd consoleif ; make clean ; cd ..
 
 stats:
 	wc -l *.c *.h

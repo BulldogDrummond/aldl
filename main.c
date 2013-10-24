@@ -13,6 +13,7 @@
 #include "error.h"
 #include "aldl-io.h"
 #include "debugif/debugif.h"
+#include "consoleif/consoleif.h"
 
 /* ------ local functions ------------- */
 
@@ -43,13 +44,13 @@ int main() { /*-------------------------------------------------- */
 
   /* configure threading */
   pthread_t thread_acq; 
-  pthread_t thread_debugif; /* temporary */
+  //pthread_t thread_debugif; /* temporary */
+  pthread_t thread_consoleif;
 
-  /* FIXME doesnt check for pthread error ... */
-  
   /* spawn acq thread */
   pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
-  pthread_create(&thread_debugif,NULL,debugif_loop,(void *)aldl); /* temp */
+  //pthread_create(&thread_debugif,NULL,debugif_loop,(void *)aldl); /* temp */
+  pthread_create(&thread_consoleif,NULL,consoleif,(void *) aldl);
 
   /* wait for acq thread to finish ... */
   pthread_join(thread_acq,NULL);

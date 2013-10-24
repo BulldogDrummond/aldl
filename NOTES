@@ -25,6 +25,9 @@ Access of Data:
   This is an example of a stupid plugin that has some initial knowledge of the
   unique ID of the RPM definition, and displays RPM in a loop, it's thread-safe
 
+- There is a statistical structure that requires locking, lock_stats() and
+  unlock_stats() need to be called.
+
 /*------------------------------------------------------------------------*/
 
 void display_rpm(aldl_conf_t *aldl) {
