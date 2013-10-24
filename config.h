@@ -32,10 +32,14 @@
 
 /* --------- TIMING CONSTANTS ------------------------*/
 
-/* a static delay in milliseconds.  used for waiting in between grabbing
-   serial chunks, and for delay timers.  decreasing this value makes timeouts
-   more accurate.  increasing improves cpu usage.  2 is reccommended.. */
-#define SLEEPYTIME 2
+/* define for more aggressive timing behavior in an attempt to increase packet
+   rate, at a higher risk of dropped packets and increased cpu usage */
+#define AGGRESSIVE
+
+/* a static delay in microseconds.  used for waiting in between grabbing
+   serial chunks, and other throttling.  if AGGRESSIVE is defined, this is
+   generally ignored ... */
+#define SLEEPYTIME 1200
 
 /* a theoretical maximum multiplier per byte that the ECM may take to generate
    data under any circumstance ... */
