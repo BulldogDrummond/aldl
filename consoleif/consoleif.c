@@ -101,6 +101,14 @@ void *consoleif(void *aldl_in) {
   rpmgauge->bottom = 0;
   rpmgauge->top = 6375;
 
+  gauge_t *tpsgauge = malloc(sizeof(gauge_t));
+  tpsgauge->x = 1;
+  tpsgauge->y = 7;
+  tpsgauge->width = 20;
+  tpsgauge->data_a = get_index_by_name(aldl,"NTPSLDT");
+  tpsgauge->bottom = 0;
+  tpsgauge->top = 100;
+
   while(1) {
     rec = newest_record_wait(aldl,rec);
     if(rec == NULL) { /* disconnected */
@@ -109,6 +117,7 @@ void *consoleif(void *aldl_in) {
     };
     draw_h_progressbar(demogauge);
     draw_h_progressbar(rpmgauge);
+    draw_h_progressbar(tpsgauge);
     draw_statusbar();
     refresh();
     usleep(10000);
