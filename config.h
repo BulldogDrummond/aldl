@@ -34,7 +34,7 @@
 
 /* define for more aggressive timing behavior in an attempt to increase packet
    rate, at a higher risk of dropped packets and increased cpu usage */
-#define AGGRESSIVE
+//#define AGGRESSIVE
 
 /* a static delay in microseconds.  used for waiting in between grabbing
    serial chunks, and other throttling.  if AGGRESSIVE is defined, this is
