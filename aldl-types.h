@@ -119,7 +119,6 @@ typedef struct aldl_stats {
 /* an info structure defining aldl communications and data mgmt */
 
 typedef struct aldl_conf {
-  char ecmtype; /* the type of ecm being read */
   /* settings ------------ */
   char *serialstr; /* string to init serial port */
   int n_defs;   /* number of definitions */
