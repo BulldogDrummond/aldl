@@ -15,6 +15,7 @@ typedef struct _datalogger_conf {
   int autostart;
   char *log_filename;
   int log_all;
+  int sync;
   FILE *fdesc;
 } datalogger_conf_t;
 
@@ -82,6 +83,7 @@ void *datalogger_init(void *aldl_in) {
     };
     cursor += sprintf(cursor,"\n");
     fwrite(linebuf,cursor - linebuf,1,conf->fdesc);
+    if(conf->sync == 1) fflush(conf->fdesc);
   };
 
   fclose(conf->fdesc);
@@ -100,6 +102,7 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
   conf->autostart = configopt_int(config,"AUTOSTART",0,1,1);
   conf->log_all = configopt_int(config,"LOG_ALL",0,1,0);
   conf->log_filename = configopt_fatal(config,"LOG_FILENAME");
+  conf->sync = configopt_int(config,"SYNC",0,1,1);
   return conf;
 };
 
