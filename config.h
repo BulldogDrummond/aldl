@@ -58,6 +58,11 @@
 /* max delay in milliseconds */
 #define NICE_RECON_MAXDELAY 500
 
+/* this is added to actual message length, incl. header and checksum, to
+   determine packet length byte (byte 2 of most aldl messages).  so far, no
+   known ecms use a constant other than 0x52 */
+#define MSGLENGTH_MAGICNUMBER 0x52
+
 /* --------- DATA ACQ. CONFIG ----------------------*/
 
 /* track packet retrieval rate */
