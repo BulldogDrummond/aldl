@@ -16,6 +16,7 @@ typedef struct _datalogger_conf {
   char *log_filename;
   int log_all;
   int sync;
+  int skip;
   FILE *fdesc;
 } datalogger_conf_t;
 
@@ -73,7 +74,11 @@ void *datalogger_init(void *aldl_in) {
   aldl_record_t *rec = aldl->r;
   /* event loop */
   while(1) {
-    rec = next_record_wait(aldl,rec);
+    if(conf->skip == 1) {
+      rec = newest_record_wait(aldl,rec);
+    } else {
+      rec = next_record_wait(aldl,rec);
+    };
     if(rec == NULL) {
       if(logger_be_quiet(aldl) == 0) {
         printf("Connection state: %s.  Waiting for connection...\n",
@@ -123,6 +128,7 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
   conf->log_all = configopt_int(config,"LOG_ALL",0,1,0);
   conf->log_filename = configopt_fatal(config,"LOG_FILENAME");
   conf->sync = configopt_int(config,"SYNC",0,1,1);
+  conf->skip = configopt_int(config,"SKIP",0,1,1);
   return conf;
 };
 
