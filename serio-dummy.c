@@ -59,13 +59,13 @@ int serial_write(byte *str, int len) {
 }
 
 inline int serial_read(byte *str, int len) {
-  usleep(2000);
   if(txmode == 0) { /* idle traffic req */
-    usleep(500000);
+    usleep(SERIAL_BYTES_PER_MS * 64 * 1000); /* fake baud delay */
     str[0] = 0x33;
     txmode++;
     return 1;
   } if(txmode == 1) { /* shutup req */
+    usleep(SERIAL_BYTES_PER_MS * 5 * 1000); /* fake baud delay */
     str[0] = 0xF4;
     str[1] = 0x56;
     str[2] = 0x08;
@@ -73,6 +73,7 @@ inline int serial_read(byte *str, int len) {
     txmode++;
     return 4;
   } if(txmode == 2) { /* data request reply */
+    usleep(SERIAL_BYTES_PER_MS * 5 * 1000); /* fake baud delay */
     txmode = 3; 
     str[0] = 0xF4;
     str[1] = 0x57;
