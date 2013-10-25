@@ -10,8 +10,11 @@ int aldl_reconnect(); /* go into diagnostic mode, returns 1 on success */
 byte *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
 
 /* generate request strings */
-byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm);
+byte *generate_request(byte mode, byte message, aldl_commdef_t *comm);
 byte *generate_mode(byte mode, aldl_commdef_t *comm);
+
+/* use generate_request to fill a packet mode str */
+byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm);
 
 /* serial comms-----------------------------------*/
 
