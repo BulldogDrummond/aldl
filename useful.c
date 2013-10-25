@@ -8,14 +8,22 @@
 
 timespec_t get_time() {
   timespec_t currenttime;
-  clock_gettime(_CLOCKSOURCE, &currenttime);
+  #ifdef USEFUL_BETTERCLOCK
+  clock_gettime(CLOCK_MONOTONIC,&currenttime);
+  #else
+  gettimeofday(&currenttime,NULL);
+  #endif
   return currenttime;
 };
 
 unsigned long get_elapsed_ms(timespec_t timestamp) {
   timespec_t currenttime = get_time();
-  unsigned long seconds = currenttime.tv_sec-timestamp.tv_sec;
-  unsigned long milliseconds =(currenttime.tv_nsec-timestamp.tv_nsec)*0.000001;
+  unsigned long seconds = currenttime.tv_sec - timestamp.tv_sec;
+  #ifdef USEFUL_BETTERCLOCK
+  unsigned long milliseconds =(currenttime.tv_nsec-timestamp.tv_nsec) / 1000000;
+  #else
+  unsigned long milliseconds =(currenttime.tv_usec-timestamp.tv_usec) / 1000;
+  #endif
   return ( seconds * 1000 ) + milliseconds;
 };
 

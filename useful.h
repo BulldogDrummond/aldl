@@ -1,18 +1,21 @@
 #ifndef _USEFUL_H
 #define _USEFUL_H
 
-#include <time.h>
+/* this uses clock_gettime instead of gettimeofday, which rounds nanosecond
+   clock instead of microsecond, and isnt affected by time jumps.  i think that
+   it might introduce more overhead, though ... */
+#define USEFUL_BETTERCLOCK
 
-/* monotonic clock is broken on arm, CLOCK_REALTIME is the only one that seems
-   to work properly.  this means on ARM systems, it would be a BAD idea to use
-   ntpd or some such thing. */
-#ifdef __arm__
-#define _CLOCKSOURCE CLOCK_REALTIME
-#else
+/* clock source for USEFUL_BETTERCLOCK mode. */
 #define _CLOCKSOURCE CLOCK_MONOTONIC
-#endif
 
+#ifdef USEFUL_BETTERCLOCK
+#include <time.h>
 typedef struct timespec timespec_t;
+#else
+#include <sys/time.h>
+typedef struct timeval timespec_t;
+#endif
 
 /* get current time */
 timespec_t get_time();
