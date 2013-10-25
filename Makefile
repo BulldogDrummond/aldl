@@ -1,16 +1,15 @@
 # compiler flags
 CFLAGS= -O2 -Wall
-OBJS= datalogger/datalogger.o debugif/debugif.o consoleif/consoleif.o acquire.o error.o loadconfig.o useful.o
-FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
+OBJS= datalogger/datalogger.o debugif/debugif.o consoleif/consoleif.o acquire.o error.o loadconfig.o useful.o aldlcomm.o aldldata.o
 LIBS= -lpthread -lrt -lncurses
 
-all: clean aldl-ftdi aldl-dummy
+all: aldl-ftdi aldl-dummy
 
-aldl-ftdi: main.c aldl-io-ftdi.a config.h aldl-io.h aldl-types.h debugif_ $(OBJS)
-	gcc $(CFLAGS) -lftdi $(LIBS) main.c -o aldl-ftdi $(OBJS) aldl-io-ftdi.a
+aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h $(OBJS)
+	gcc $(CFLAGS) -lftdi $(LIBS) main.c -o aldl-ftdi $(OBJS) serio-ftdi.o
 
-aldl-dummy: main.c aldl-io-dummy.a config.h aldl-io.h aldl-types.h debugif_ $(OBJS)
-	gcc $(CFLAGS) $(LIBS) main.c -o aldl-dummy $(OBJS) aldl-io-dummy.a
+aldl-dummy: main.c serio-dummy.o config.h aldl-io.h aldl-types.h $(OBJS)
+	gcc $(CFLAGS) $(LIBS) main.c -o aldl-dummy $(OBJS) serio-dummy.o
 
 useful.o: useful.c useful.h config.h aldl-types.h
 	gcc $(CFLAGS) -c useful.c -o useful.o
@@ -24,13 +23,13 @@ acquire.o: acquire.c acquire.h config.h aldl-io.h aldl-types.h
 error.o: error.c error.h config.h aldl-types.h
 	gcc $(CFLAGS) -c error.c -o error.o
 
-debugif_:
+debugif/debugif.o:
 	cd debugif ; make ; cd ..
 
-consoleif_:
+consoleif/consoleif.o:
 	cd consoleif ; make ; cd ..
 
-datalogger_:
+datalogger/datalogger.o:
 	cd datalogger ; make ; cd ..
 
 serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h config.h
@@ -44,12 +43,6 @@ aldlcomm.o: aldl-io.h aldl-types.h serio-ftdi.o config.h
 
 aldldata.o: aldl-io.h aldl-types.h aldldata.c aldlcomm.o config.h
 	gcc $(CFLAGS) -c aldldata.c -o aldldata.o
-
-aldl-io-ftdi.a: serio-ftdi.o aldlcomm.o aldldata.o config.h
-	ar rcs aldl-io-ftdi.a serio-ftdi.o aldlcomm.o aldldata.o
-
-aldl-io-dummy.a: serio-dummy.o aldlcomm.o aldldata.o config.h
-	ar rcs aldl-io-dummy.a serio-dummy.o aldlcomm.o aldldata.o
 
 clean:
 	rm -fv *.o *.a aldl-ftdi aldl-dummy
