@@ -57,12 +57,15 @@ void *datalogger_init(void *aldl_in) {
   char *cursor = linebuf;
 
   int x;
-  cursor += sprintf(cursor,"TIMESTAMP");
+  cursor += sprintf(cursor,"TIMESTAMP(ms)");
   for(x=0;x<aldl->n_defs;x++) {
     if(conf->log_all == 0) {
       if(aldl->def[x].log == 0) continue;
     };
     cursor += sprintf(cursor,",%s",aldl->def[x].name);
+    if(aldl->def[x].uom != NULL) {
+      cursor += sprintf(cursor,"(%s)",aldl->def[x].uom);
+    };
   };
   cursor += sprintf(cursor,"\n");
   fwrite(linebuf,cursor - linebuf,1,conf->fdesc);
