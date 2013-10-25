@@ -59,4 +59,4 @@ clean:
 	cd datalogger ; make clean ; cd ..
 
 stats:
-	wc -l *.c *.h
+	wc -l *.c *.h */*.c */*.h
