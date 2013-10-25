@@ -142,7 +142,8 @@ void *aldl_acq(void *aldl_in) {
        even in the ballpark of a legit packet.  this may avoid an expensive
        checksumming run if the packet is total garbage. */
     #ifdef CHECK_HEADER_SANITY
-    } else if (pkt->data[0] != comm->pcm_address) {
+    } else if (pkt->data[0] != comm->pcm_address ||
+       pkt->data[1] != calc_msglength(pkt->length)) {
       pktfail = 1;
       lock_stats();
       aldl->stats->packetheaderfail++;
