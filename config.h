@@ -7,34 +7,34 @@
 /* ----------- DEBUG OUTPUT --------------------------*/
 
 /* generally verbose behavior */
-//#define VERBLOSITY
+#undef VERBLOSITY
 
 /* debug structural functions, such as record link list management */
-//#define DEBUGSTRUCT
+#undef DEBUGSTRUCT
 
 /* debug configuration file loading */
-//#define DEBUGCONFIG
+#undef DEBUGCONFIG
 
 /* print debugging info for memory */
-//#define DEBUGMEM
+#undef DEBUGMEM
 
 /* verbosity levels in raw serial handlers */
-//#define SERIAL_VERBOSE
-//#define SERIAL_SUPERVERBOSE
+#undef SERIAL_VERBOSE
+#undef SERIAL_SUPERVERBOSE
 
 /* verbose aldl protocol level comms on stdout */
-//#define ALDL_VERBOSE
+#undef ALDL_VERBOSE
 
 /* --------- GLOBAL FEATURE CONFIG -----------------*/
 
 /* support multiple packets, required by some definition files */
-//#define ALDL_MULTIPACKET
+#undef ALDL_MULTIPACKET
 
 /* --------- TIMING CONSTANTS ------------------------*/
 
 /* define for more aggressive timing behavior in an attempt to increase packet
    rate, at a higher risk of dropped packets and increased cpu usage */
-//#define AGGRESSIVE
+#undef AGGRESSIVE
 
 /* a static delay in microseconds.  used for waiting in between grabbing
    serial chunks, and other throttling.  if AGGRESSIVE is defined, this is
