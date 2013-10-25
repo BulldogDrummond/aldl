@@ -44,7 +44,7 @@ aldl_record_t *newest_record(aldl_conf_t *aldl);
 aldl_record_t *newest_record_wait(aldl_conf_t *aldl, aldl_record_t *rec);
 
 /* get next record in the list, waits until one is available */
-aldl_record_t *next_record_wait(aldl_record_t *rec);
+aldl_record_t *next_record_wait(aldl_conf_t *aldl, aldl_record_t *rec);
 
 /* get next record in the list, returns NULL if none is available */
 aldl_record_t *next_record(aldl_record_t *rec);

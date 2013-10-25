@@ -242,11 +242,11 @@ aldl_record_t *newest_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
 };
 
 /* get next record in the list, waits until one is available */
-aldl_record_t *next_record_wait(aldl_record_t *rec) {
+aldl_record_t *next_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
   aldl_record_t *next = NULL;
   while(next == NULL) {
-    /* just call next_record repeatedly until one shows up */
     next = next_record(rec);
+    if(get_connstate(aldl) > 10) return NULL;
     #ifndef AGGRESSIVE
     usleep(500); /* throttling ... */
     #endif
