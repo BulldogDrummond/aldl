@@ -14,8 +14,9 @@ timespec_t get_time() {
 
 unsigned long get_elapsed_ms(timespec_t timestamp) {
   timespec_t currenttime = get_time();
-  return ((currenttime.tv_sec - timestamp.tv_sec) * 
-       1000.5 + ( ( currenttime.tv_nsec - timestamp.tv_nsec ) / 1000000 ));
+  unsigned long seconds = currenttime.tv_sec-timestamp.tv_sec;
+  unsigned long milliseconds =(currenttime.tv_nsec-timestamp.tv_nsec)*0.000001;
+  return ( seconds * 1000 ) + milliseconds;
 };
 
 inline int faststrcmp(char *a, char *b) {
