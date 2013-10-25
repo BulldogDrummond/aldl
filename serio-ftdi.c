@@ -61,8 +61,8 @@ int serial_init(char *port) {
     res = ftdi_usb_open_string(ftdi,port);
     ftdierror(2,res); /* trap error */
   } else { /* autodetect mode */
-    struct ftdi_device_list **devlist = malloc(sizeof(struct ftdi_device_list)
-                                                * FTDI_AUTO_MAXDEVS);
+    struct ftdi_device_list **devlist = malloc(sizeof(
+                          struct ftdi_device_list *) * FTDI_AUTO_MAXDEVS);
     int n_devices = ftdi_usb_find_all(ftdi,devlist,0,0);
     if(n_devices > 0) { /* device found */
       /* right now this just grabs the first available ftdi device .. */
