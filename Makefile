@@ -1,5 +1,4 @@
 # compiler flags
-#CFLAGS= -g -Wall
 CFLAGS= -O2 -Wall
 OBJS= datalogger/datalogger.o debugif/debugif.o consoleif/consoleif.o acquire.o error.o loadconfig.o useful.o
 FTDI= /usr/lib/arm-linux-gnueabihf/libftdi.a
