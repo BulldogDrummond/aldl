@@ -41,7 +41,12 @@ void display_rpm(aldl_conf_t *aldl) {
 
   while(1) {
     /* pause until new data is available, then point to new record */
-    rec = next_record_wait(rec);
+    rec = next_record_wait(aldl,rec);
+    if(rec == NULL) { /* we've disconnected ... */
+      printf("disconnected; waiting for connection...");
+      pause_until_connected(aldl);
+      continue;
+    };
 
     /* in that record, get data field rpmindex, and the floating point value
        contained within ... also get the short name from the definition. */
