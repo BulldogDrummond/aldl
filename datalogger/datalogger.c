@@ -3,6 +3,7 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <time.h>
 
 /* local objects */
 #include "../error.h"
@@ -12,7 +13,7 @@
 typedef struct _datalogger_conf {
   dfile_t *dconf; /* raw config data */
   int autostart;
-  char *log_path;
+  char *log_filename;
   int log_all;
   FILE *fdesc;
 } datalogger_conf_t;
@@ -25,8 +26,13 @@ void *datalogger_init(void *aldl_in) {
   datalogger_conf_t *conf = datalogger_load_config(aldl);
 
   /* alloc and fill filename buffer */
-  char *filename = malloc(strlen(conf->log_path) + 30);
-  sprintf(filename,"%s/log-%s.csv",conf->log_path,"FIXME");
+  int maxfnlength = strlen(conf->log_filename) * 2 + 20;
+  struct tm *tm;
+  time_t t;
+  t = time(NULL);
+  tm = localtime(&t);
+  char *filename = malloc(maxfnlength);
+  strftime(filename,maxfnlength,conf->log_filename,tm);
 
   /* open file */
   conf->fdesc = fopen(filename, "a");
@@ -93,7 +99,7 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
   dfile_t *config = conf->dconf;
   conf->autostart = configopt_int(config,"AUTOSTART",0,1,1);
   conf->log_all = configopt_int(config,"LOG_ALL",0,1,0);
-  conf->log_path = configopt_fatal(config,"LOG_PATH");
+  conf->log_filename = configopt_fatal(config,"LOG_FILENAME");
   return conf;
 };
 
