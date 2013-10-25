@@ -2,7 +2,16 @@
 #define _USEFUL_H
 
 #include <time.h>
+
+/* monotonic clock is broken on arm, CLOCK_REALTIME is the only one that seems
+   to work properly.  this means on ARM systems, it would be a BAD idea to use
+   ntpd or some such thing. */
+#ifdef __arm__
 #define _CLOCKSOURCE CLOCK_REALTIME
+#else
+#define _CLOCKSOURCE CLOCK_MONOTONIC
+#endif
+
 typedef struct timespec timespec_t;
 
 /* get current time */
