@@ -80,6 +80,9 @@ void serial_close(); /* close the serial port */
 /* generate a checksum byte */
 byte checksum_generate(byte *buf, int len);
 
+/* generate a msg length byte */
+byte calc_msglength(byte len);
+
 /* test checksum byte of buf, 1 if ok */
 int checksum_test(byte *buf, int len);
 

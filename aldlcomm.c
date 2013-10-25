@@ -206,7 +206,7 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
 byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
   packet->command = malloc(5);
   packet->command[0] = comm->pcm_address;
-  packet->command[1] = 0x57; /* msg length */
+  packet->command[1] = calc_msglength(5); /* msg length */
   packet->command[2] = 0x01; /* msg mode */
   packet->command[3] = packet->id;
   packet->command[4] = checksum_generate(packet->command,4);
@@ -216,9 +216,13 @@ byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
 byte *generate_mode(byte mode, aldl_commdef_t *comm) {
   byte *tmp = malloc(SHUTUP_LENGTH);
   tmp[0] = comm->pcm_address;
-  tmp[1] = 0x56;
+  tmp[1] = calc_msglength(4);
   tmp[2] = mode;
   tmp[3] = checksum_generate(tmp,SHUTUP_LENGTH - 1);
   return tmp;
 };
 
+byte calc_msglength(byte len) {
+  /* FIXME this needs more research ... */
+  return len + 82;
+};
