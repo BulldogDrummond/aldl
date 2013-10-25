@@ -1,15 +1,16 @@
 # compiler flags
 CFLAGS= -O2 -Wall
-OBJS= datalogger/datalogger.o debugif/debugif.o consoleif/consoleif.o acquire.o error.o loadconfig.o useful.o aldlcomm.o aldldata.o
+OBJS= acquire.o error.o loadconfig.o useful.o aldlcomm.o aldldata.o
+MODULES= modules/*.o
 LIBS= -lpthread -lrt -lncurses
 
 all: aldl-ftdi aldl-dummy
 
-aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h $(OBJS)
-	gcc $(CFLAGS) -lftdi $(LIBS) main.c -o aldl-ftdi $(OBJS) serio-ftdi.o
+aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
+	gcc $(CFLAGS) -lftdi $(LIBS) main.c -o aldl-ftdi $(OBJS) $(MODULES) serio-ftdi.o
 
-aldl-dummy: main.c serio-dummy.o config.h aldl-io.h aldl-types.h $(OBJS)
-	gcc $(CFLAGS) $(LIBS) main.c -o aldl-dummy $(OBJS) serio-dummy.o
+aldl-dummy: main.c serio-dummy.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
+	gcc $(CFLAGS) $(LIBS) main.c -o aldl-dummy $(OBJS) $(MODULES) serio-dummy.o
 
 useful.o: useful.c useful.h config.h aldl-types.h
 	gcc $(CFLAGS) -c useful.c -o useful.o
@@ -23,14 +24,8 @@ acquire.o: acquire.c acquire.h config.h aldl-io.h aldl-types.h
 error.o: error.c error.h config.h aldl-types.h
 	gcc $(CFLAGS) -c error.c -o error.o
 
-debugif/debugif.o:
-	cd debugif ; make ; cd ..
-
-consoleif/consoleif.o:
-	cd consoleif ; make ; cd ..
-
-datalogger/datalogger.o:
-	cd datalogger ; make ; cd ..
+modules_:
+	cd modules ; make ; cd ..
 
 serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h config.h
 	gcc $(CFLAGS) -c serio-ftdi.c -o serio-ftdi.o
@@ -46,9 +41,7 @@ aldldata.o: aldl-io.h aldl-types.h aldldata.c aldlcomm.o config.h
 
 clean:
 	rm -fv *.o *.a aldl-ftdi aldl-dummy
-	cd debugif ; make clean ; cd ..
-	cd consoleif ; make clean ; cd ..
-	cd datalogger ; make clean ; cd ..
+	cd modules ; make clean ; cd ..
 
 stats:
 	wc -l *.c *.h */*.c */*.h

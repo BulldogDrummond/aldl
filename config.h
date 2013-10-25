@@ -2,7 +2,7 @@
 /* ----------- FILE CONFIG ----------------------------*/
 
 /* path to the root config file */
-#define ROOT_CONFIG_FILE "./main.conf"
+#define ROOT_CONFIG_FILE "./aldl.conf"
 
 /* ----------- DEBUG OUTPUT --------------------------*/
 

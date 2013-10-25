@@ -12,10 +12,9 @@
 #include "acquire.h"
 #include "error.h"
 #include "aldl-io.h"
-#include "debugif/debugif.h"
-#include "consoleif/consoleif.h"
-#include "datalogger/datalogger.h"
 #include "useful.h"
+
+#include "modules/modules.h"
 
 /* ------ local functions ------------- */
 
@@ -80,11 +79,11 @@ int main(int argc, char **argv) { /*--------------------------- */
   pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
 
   if(aldl->debugif_enable == 1) {
-    pthread_create(&thread_debugif,NULL,debugif_loop,(void *)aldl);
+    pthread_create(&thread_debugif,NULL,debugif_init,(void *)aldl);
   };
 
   if(aldl->consoleif_enable == 1) {
-    pthread_create(&thread_consoleif,NULL,consoleif,(void *) aldl);
+    pthread_create(&thread_consoleif,NULL,consoleif_init,(void *) aldl);
   };
 
   if(aldl->datalogger_enable == 1) {

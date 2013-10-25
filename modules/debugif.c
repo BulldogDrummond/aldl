@@ -6,7 +6,7 @@
 /* local objects */
 #include "../aldl-io.h"
 
-void *debugif_loop(void *aldl_in) {
+void *debugif_init(void *aldl_in) {
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
   printf("-------DEBUG DISPLAY INTERFACE ACTIVE--------\n"); 
   int x;

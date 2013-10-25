@@ -57,7 +57,7 @@ void draw_statusbar();
 
 /* --------------------------------------------*/
 
-void *consoleif(void *aldl_in) {
+void *consoleif_init(void *aldl_in) {
   aldl = (aldl_conf_t *)aldl_in;
   bigbuf = malloc(128);
 
