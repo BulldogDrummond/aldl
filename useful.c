@@ -13,11 +13,9 @@ timespec_t get_time() {
 };
 
 unsigned long get_elapsed_ms(timespec_t timestamp) {
-  timespec_t currenttime;
-  clock_gettime(_CLOCKSOURCE, &currenttime);
+  timespec_t currenttime = get_time();
   return ((currenttime.tv_sec - timestamp.tv_sec) * 
-       1000 + ( ( currenttime.tv_nsec - timestamp.tv_nsec ) / 1000 ) / 1000 )
-           + 0.5;
+       1000.5 + ( ( currenttime.tv_nsec - timestamp.tv_nsec ) / 1000000 ));
 };
 
 inline int faststrcmp(char *a, char *b) {
