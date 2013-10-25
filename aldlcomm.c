@@ -11,10 +11,6 @@
 #include "aldl-io.h"
 #include "useful.h"
 
-/* length of an aldl mode change request string */
-/* FIXME this might not be good for other ECMS */
-#define SHUTUP_LENGTH 4
-
 /* local functions -----*/
 int aldl_shutup(); /* repeatedly attempt to make the ecm shut up */
 
@@ -51,7 +47,7 @@ int aldl_reconnect(aldl_commdef_t *c) {
   /* wait forever.  bail some other way if you want to stop waiting. */
   while(1) {
     /* send a 'return to normal mode' command first ... */
-    serial_write(c->returncommand,SHUTUP_LENGTH);
+    serial_write(c->returncommand,4);
     msleep(50);
     serial_purge();
     if(c->chatterwait == 1) {
@@ -111,7 +107,7 @@ int aldl_shutup(aldl_commdef_t *c) {
   if(c->shutuprepeat == 0) return 1; /* no shutup necessary */
   int x;
   for(x=1;x<=c->shutuprepeat;x++) {
-    if(aldl_request(c->shutupcommand,SHUTUP_LENGTH) == 1) return 1;
+    if(aldl_request(c->shutupcommand,4) == 1) return 1;
   }
   return 0;
 }
@@ -209,16 +205,16 @@ byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
   packet->command[1] = calc_msglength(5); /* msg length */
   packet->command[2] = 0x01; /* msg mode */
   packet->command[3] = packet->id;
-  packet->command[4] = checksum_generate(packet->command,4);
+  packet->command[4] = checksum_generate(packet->command,5-1);
   return packet->command;
 }
 
 byte *generate_mode(byte mode, aldl_commdef_t *comm) {
-  byte *tmp = malloc(SHUTUP_LENGTH);
+  byte *tmp = malloc(4);
   tmp[0] = comm->pcm_address;
   tmp[1] = calc_msglength(4);
   tmp[2] = mode;
-  tmp[3] = checksum_generate(tmp,SHUTUP_LENGTH - 1);
+  tmp[3] = checksum_generate(tmp,4-1);
   return tmp;
 };
 
