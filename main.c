@@ -52,6 +52,10 @@ int main(int argc, char **argv) { /*--------------------------- */
   if(aldl->debugif_enable == 1 && aldl->consoleif_enable == 1) {
     fatalerror(ERROR_PLUGIN,"consoleif and debugif plugins are incompat");
   };
+  if(aldl->debugif_enable == 0 && aldl->consoleif_enable == 0 &&
+     aldl->datalogger_enable == 0) {
+    fatalerror(ERROR_PLUGIN,"no plugins are enabled");
+  };
 
   /* ---- MORE INIT -----------------------------------------------*/
 
