@@ -19,12 +19,19 @@ typedef struct _datalogger_conf {
   FILE *fdesc;
 } datalogger_conf_t;
 
+int logger_be_quiet(aldl_conf_t *aldl);
+
 datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl);
 
 void *datalogger_init(void *aldl_in) {
   /* grab config data */
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
   datalogger_conf_t *conf = datalogger_load_config(aldl);
+
+  /* print hello string if consoleif is disabled */
+  if(logger_be_quiet(aldl) == 0) {
+    printf("Datalogger enabled!\n");
+  };
 
   /* alloc and fill filename buffer */
   int maxfnlength = strlen(conf->log_filename) * 2 + 20;
@@ -106,3 +113,7 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
   return conf;
 };
 
+int logger_be_quiet(aldl_conf_t *aldl) {
+  if(aldl->consoleif_enable == 1) return 1;
+  return 0;
+};
