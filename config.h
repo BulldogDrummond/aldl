@@ -49,6 +49,15 @@
    moved at the baud rate; generally 1 / baud * 1000 */
 #define SERIAL_BYTES_PER_MS 0.98
 
+/* defining this provides a linear decrease in the frequency of reconnect
+   attempts.  this is for 'always-on' dashboard systems that might just sit
+   there for hours at a time with no connection available.  this only works
+   with 'chatterwait' mode enabled ... */
+#define NICE_RECONNECT
+
+/* max delay in milliseconds */
+#define NICE_RECON_MAXDELAY 500
+
 /* --------- DATA ACQ. CONFIG ----------------------*/
 
 /* track packet retrieval rate */

@@ -48,7 +48,7 @@ int aldl_reconnect(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("attempting to place ecm in diagnostic mode.\n");
   #endif
-  /* reconnect runs in an infinite loop for now. */
+  /* wait forever.  bail some other way if you want to stop waiting. */
   while(1) {
     /* send a 'return to normal mode' command first ... */
     serial_write(c->returncommand,SHUTUP_LENGTH);
@@ -76,7 +76,13 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("waiting for idle chatter to confirm key is on..\n");
   #endif
-  while(skip_bytes(1,50) == 0) msleep(50);
+  int c_delay = 10;
+  while(skip_bytes(1,c_delay) == 0) {
+    msleep(c_delay);
+    #ifdef NICE_RECONNECT
+    if(c_delay < NICE_RECON_MAXDELAY) c_delay += 50;
+    #endif
+  };
   #ifdef ALDL_VERBOSE
     printf("got idle chatter or something.\n");
   #endif
