@@ -81,6 +81,7 @@ inline int serial_read(byte *str, int len) {
     str[4] = 0xB4;
     return 5;
   } if(txmode == 3) { /* data send */
+    usleep(SERIAL_BYTES_PER_MS * len * 1000); /* fake baud delay */
     txmode = 2;
     gen_pkt();
     int x;
