@@ -70,7 +70,17 @@ void *datalogger_init(void *aldl_in) {
   aldl_record_t *rec = aldl->r;
   /* event loop */
   while(1) {
-    rec = next_record_wait(rec);
+    rec = next_record_wait(aldl,rec);
+    if(rec == NULL) {
+      if(logger_be_quiet(aldl) == 0) {
+        printf("Connection state: %s.  Waiting for connection...\n",
+                get_state_string(get_connstate(aldl)));
+      };
+      pause_until_connected(aldl);
+      if(logger_be_quiet(aldl) == 0) {
+        printf("Reconnected.  Resuming logging...\n");
+      }; 
+    };
     cursor=linebuf; /* reset cursor */
     cursor += sprintf(cursor,"%lu",rec->t);
     for(x=0;x<aldl->n_defs;x++) {
