@@ -2,7 +2,7 @@
 #define _USEFUL_H
 
 #include <time.h>
-#define _CLOCKSOURCE CLOCK_MONOTONIC
+#define _CLOCKSOURCE CLOCK_REALTIME
 typedef struct timespec timespec_t;
 
 /* get current time */
