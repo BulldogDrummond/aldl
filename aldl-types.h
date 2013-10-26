@@ -134,6 +134,7 @@ typedef struct aldl_conf {
   /* plugin enables -------*/
   int debugif_enable, consoleif_enable, datalogger_enable;
   char *datalogger_config; /* path to datalogger config file */
+  char *consoleif_config;  /* path to consoleif config file */
   /* structures -----------*/
   aldl_state_t state; /* connection state, do not touch */
   aldl_define_t *def; /* link to the definition set */

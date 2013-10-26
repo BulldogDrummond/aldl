@@ -8,6 +8,7 @@
 #include "../error.h"
 #include "../aldl-io.h"
 #include "../config.h"
+#include "../loadconfig.h"
 
 enum {
   RED_ON_BLACK = 1,
@@ -17,13 +18,25 @@ enum {
   WHITE_ON_BLACK = 5
 };
 
+typedef enum _gaugetype {
+  GAUGE_PROGRESSBAR,
+  GAUGE_TEXT
+} gaugetype_t;
+
 typedef struct _gauge {
   int x, y; /* coords */
   int width, height; /* size */
   int data_a, data_b; /* assoc. data index */
   aldl_data_t prev_a, prev_b; /* prev. value */
   float bottom, top; /* bottom and top of a graph */
+  gaugetype_t gaugetype;
 } gauge_t;
+
+typedef struct _consoleif_conf {
+  int n_gauges;
+  gauge_t *gauge; 
+  dfile_t *dconf;
+} consoleif_conf_t;
 
 #define COLOR_STATUSSCREEN RED_ON_BLACK
 #define COLOR_PROGRESSBAR RED_ON_BLACK
@@ -39,6 +52,8 @@ char *bigbuf; /* a large temporary string construction buffer */
 aldl_record_t *rec; /* current record */
 
 /* --- local functions ------------------------*/
+
+consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl);
 
 /* center half-width of an element on the screen */
 int xcenter(int width);
@@ -59,6 +74,10 @@ void draw_statusbar();
 
 void *consoleif_init(void *aldl_in) {
   aldl = (aldl_conf_t *)aldl_in;
+
+  /* load config file */
+  consoleif_conf_t *conf = consoleif_load_config(aldl);
+
   bigbuf = malloc(128);
 
   /* initialize root window */
@@ -82,14 +101,11 @@ void *consoleif_init(void *aldl_in) {
 
   rec = newest_record(aldl);
 
-  int rpmid = get_index_by_name(aldl,"NEWRFPRT");
-  if(rpmid == -1) fatalerror(ERROR_NULL,"rpm not found");
-
   gauge_t *demogauge = malloc(sizeof(gauge_t));
   demogauge->x = 1;
   demogauge->y = 1;
   demogauge->width=30;
-  demogauge->data_a = get_index_by_name(aldl,"ISESDD");
+  demogauge->data_a = get_index_by_name(aldl,"IDLESPD");
   demogauge->bottom = 0;
   demogauge->top = 3187.50;
 
@@ -97,7 +113,7 @@ void *consoleif_init(void *aldl_in) {
   rpmgauge->x = 1;
   rpmgauge->y = 4;
   rpmgauge->width = 30;
-  rpmgauge->data_a = get_index_by_name(aldl,"NTRPMX");
+  rpmgauge->data_a = get_index_by_name(aldl,"RPM");
   rpmgauge->bottom = 0;
   rpmgauge->top = 6375;
 
@@ -105,7 +121,7 @@ void *consoleif_init(void *aldl_in) {
   tpsgauge->x = 1;
   tpsgauge->y = 7;
   tpsgauge->width = 20;
-  tpsgauge->data_a = get_index_by_name(aldl,"NTPSLDT");
+  tpsgauge->data_a = get_index_by_name(aldl,"TPS");
   tpsgauge->bottom = 0;
   tpsgauge->top = 100;
 
@@ -182,16 +198,19 @@ void cons_wait_for_connection() {
 void draw_h_progressbar(gauge_t *g) {
   aldl_define_t *def = &aldl->def[g->data_a];
   float data = rec->data[g->data_a].f;
-  /* draw title text */
-  mvaddstr(g->y,g->x,def->name);
+  int x;
+  /* blank out title section */
+  move(g->y,g->x);   
+  for(x=0;x<g->width;x++) addch(' ');
   /* draw output text */
   sprintf(bigbuf,"%.1f %s",data,def->uom);
   mvaddstr(g->y,g->x + g->width - strlen(bigbuf),bigbuf);
+  /* draw title text */
+  mvaddstr(g->y,g->x,def->name);
   /* draw progress bar */
   move(g->y + 1, g->x);
   int filled = data / ( g->top / g->width );
   int remainder = g->width - filled;
-  int x;
   attron(COLOR_PAIR(COLOR_PROGRESSBAR)); 
   for(x=0;x<filled;x++) { /* draw filled section */
     addch(' '|A_REVERSE);
@@ -200,4 +219,14 @@ void draw_h_progressbar(gauge_t *g) {
     addch('-');
   };
   attroff(COLOR_PAIR(COLOR_PROGRESSBAR));
+};
+
+consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
+  consoleif_conf_t *conf = malloc(sizeof(consoleif_conf_t));
+  if(aldl->consoleif_config == NULL) fatalerror(ERROR_CONFIG,
+                       "no consoleif config specified");
+  conf->dconf = dfile_load(aldl->consoleif_config);
+  if(conf->dconf == NULL) fatalerror(ERROR_CONFIG,
+                       "consoleif config file missing");
+  dfile_t *config = conf->dconf;
 };
