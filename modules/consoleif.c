@@ -66,8 +66,9 @@ void statusmessage(char *str);
 /* clear screen and display waiting for connection messages */
 void cons_wait_for_connection();
 
-void draw_h_progressbar(gauge_t *g);
+char *gconfig(char *parameter, int n);
 
+void draw_h_progressbar(gauge_t *g);
 void draw_statusbar();
 
 /* --------------------------------------------*/
@@ -75,10 +76,10 @@ void draw_statusbar();
 void *consoleif_init(void *aldl_in) {
   aldl = (aldl_conf_t *)aldl_in;
 
+  bigbuf = malloc(512);
+
   /* load config file */
   consoleif_conf_t *conf = consoleif_load_config(aldl);
-
-  bigbuf = malloc(128);
 
   /* initialize root window */
   WINDOW *root;
@@ -229,4 +230,26 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
   if(conf->dconf == NULL) fatalerror(ERROR_CONFIG,
                        "consoleif config file missing");
   dfile_t *config = conf->dconf;
+  conf->n_gauges = configopt_int_fatal(config,"N_GAUGES",1,99999);
+  conf->gauge = malloc(sizeof(gauge_t) * conf->n_gauges);
+  gauge_t *gauge;
+  int n;
+  for(n=0;n<conf->n_gauges;n++) {
+    gauge = &conf->gauge[n]; 
+    /*FIXME need to be able to retrieve by ID too ... */
+    gauge->data_a = get_index_by_name(aldl,configopt_fatal(config,
+                                 gconfig("A_NAME",n)));
+    gauge->x = configopt_int_fatal(config,gconfig("X",n),0,10000);
+    gauge->y = configopt_int_fatal(config,gconfig("Y",n),0,10000);
+    gauge->width = configopt_int_fatal(config,gconfig("WIDTH",n),0,10000);
+    gauge->height = configopt_int(config,gconfig("HEIGHT",n),0,10000,1);
+    gauge->bottom = configopt_float_fatal(config,gconfig("MIN",n));
+    gauge->top = configopt_float_fatal(config,gconfig("MAX",n));
+  };
+  return conf;
+};
+
+char *gconfig(char *parameter, int n) {
+  sprintf(bigbuf,"G%i.%s",n,parameter);
+  return bigbuf;
 };
