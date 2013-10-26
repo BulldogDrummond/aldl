@@ -36,6 +36,8 @@ typedef struct _consoleif_conf {
   int n_gauges;
   gauge_t *gauge; 
   dfile_t *dconf;
+  int statusbar;
+  int delay;
 } consoleif_conf_t;
 
 #define COLOR_STATUSSCREEN RED_ON_BLACK
@@ -102,29 +104,7 @@ void *consoleif_init(void *aldl_in) {
 
   rec = newest_record(aldl);
 
-  gauge_t *demogauge = malloc(sizeof(gauge_t));
-  demogauge->x = 1;
-  demogauge->y = 1;
-  demogauge->width=30;
-  demogauge->data_a = get_index_by_name(aldl,"IDLESPD");
-  demogauge->bottom = 0;
-  demogauge->top = 3187.50;
-
-  gauge_t *rpmgauge = malloc(sizeof(gauge_t));
-  rpmgauge->x = 1;
-  rpmgauge->y = 4;
-  rpmgauge->width = 30;
-  rpmgauge->data_a = get_index_by_name(aldl,"RPM");
-  rpmgauge->bottom = 0;
-  rpmgauge->top = 6375;
-
-  gauge_t *tpsgauge = malloc(sizeof(gauge_t));
-  tpsgauge->x = 1;
-  tpsgauge->y = 7;
-  tpsgauge->width = 20;
-  tpsgauge->data_a = get_index_by_name(aldl,"TPS");
-  tpsgauge->bottom = 0;
-  tpsgauge->top = 100;
+  int x;
 
   while(1) {
     rec = newest_record_wait(aldl,rec);
@@ -132,12 +112,14 @@ void *consoleif_init(void *aldl_in) {
       cons_wait_for_connection();
       continue;
     };
-    draw_h_progressbar(demogauge);
-    draw_h_progressbar(rpmgauge);
-    draw_h_progressbar(tpsgauge);
-    draw_statusbar();
+    for(x=0;x<conf->n_gauges;x++) {
+      draw_h_progressbar(&conf->gauge[x]);
+    };
+    if(conf->statusbar == 1) {
+      draw_statusbar();
+    };
     refresh();
-    usleep(10000);
+    usleep(conf->delay);
   };
 
   sleep(4);
@@ -230,7 +212,11 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
   if(conf->dconf == NULL) fatalerror(ERROR_CONFIG,
                        "consoleif config file missing");
   dfile_t *config = conf->dconf;
+  /* GLOBAL OPTIONS */
   conf->n_gauges = configopt_int_fatal(config,"N_GAUGES",1,99999);
+  conf->statusbar = configopt_int(config,"STATUSBAR",0,1,0);
+  conf->delay = configopt_int(config,"DELAY",0,65535,0);
+  /* PER GAUGE OPTIONS */
   conf->gauge = malloc(sizeof(gauge_t) * conf->n_gauges);
   gauge_t *gauge;
   int n;
