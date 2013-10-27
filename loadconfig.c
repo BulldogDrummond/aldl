@@ -160,6 +160,7 @@ void aldl_alloc_b() {
 void load_config_b(dfile_t *config) {
   int x;
   char *pktname = malloc(50);
+  if(pktname == NULL) fatalerror(ERROR_MEMORY,"pktname buffer");
   for(x=0;x<comm->n_packets;x++) {
     comm->packet[x].id = configopt_byte_fatal(config,pktconfig(pktname,"ID",x));
     comm->packet[x].length = configopt_int_fatal(config,pktconfig(pktname,
@@ -209,6 +210,7 @@ void aldl_alloc_c() {
 void load_config_c(dfile_t *config) {
   int x=0;
   char *configstr = malloc(50);
+  if(configstr == NULL) fatalerror(ERROR_MEMORY,"in configstr conf_c");
   char *tmp;
   aldl_define_t *d;
   int z;
@@ -367,10 +369,13 @@ void dfile_strip_quotes(dfile_t *d) {
 dfile_t *dfile(char *data) {
   /* allocate base structure */
   dfile_t *out = malloc(sizeof(dfile_t));
+  if(out == NULL) fatalerror(ERROR_MEMORY,"dfile out");
 
   /* initial allocation of pointer array */
   out->p = malloc(sizeof(char*) * MAX_PARAMETERS);
+  if(out->p == NULL) fatalerror(ERROR_MEMORY,"dfile-p out");
   out->v = malloc(sizeof(char*) * MAX_PARAMETERS);
+  if(out->v == NULL) fatalerror(ERROR_MEMORY,"dfile-v out");
   out->n = 0;
 
   /* more useful variables */
@@ -438,6 +443,7 @@ char *dfile_shrink(dfile_t *d) {
   ttl++;
   /* move everything and update pointers */
   char *newdata = malloc(ttl); /* new storage */
+  if(newdata == NULL) fatalerror(ERROR_MEMORY,"in resize dfile");
   char *c = newdata; /* cursor*/
   for(x=0;x<d->n;x++) {
     /* copy parameter */

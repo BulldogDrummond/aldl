@@ -40,6 +40,7 @@ void *aldl_acq(void *aldl_in) {
   #ifdef ALDL_MULTIPACKET
   /* prepare array for packet retrieval frequency tracking */
   int *freq_counter = malloc(sizeof(int) * comm->n_packets);
+  if(freq_counter == NULL) fatalerror(ERROR_MEMORY,"out of memory in freq ctr");
   int freq_init;
   for(freq_init=0;freq_init < comm->n_packets; freq_init++) {
     /* if we init the frequency with freq max, that will ensure that each

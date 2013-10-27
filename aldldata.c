@@ -44,6 +44,7 @@ aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
 /* --------------------------------------------------------- */
 
 void init_locks() {
+  /* FIXME this is a dumb way to do it */
   lock.connstate = malloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(lock.connstate,NULL);
   lock.recordptr = malloc(sizeof(pthread_mutex_t));

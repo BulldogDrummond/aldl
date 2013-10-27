@@ -150,6 +150,7 @@ inline int read_bytes(byte *str, int bytes, int timeout) {
 
 inline int skip_bytes(int bytes, int timeout) {
   byte *buf = malloc(bytes);
+  if(buf == NULL) fatalerror(ERROR_MEMORY,"out of memory in skip buf");
   int bytes_read = read_bytes(buf,bytes,timeout);
   #ifdef SERIAL_VERBOSE
   printf("SKIP_BYTES: Discarded %i bytes.\n",bytes_read);
@@ -163,6 +164,7 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
   int chars_in = 0; /* chars added to buffer */
   timespec_t timestamp = get_time(); /* timestamp beginning of op */
   byte *buf = malloc(max); /* buffer for incoming data */
+  if(buf == NULL) fatalerror(ERROR_MEMORY,"out of memory in listen buf");
   memset(buf,0,max);
   #ifdef SERIAL_VERBOSE
   printf("LISTEN: ");
