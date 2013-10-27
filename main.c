@@ -38,7 +38,7 @@ int main(int argc, char **argv) { /*--------------------------- */
   /* ----- PROC CMDLINE OPTS ---------------------------------------*/
 
   int n_arg = 0;
-  for(n_arg=0;n_arg<argc;n_arg++) {
+  for(n_arg=1;n_arg<argc;n_arg++) {
     if(faststrcmp(argv[n_arg],"configtest") == 1) {
       printf("Loaded config OK.  Exiting...\n");
       exit(0);
