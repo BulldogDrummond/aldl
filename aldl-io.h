@@ -29,28 +29,36 @@ void aldl_init_record(aldl_conf_t *aldl);
 
 /* buffer management --------------------------------------*/
 
+/* WARNING: only the acquisition loop should use these functions */
+
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
 
 /* remove a record from the linked list and deallocate */
 void remove_record(aldl_record_t *rec);
 
-/* record selection ---------------------------------------*/
-
-/* return a pointer to the oldest record in the linked list */
+/* return a pointer to the oldest record in the linked list; this is for
+   garbage collection in acquisition event loops, so don't use it. */
 aldl_record_t *oldest_record(aldl_conf_t *aldl);
 
-/* get newest record in the list */
+/* record selection ---------------------------------------*/
+
+/* return the newest or next record in the linked list.  if there is no such
+   record, return NULL. */
 aldl_record_t *newest_record(aldl_conf_t *aldl);
+aldl_record_t *next_record(aldl_record_t *rec);
 
-/* wait for newest record to become available */
+/* return the newest or next record in the linked list.  if there is no such
+   record, wait forever until one is available, unless the connection to the
+   ECM is lost, in which case return NULL. */
 aldl_record_t *newest_record_wait(aldl_conf_t *aldl, aldl_record_t *rec);
-
-/* get next record in the list, waits until one is available */
 aldl_record_t *next_record_wait(aldl_conf_t *aldl, aldl_record_t *rec);
 
-/* get next record in the list, returns NULL if none is available */
-aldl_record_t *next_record(aldl_record_t *rec);
+/* return the newest or next record in the linked list.  if there is no such
+   record, wait forever until one is available.  never return anything but a
+   valid record. */
+aldl_record_t *next_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec);
+aldl_record_t *newest_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec);
 
 /* get definition or data array index, returns -1 if not found */
 int get_index_by_id(aldl_conf_t *aldl, int id);
