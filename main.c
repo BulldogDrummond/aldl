@@ -18,6 +18,9 @@
 
 /* ------ local functions ------------- */
 
+/* run some post-config loading sanity checks */
+void aldl_sanity_check(aldl_conf_t *aldl);
+
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
 
@@ -30,6 +33,7 @@ int main(int argc, char **argv) { /*--------------------------- */
 
   /* allocate everything and parse config */
   aldl_conf_t *aldl = aldl_setup();
+  aldl_sanity_check(aldl); /* sanity checks */
 
   /* ----- PROC CMDLINE OPTS ---------------------------------------*/
 
@@ -105,3 +109,27 @@ int aldl_finish() {
   return 0;
 }
 
+void aldl_sanity_check(aldl_conf_t *aldl) {
+  int x;
+  aldl_define_t *def;
+  aldl_packetdef_t *pkt;
+  int id = 0;
+
+  /* find related pkt number */
+  for(x=0;x<aldl->n_defs;x++) {
+    def = &aldl->def[x];
+    pkt = NULL;
+    for(id=0; id < aldl->comm->n_packets; id++) {
+      if(aldl->comm->packet[id].id == def->packet) {
+        pkt = &aldl->comm->packet[id]; 
+        break;
+      };
+    };
+    if(pkt == NULL) fatalerror(ERROR_RANGE,"invalid packet specified");
+
+    /* check range */
+    if(pkt->offset + def->offset > pkt->length) {
+      fatalerror(ERROR_RANGE,"definition out of packet range");
+    };
+  };
+};
