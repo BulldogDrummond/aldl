@@ -36,13 +36,20 @@ void *datalogger_init(void *aldl_in) {
   };
 
   /* alloc and fill filename buffer */
-  int maxfnlength = strlen(conf->log_filename) * 2 + 20;
+  int maxfnlength = strlen(conf->log_filename) * 2 + 50;
   struct tm *tm;
   time_t t;
+  unsigned int suffix = 1;
   t = time(NULL);
   tm = localtime(&t);
   char *filename = smalloc(maxfnlength);
   strftime(filename,maxfnlength,conf->log_filename,tm);
+  char *fnappend = filename;
+  while(fnappend[0] != 0) fnappend++; /* find end of string */
+  do {
+    sprintf(fnappend,"%i.csv",suffix);
+    suffix++;
+  } while(access(filename,F_OK) == 0);
 
   /* open file */
   conf->fdesc = fopen(filename, "a");
