@@ -17,17 +17,17 @@
 
 /* -------- globalstuffs ------------------ */
 
+/* global struct to store locking states. */
 typedef struct aldl_lock {
   pthread_mutex_t *connstate; /* locks connection state */
   pthread_mutex_t *recordptr; /* locks linked list links in records */
   pthread_mutex_t *stats; /* stats structure */
 } aldl_lock_t;
-
 aldl_lock_t lock;
 
-timespec_t firstrecordtime;
+timespec_t firstrecordtime; /* timestamp used to calc. relative time */
 
-/* --------- local functions ---------------- */
+/* --------- local function decl. ---------------- */
 
 /* update the value in the record from definition n */
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n);
@@ -40,6 +40,8 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl);
 
 /* fill a prepared record with data */
 aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
+
+/* --------------------------------------------------------- */
 
 void init_locks() {
   lock.connstate = malloc(sizeof(pthread_mutex_t));
@@ -72,15 +74,16 @@ aldl_record_t *oldest_record(aldl_conf_t *aldl) {
 };
 
 void remove_record(aldl_record_t *rec) {
-  if(rec->next == NULL) return; /* dont remove the only record */
+  #ifdef DEBUGSTRUCT
+  if(rec->next == NULL) fatalerror(ERROR_NULL,"remove only record");
   if(rec->prev != NULL) fatalerror(ERROR_NULL,"remove wrong record");
+  #endif
   rec->next->prev = NULL; /* delink from linked list */
   free(rec->data);
   free(rec);
 };
 
 void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
-  /* prepare links in new record */
   rec->next = NULL; /* terminate linked list */
   rec->prev = aldl->r; /* previous link */
   pthread_mutex_lock(lock.recordptr);
@@ -103,10 +106,6 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   /* allocate record memory */
   aldl_record_t *rec = malloc(sizeof(aldl_record_t));
   if(rec == NULL) fatalerror(ERROR_MEMORY,"record creation");
-
-  /* handle no definition case, which creates records with no data,
-     for testing purposes */
-  if(aldl->n_defs < 1) return rec;
 
   /* timestamp record */
   rec->t = get_elapsed_ms(firstrecordtime);
@@ -133,8 +132,10 @@ aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec) {
 };
 
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
+  #ifdef DEBUGSTRUCT
   /* check for out of range */
   if(n < 0 || n > aldl->n_defs - 1) fatalerror(ERROR_RANGE,"def number"); 
+  #endif
 
   aldl_define_t *def = &aldl->def[n]; /* shortcut to definition */
 
@@ -149,12 +150,6 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   #endif
 
   aldl_packetdef_t *pkt = &aldl->comm->packet[id]; /* ptr to packet */
-
-  /* check to ensure byte location is in range */
-  /* FIXME this could be checked while loading definitions ... */
-  if(pkt->offset + def->offset > pkt->length) {
-    fatalerror(ERROR_RANGE,"definition out of packet range");
-  };
 
   /* location of actual data byte */
   byte *data = pkt->data + def->offset + pkt->offset;
@@ -216,7 +211,6 @@ void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
   pthread_mutex_unlock(lock.connstate);
 };
 
-/* get newest record in the list */
 aldl_record_t *newest_record(aldl_conf_t *aldl) {
   aldl_record_t *rec = NULL;
   pthread_mutex_lock(lock.recordptr);
@@ -241,7 +235,6 @@ aldl_record_t *newest_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
   }; 
 };
 
-/* get next record in the list, waits until one is available */
 aldl_record_t *next_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
   aldl_record_t *next = NULL;
   while(next == NULL) {
@@ -254,12 +247,25 @@ aldl_record_t *next_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
   return next;
 };
 
-/* get next record in the list, returns NULL if none is available */
+aldl_record_t *next_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec) {
+  aldl_record_t *next = NULL;
+  while((next = next_record_wait) == NULL) usleep(500);
+  return next;
+};
+
+aldl_record_t *newest_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec) {
+  aldl_record_t *next = NULL;
+  while((next = newest_record_wait) == NULL) usleep(500);
+  return next;
+};
+
 aldl_record_t *next_record(aldl_record_t *rec) {
+  #ifdef DEBUGSTRUCT
   /* check for underrun ... */
   if(rec->prev == NULL) {
      fatalerror(ERROR_BUFFER,"underrun in record retrieve");
   };
+  #endif
   aldl_record_t *next;
   pthread_mutex_lock(lock.recordptr);
   next = rec->next;
