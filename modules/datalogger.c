@@ -18,6 +18,7 @@ typedef struct _datalogger_conf {
   int log_all;
   int sync;
   int skip;
+  int marker;
   FILE *fdesc;
 } datalogger_conf_t;
 
@@ -26,6 +27,8 @@ int logger_be_quiet(aldl_conf_t *aldl);
 datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl);
 
 void *datalogger_init(void *aldl_in) {
+  unsigned int n_records = 0;
+  float pps;
   /* grab config data */
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
   datalogger_conf_t *conf = datalogger_load_config(aldl);
@@ -118,6 +121,15 @@ void *datalogger_init(void *aldl_in) {
     cursor += sprintf(cursor,"\n");
     fwrite(linebuf,cursor - linebuf,1,conf->fdesc);
     if(conf->sync == 1) fflush(conf->fdesc);
+    if(logger_be_quiet(aldl) == 0) {
+      n_records++;
+      if(n_records % 300 == 0) {
+        lock_stats();
+        pps = aldl->stats->packetspersecond;
+        unlock_stats();
+        printf("Logged %u pkts @ %.2f/sec\n",n_records,pps);
+      };
+    };
   };
 
   fclose(conf->fdesc);
@@ -138,6 +150,7 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
   conf->log_filename = configopt_fatal(config,"LOG_FILENAME");
   conf->sync = configopt_int(config,"SYNC",0,1,1);
   conf->skip = configopt_int(config,"SKIP",0,1,1);
+  conf->marker = configopt_int(config,"MARKER",0,10000,100);
   return conf;
 };
 
