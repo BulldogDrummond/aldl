@@ -9,6 +9,7 @@
 #include "../error.h"
 #include "../aldl-io.h"
 #include "../loadconfig.h"
+#include "../useful.h"
 
 typedef struct _datalogger_conf {
   dfile_t *dconf; /* raw config data */
@@ -40,7 +41,7 @@ void *datalogger_init(void *aldl_in) {
   time_t t;
   t = time(NULL);
   tm = localtime(&t);
-  char *filename = malloc(maxfnlength);
+  char *filename = smalloc(maxfnlength);
   strftime(filename,maxfnlength,conf->log_filename,tm);
 
   /* open file */
@@ -54,7 +55,7 @@ void *datalogger_init(void *aldl_in) {
   /* FIXME this just logs all the time.  that's stupid. */
 
   /* bigass buffer, should calculate this better */
-  char *linebuf = malloc(aldl->n_defs * 128);
+  char *linebuf = smalloc(aldl->n_defs * 128);
   char *cursor = linebuf;
 
   int x;
@@ -118,7 +119,7 @@ void *datalogger_init(void *aldl_in) {
 };
 
 datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
-  datalogger_conf_t *conf = malloc(sizeof(datalogger_conf_t));
+  datalogger_conf_t *conf = smalloc(sizeof(datalogger_conf_t));
   if(aldl->datalogger_config == NULL) fatalerror(ERROR_CONFIG,
                                "no datalogger config file specified");
   conf->dconf = dfile_load(aldl->datalogger_config);
