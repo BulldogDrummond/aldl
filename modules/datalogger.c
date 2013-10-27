@@ -30,11 +30,6 @@ void *datalogger_init(void *aldl_in) {
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
   datalogger_conf_t *conf = datalogger_load_config(aldl);
 
-  /* print hello string if consoleif is disabled */
-  if(logger_be_quiet(aldl) == 0) {
-    printf("Datalogger enabled!\n");
-  };
-
   /* alloc and fill filename buffer */
   int maxfnlength = strlen(conf->log_filename) * 2 + 50;
   struct tm *tm;
@@ -50,6 +45,11 @@ void *datalogger_init(void *aldl_in) {
     sprintf(fnappend,"%i.csv",suffix);
     suffix++;
   } while(access(filename,F_OK) == 0);
+
+  /* print hello string if consoleif is disabled */
+  if(logger_be_quiet(aldl) == 0) {
+    printf("Logging data to file: %s\n",filename);
+  };
 
   /* open file */
   conf->fdesc = fopen(filename, "a");
