@@ -16,7 +16,7 @@ typedef enum _error {
   ERROR_PLUGIN=9
 } error_t;
 
-void fatalerror(error_t code, char *str);
-void nonfatalerror(error_t code, char *str);
+void fatalerror(error_t code, char *str, ...);
+void nonfatalerror(error_t code, char *str, ...);
 
 #endif

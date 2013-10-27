@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdarg.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <string.h>
@@ -21,18 +22,26 @@ char errstr[N_ERRORCODES][24] = {
 "PLUGIN LOADING"
 };
 
-void fatalerror(error_t code, char *str) {
+void fatalerror(error_t code, char *str, ...) {
+  va_list arg;
   fprintf(stderr,"FATAL: %s ERROR (%i)\n",errstr[code],code);
   if(str != NULL) {
-    fprintf(stderr,"NOTES: %s\n",str);
+    fprintf(stderr,"NOTES: ");
+    va_start(arg,str);
+    vfprintf(stderr,str,arg);
+    va_end(arg);
   };
   exit(1);
 };
 
-void nonfatalerror(error_t code, char *str) {
+void nonfatalerror(error_t code, char *str, ...) {
+  va_list arg;
   fprintf(stderr,"ERROR: %s ERROR (%i)\n",errstr[code],code);
   if(str != NULL) {
-    fprintf(stderr,"NOTES: %s\n",str);
+    fprintf(stderr,"NOTES: ");
+    va_start(arg,str);
+    vfprintf(stderr,str,arg);
+    va_end(arg);
   };
 };
 
