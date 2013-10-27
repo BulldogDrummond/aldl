@@ -19,7 +19,8 @@ char errstr[N_ERRORCODES][24] = {
 "CONFIG",
 "BUFFER",
 "CONFIG OPTION MISSING",
-"PLUGIN LOADING"
+"PLUGIN LOADING",
+"THREADLOCKING"
 };
 
 void fatalerror(error_t code, char *str, ...) {
@@ -30,6 +31,7 @@ void fatalerror(error_t code, char *str, ...) {
     va_start(arg,str);
     vfprintf(stderr,str,arg);
     va_end(arg);
+    fprintf(stderr,"\n");
   };
   exit(1);
 };
@@ -42,6 +44,7 @@ void nonfatalerror(error_t code, char *str, ...) {
     va_start(arg,str);
     vfprintf(stderr,str,arg);
     va_end(arg);
+    fprintf(stderr,"\n");
   };
 };
 
