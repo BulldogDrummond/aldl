@@ -17,13 +17,14 @@
 
 /* -------- globalstuffs ------------------ */
 
-/* global struct to store locking states. */
-typedef struct aldl_lock {
-  pthread_mutex_t *connstate; /* locks connection state */
-  pthread_mutex_t *recordptr; /* locks linked list links in records */
-  pthread_mutex_t *stats; /* stats structure */
+/* locking */
+typedef enum aldl_lock {
+  LOCK_CONNSTATE = 0,
+  LOCK_RECORDPTR = 1,
+  LOCK_STATS = 2,
+  N_LOCKS = 3
 } aldl_lock_t;
-aldl_lock_t lock;
+pthread_mutex_t *aldllock;
 
 timespec_t firstrecordtime; /* timestamp used to calc. relative time */
 
@@ -41,24 +42,43 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl);
 /* fill a prepared record with data */
 aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
 
+/* set and unset locks, wrapper with error checking for pthread funcs */
+inline void set_lock(aldl_lock_t lock_number);
+inline void unset_lock(aldl_lock_t lock_number);
+
 /* --------------------------------------------------------- */
 
 void init_locks() {
-  /* FIXME this is a dumb way to do it */
-  lock.connstate = smalloc(sizeof(pthread_mutex_t));
-  pthread_mutex_init(lock.connstate,NULL);
-  lock.recordptr = smalloc(sizeof(pthread_mutex_t));
-  pthread_mutex_init(lock.recordptr,NULL);
-  lock.stats = smalloc(sizeof(pthread_mutex_t));
-  pthread_mutex_init(lock.stats,NULL);
+  int x;
+  int pthreaderr;
+  aldllock = smalloc(sizeof(pthread_mutex_t) * N_LOCKS); 
+  for(x=0;x<N_LOCKS;x++) {
+    pthreaderr = pthread_mutex_init(&aldllock[x],NULL); 
+    if(pthreaderr != 0) fatalerror(ERROR_LOCK,
+         "error initializing lock %i, pthread error %i",x,pthreaderr);
+  };
+};
+
+inline void set_lock(aldl_lock_t lock_number) {
+  int rtval;
+  rtval = pthread_mutex_lock(&aldllock[lock_number]);
+  if(rtval != 0) fatalerror(ERROR_LOCK,
+          "error setting lock %i, pthread error code %i",lock_number,rtval);
+};
+
+inline void unset_lock(aldl_lock_t lock_number) {
+  int rtval;
+  rtval = pthread_mutex_unlock(&aldllock[lock_number]);
+  if(rtval != 0) fatalerror(ERROR_LOCK,
+          "error unsetting lock %i, pthread error code %i",lock_number,rtval);
 };
 
 void lock_stats() {
-  pthread_mutex_lock(lock.stats);
+  set_lock(LOCK_STATS);
 };
 
 void unlock_stats() {
-  pthread_mutex_unlock(lock.stats);
+  unset_lock(LOCK_STATS);
 };
 
 aldl_record_t *process_data(aldl_conf_t *aldl) {
@@ -87,19 +107,19 @@ void remove_record(aldl_record_t *rec) {
 void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
   rec->next = NULL; /* terminate linked list */
   rec->prev = aldl->r; /* previous link */
-  pthread_mutex_lock(lock.recordptr);
+  set_lock(LOCK_RECORDPTR);
   aldl->r->next = rec; /* attach to linked list */
   aldl->r = rec; /* fix master link */
-  pthread_mutex_unlock(lock.recordptr);
+  unset_lock(LOCK_RECORDPTR);
 };
 
 void aldl_init_record(aldl_conf_t *aldl) {
   aldl_record_t *rec = aldl_create_record(aldl);
-  pthread_mutex_lock(lock.recordptr);
+  set_lock(LOCK_RECORDPTR);
   rec->next = NULL;
   rec->prev = NULL;
   aldl->r = rec;
-  pthread_mutex_unlock(lock.recordptr);
+  unset_lock(LOCK_RECORDPTR);
   firstrecordtime = get_time();
 };
 
@@ -194,26 +214,26 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
 };
 
 aldl_state_t get_connstate(aldl_conf_t *aldl) {
-  pthread_mutex_lock(lock.connstate);
+  set_lock(LOCK_CONNSTATE);
   aldl_state_t st = aldl->state;
-  pthread_mutex_unlock(lock.connstate);
+  unset_lock(LOCK_CONNSTATE);
   return st;
 };
 
 void set_connstate(aldl_state_t s, aldl_conf_t *aldl) {
-  pthread_mutex_lock(lock.connstate);
+  set_lock(LOCK_CONNSTATE);
   #ifdef DEBUGSTRUCT
   printf("set connection state to %i\n",s);
   #endif
   aldl->state = s;
-  pthread_mutex_unlock(lock.connstate);
+  unset_lock(LOCK_CONNSTATE);
 };
 
 aldl_record_t *newest_record(aldl_conf_t *aldl) {
   aldl_record_t *rec = NULL;
-  pthread_mutex_lock(lock.recordptr);
+  set_lock(LOCK_RECORDPTR);
   rec = aldl->r; 
-  pthread_mutex_unlock(lock.recordptr);
+  unset_lock(LOCK_RECORDPTR);
   return rec;
 };
 
@@ -265,9 +285,9 @@ aldl_record_t *next_record(aldl_record_t *rec) {
   };
   #endif
   aldl_record_t *next;
-  pthread_mutex_lock(lock.recordptr);
+  set_lock(LOCK_RECORDPTR);
   next = rec->next;
-  pthread_mutex_unlock(lock.recordptr);
+  unset_lock(LOCK_RECORDPTR);
   return next;
 };
 
