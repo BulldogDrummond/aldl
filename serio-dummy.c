@@ -17,6 +17,7 @@
 
 unsigned char *databuff;
 char txmode;
+int start_delay;
 
 void gen_pkt();
 
@@ -38,6 +39,7 @@ void gen_pkt() {
 int serial_init(char *port) {
   printf("serial dummy driver active\n");
   txmode=0;
+  start_delay = 0;
   databuff=malloc(64);
   return 1;
 };
@@ -59,6 +61,10 @@ int serial_write(byte *str, int len) {
 }
 
 inline int serial_read(byte *str, int len) {
+  if(start_delay < 1000) {
+    start_delay++;
+    return 0;
+  };
   if(txmode == 0) { /* idle traffic req */
     usleep(SERIAL_BYTES_PER_MS * 64 * 1000); /* fake baud delay */
     str[0] = 0x33;
