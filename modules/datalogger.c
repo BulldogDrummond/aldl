@@ -24,47 +24,29 @@ typedef struct _datalogger_conf {
 
 int logger_be_quiet(aldl_conf_t *aldl);
 
+void datalogger_make_file(datalogger_conf_t *conf);
+
 datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl);
 
 void *datalogger_init(void *aldl_in) {
-  unsigned int n_records = 0;
-  float pps;
-  /* grab config data */
+  unsigned int n_records = 0; /* number of record counter */
+  float pps; /* packet per second rate */
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
-  datalogger_conf_t *conf = datalogger_load_config(aldl);
 
-  /* alloc and fill filename buffer */
-  int maxfnlength = strlen(conf->log_filename) * 2 + 50;
-  struct tm *tm;
-  time_t t;
-  unsigned int suffix = 1;
-  t = time(NULL);
-  tm = localtime(&t);
-  char *filename = smalloc(maxfnlength);
-  strftime(filename,maxfnlength,conf->log_filename,tm);
-  char *fnappend = filename;
-  while(fnappend[0] != 0) fnappend++; /* find end of string */
-  do {
-    sprintf(fnappend,"%i.csv",suffix);
-    suffix++;
-  } while(access(filename,F_OK) == 0);
+  /* grab config data */
+  datalogger_conf_t *conf = datalogger_load_config(aldl);
 
   /* print hello string if consoleif is disabled */
   if(logger_be_quiet(aldl) == 0) {
-    printf("Logging data to file: %s\n",filename);
+    printf("Logging data to file: %s\n",conf->log_filename);
   };
-
-  /* open file */
-  conf->fdesc = fopen(filename, "a");
-  if(conf->fdesc == NULL) fatalerror(ERROR_PLUGIN,"cannot append to log");
-  free(filename); /* shouldn't need to re-open it */
 
   /* wait for buffered connection */
   pause_until_buffered(aldl);
 
   /* FIXME this just logs all the time.  that's stupid. */
 
-  /* bigass buffer, should calculate this better */
+  /* bigass buffer, should calculate this better  */
   char *linebuf = smalloc(aldl->n_defs * 128);
   char *cursor = linebuf;
 
@@ -137,6 +119,29 @@ void *datalogger_init(void *aldl_in) {
   return NULL;
 };
 
+void datalogger_make_file(datalogger_conf_t *conf) {
+  /* alloc and fill filename buffer */
+  int maxfnlength = strlen(conf->log_filename) * 2 + 50;
+  struct tm *tm;
+  time_t t;
+  unsigned int suffix = 1;
+  t = time(NULL);
+  tm = localtime(&t);
+  char *filename = smalloc(maxfnlength);
+  strftime(filename,maxfnlength,conf->log_filename,tm);
+  char *fnappend = filename;
+  while(fnappend[0] != 0) fnappend++; /* find end of string */
+  do {
+    sprintf(fnappend,"%i.csv",suffix);
+    suffix++;
+  } while(access(filename,F_OK) == 0);
+
+  /* open file */
+  conf->fdesc = fopen(filename, "a");
+  if(conf->fdesc == NULL) fatalerror(ERROR_PLUGIN,"cannot append to log");
+  free(filename); /* shouldn't need to re-open it */
+};
+
 datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
   datalogger_conf_t *conf = smalloc(sizeof(datalogger_conf_t));
   if(aldl->datalogger_config == NULL) fatalerror(ERROR_CONFIG,
@@ -158,3 +163,4 @@ int logger_be_quiet(aldl_conf_t *aldl) {
   if(aldl->consoleif_enable == 1) return 1;
   return 0;
 };
+
