@@ -29,8 +29,9 @@ void *aldl_acq(void *aldl_in) {
   aldl->ready = 0;
 
   /* sanity checks */
-  if(aldl->rate > 200000) fatalerror(ERROR_TIMING,"acq delay too high");
-  if(comm->n_packets < 1) fatalerror(ERROR_RANGE,"no packets in acq");
+  if(aldl->rate > 200000) fatalerror(ERROR_TIMING,
+                                    "acq delay (%i) too high",aldl->rate);
+  if(comm->n_packets < 1) fatalerror(ERROR_RANGE,"no packets specified");
 
   /* timestamp for lag check */
   #ifdef LAGCHECK
@@ -39,8 +40,7 @@ void *aldl_acq(void *aldl_in) {
 
   #ifdef ALDL_MULTIPACKET
   /* prepare array for packet retrieval frequency tracking */
-  int *freq_counter = malloc(sizeof(int) * comm->n_packets);
-  if(freq_counter == NULL) fatalerror(ERROR_MEMORY,"out of memory in freq ctr");
+  int *freq_counter = smalloc(sizeof(int) * comm->n_packets);
   int freq_init;
   for(freq_init=0;freq_init < comm->n_packets; freq_init++) {
     /* if we init the frequency with freq max, that will ensure that each

@@ -45,11 +45,11 @@ aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
 
 void init_locks() {
   /* FIXME this is a dumb way to do it */
-  lock.connstate = malloc(sizeof(pthread_mutex_t));
+  lock.connstate = smalloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(lock.connstate,NULL);
-  lock.recordptr = malloc(sizeof(pthread_mutex_t));
+  lock.recordptr = smalloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(lock.recordptr,NULL);
-  lock.stats = malloc(sizeof(pthread_mutex_t));
+  lock.stats = smalloc(sizeof(pthread_mutex_t));
   pthread_mutex_init(lock.stats,NULL);
 };
 
@@ -105,8 +105,7 @@ void aldl_init_record(aldl_conf_t *aldl) {
 
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   /* allocate record memory */
-  aldl_record_t *rec = malloc(sizeof(aldl_record_t));
-  if(rec == NULL) fatalerror(ERROR_MEMORY,"record creation");
+  aldl_record_t *rec = smalloc(sizeof(aldl_record_t));
 
   /* timestamp record */
   rec->t = get_elapsed_ms(firstrecordtime);
@@ -117,8 +116,7 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   #endif
 
   /* allocate data memory */
-  rec->data = malloc(sizeof(aldl_data_t) * aldl->n_defs);
-  if(rec == NULL) fatalerror(ERROR_MEMORY,"data str in record");
+  rec->data = smalloc(sizeof(aldl_data_t) * aldl->n_defs);
 
   return rec;
 };
@@ -133,10 +131,9 @@ aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec) {
 };
 
 aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
-  #ifdef DEBUGSTRUCT
   /* check for out of range */
-  if(n < 0 || n > aldl->n_defs - 1) fatalerror(ERROR_RANGE,"def number"); 
-  #endif
+  if(n < 0 || n > aldl->n_defs - 1) fatalerror(ERROR_RANGE,
+                                    "def number %i is out of range",n); 
 
   aldl_define_t *def = &aldl->def[n]; /* shortcut to definition */
 
@@ -190,7 +187,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
       out->i = getbit(x,def->binary,def->invert);
       break;
     default:
-      fatalerror(ERROR_RANGE,"invalid type spec");
+      fatalerror(ERROR_RANGE,"invalid type spec: %i",def->type);
   };
 
   return out;
@@ -264,7 +261,7 @@ aldl_record_t *next_record(aldl_record_t *rec) {
   #ifdef DEBUGSTRUCT
   /* check for underrun ... */
   if(rec->prev == NULL) {
-     fatalerror(ERROR_BUFFER,"underrun in record retrieve");
+     fatalerror(ERROR_BUFFER,"underrun in record retrieve %p",rec);
   };
   #endif
   aldl_record_t *next;

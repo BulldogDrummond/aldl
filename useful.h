@@ -17,6 +17,9 @@ typedef struct timespec timespec_t;
 typedef struct timeval timespec_t;
 #endif
 
+/* a safe malloc that checks the return value and bails */
+void *smalloc(size_t size);
+
 /* get current time */
 timespec_t get_time();
 

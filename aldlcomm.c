@@ -149,8 +149,7 @@ inline int read_bytes(byte *str, int bytes, int timeout) {
 }
 
 inline int skip_bytes(int bytes, int timeout) {
-  byte *buf = malloc(bytes);
-  if(buf == NULL) fatalerror(ERROR_MEMORY,"out of memory in skip buf");
+  byte *buf = smalloc(bytes);
   int bytes_read = read_bytes(buf,bytes,timeout);
   #ifdef SERIAL_VERBOSE
   printf("SKIP_BYTES: Discarded %i bytes.\n",bytes_read);
@@ -163,8 +162,7 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
   int chars_read = 0; /* total chars read into buffer */
   int chars_in = 0; /* chars added to buffer */
   timespec_t timestamp = get_time(); /* timestamp beginning of op */
-  byte *buf = malloc(max); /* buffer for incoming data */
-  if(buf == NULL) fatalerror(ERROR_MEMORY,"out of memory in listen buf");
+  byte *buf = smalloc(max); /* buffer for incoming data */
   memset(buf,0,max);
   #ifdef SERIAL_VERBOSE
   printf("LISTEN: ");
@@ -207,7 +205,7 @@ byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm) {
 }
 
 byte *generate_request(byte mode, byte message, aldl_commdef_t *comm) {
-  byte *command = malloc(5); 
+  byte *command = smalloc(5); 
   command[0] = comm->pcm_address;
   command[1] = calc_msglength(5); 
   command[2] = mode;
@@ -217,7 +215,7 @@ byte *generate_request(byte mode, byte message, aldl_commdef_t *comm) {
 }
 
 byte *generate_mode(byte mode, aldl_commdef_t *comm) {
-  byte *tmp = malloc(4);
+  byte *tmp = smalloc(4);
   tmp[0] = comm->pcm_address;
   tmp[1] = calc_msglength(4);
   tmp[2] = mode;

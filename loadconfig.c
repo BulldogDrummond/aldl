@@ -47,7 +47,8 @@ char *load_config_root(dfile_t *config); /* returns path to sub config */
 aldl_conf_t *aldl_setup() {
   /* load root config file ... */
   dfile_t *config = dfile_load(ROOT_CONFIG_FILE);
-  if(config == NULL) fatalerror(ERROR_CONFIG,"cant load config file");
+  if(config == NULL) fatalerror(ERROR_CONFIG,
+                        "cant load root config file: %s", ROOT_CONFIG_FILE);
   #ifdef DEBUGCONFIG
   print_config(config);
   #endif
@@ -62,7 +63,8 @@ aldl_conf_t *aldl_setup() {
 
   /* load def config file ... */
   config = dfile_load(configfile); /* re-use pointer */
-  if(config == NULL) fatalerror(ERROR_CONFIG,"cant load definition file");
+  if(config == NULL) fatalerror(ERROR_CONFIG,
+                        "cant load definition file: %s",configfile);
   #ifdef DEBUGCONFIG
   print_config(config);
   printf("configuration, stage A...\n");
@@ -87,8 +89,7 @@ aldl_conf_t *aldl_setup() {
 
 void aldl_alloc_a() {
   /* primary aldl configuration structure */
-  aldl = malloc(sizeof(aldl_conf_t));
-  if(aldl == NULL) fatalerror(ERROR_MEMORY,"conf_t alloc");
+  aldl = smalloc(sizeof(aldl_conf_t));
   memset(aldl,0,sizeof(aldl_conf_t));
 
   #ifdef DEBUGMEM
@@ -96,8 +97,7 @@ void aldl_alloc_a() {
   #endif
 
   /* communication definition */
-  comm = malloc(sizeof(aldl_commdef_t));
-  if(comm == NULL) fatalerror(ERROR_MEMORY,"commdef alloc");
+  comm = smalloc(sizeof(aldl_commdef_t));
   memset(comm,0,sizeof(aldl_commdef_t));
   aldl->comm = comm; /* link to conf */
 
@@ -106,7 +106,7 @@ void aldl_alloc_a() {
   #endif
 
   /* stats tracking structure */
-  aldl->stats = malloc(sizeof(aldl_stats_t));
+  aldl->stats = smalloc(sizeof(aldl_stats_t));
   if(aldl->stats == NULL) fatalerror(ERROR_MEMORY,"stats alloc");
   memset(aldl->stats,0,sizeof(aldl_stats_t));
 
@@ -149,8 +149,7 @@ void load_config_a(dfile_t *config) {
 
 void aldl_alloc_b() {
   /* allocate space to store packet definitions */
-  comm->packet = malloc(sizeof(aldl_packetdef_t) * comm->n_packets);
-  if(comm->packet == NULL) fatalerror(ERROR_MEMORY,"packet mem");
+  comm->packet = smalloc(sizeof(aldl_packetdef_t) * comm->n_packets);
 
   #ifdef DEBUGMEM
   printf("aldl_commdef_t: %i bytes\n",(int)sizeof(aldl_commdef_t));
@@ -159,8 +158,7 @@ void aldl_alloc_b() {
 
 void load_config_b(dfile_t *config) {
   int x;
-  char *pktname = malloc(50);
-  if(pktname == NULL) fatalerror(ERROR_MEMORY,"pktname buffer");
+  char *pktname = smalloc(50);
   for(x=0;x<comm->n_packets;x++) {
     comm->packet[x].id = configopt_byte_fatal(config,pktconfig(pktname,"ID",x));
     comm->packet[x].length = configopt_int_fatal(config,pktconfig(pktname,
@@ -179,10 +177,10 @@ void load_config_b(dfile_t *config) {
   /* sanity checks for single packet mode */
   #ifndef ALDL_MULTIPACKET
   if(comm->packet[0].frequency == 0) {
-    fatalerror(ERROR_CONFIG,"the only packet is disabled");
+    fatalerror(ERROR_CONFIG,"the only packet is disabled due to 0 frequency");
   };
   if(comm->n_packets != 1) {
-    fatalerror(ERROR_CONFIG,"this config requires multipacket capabilities");
+    fatalerror(ERROR_CONFIG,"this config requires a multipacket build");
   };
   #endif
 }
@@ -191,7 +189,7 @@ void aldl_alloc_c() {
   /* storage for raw packet data */
   int x = 0;
   for(x=0;x<comm->n_packets;x++) {
-    comm->packet[x].data = malloc(comm->packet[x].length);
+    comm->packet[x].data = smalloc(comm->packet[x].length);
     #ifdef DEBUGMEM
     printf("packet %i raw storage: %i bytes\n",x,comm->packet[x].length);
     #endif
@@ -199,8 +197,7 @@ void aldl_alloc_c() {
   };
 
   /* storage for data definitions */
-  aldl->def = malloc(sizeof(aldl_define_t) * aldl->n_defs);
-  if(aldl->def == NULL) fatalerror(ERROR_MEMORY,"definition");
+  aldl->def = smalloc(sizeof(aldl_define_t) * aldl->n_defs);
   #ifdef DEBUGMEM
   printf("aldl_define_t definition storage: %i bytes\n",
               (int)sizeof(aldl_define_t) * aldl->n_defs);
@@ -209,8 +206,7 @@ void aldl_alloc_c() {
 
 void load_config_c(dfile_t *config) {
   int x=0;
-  char *configstr = malloc(50);
-  if(configstr == NULL) fatalerror(ERROR_MEMORY,"in configstr conf_c");
+  char *configstr = smalloc(50);
   char *tmp;
   aldl_define_t *d;
   int z;
@@ -238,7 +234,7 @@ void load_config_c(dfile_t *config) {
         d->multiplier.i=configopt_int(config,dconfig(configstr,"MULTIPLIER",x),
                                          -32678,32767,1);
       } else {
-        fatalerror(ERROR_CONFIG,"invalid data type in def");
+        fatalerror(ERROR_CONFIG,"invalid data type %s in def %i",tmp,x);
       };
       d->uom=configopt(config,dconfig(configstr,"UOM",x),NULL);
       d->size=configopt_int(config,dconfig(configstr,"SIZE",x),1,32,8);     
@@ -246,11 +242,13 @@ void load_config_c(dfile_t *config) {
     };
     d->id=configopt_int(config,dconfig(configstr,"ID",x),0,32767,x);
     for(z=x-1;z>=0;z--) { /* check for duplicate unique id */
-      if(aldl->def[z].id == d->id) fatalerror(ERROR_CONFIG,"duplicate id");
+      if(aldl->def[z].id == d->id) fatalerror(ERROR_CONFIG,
+                    "id %i not unique! def number %i and %i",d->id,x,z);
     };
     d->offset=configopt_byte_fatal(config,dconfig(configstr,"OFFSET",x));
     d->packet=configopt_byte(config,dconfig(configstr,"PACKET",x),0x00);
-    if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,"pkt range");
+    if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,
+                        "packet %i out of range in def %i",d->packet,x);
     d->name=configopt_fatal(config,dconfig(configstr,"NAME",x));
     d->description=configopt_fatal(config,dconfig(configstr,"DESC",x));
     d->log=configopt_int(config,dconfig(configstr,"LOG",x),0,1,0);
@@ -304,13 +302,15 @@ int configopt_int(dfile_t *config,char *str, int min, int max, int def) {
   if(in == NULL) return def;
   #endif
   int x = atoi(in);
-  if(x < min || x > max) fatalerror(ERROR_RANGE,str);
+  if(x < min || x > max) fatalerror(ERROR_CONFIG,
+                  "%s must be between %i and %i",str,min,max);
   return x;
 };
 
 int configopt_int_fatal(dfile_t *config,char *str, int min, int max) {
   int x = atoi(configopt_fatal(config,str));
-  if(x < min || x > max) fatalerror(ERROR_RANGE,str);
+  if(x < min || x > max) fatalerror(ERROR_CONFIG,
+                  "%s must be between %i and %i",str,min,max);
   return x;
 };
 
@@ -368,14 +368,11 @@ void dfile_strip_quotes(dfile_t *d) {
 
 dfile_t *dfile(char *data) {
   /* allocate base structure */
-  dfile_t *out = malloc(sizeof(dfile_t));
-  if(out == NULL) fatalerror(ERROR_MEMORY,"dfile out");
+  dfile_t *out = smalloc(sizeof(dfile_t));
 
   /* initial allocation of pointer array */
-  out->p = malloc(sizeof(char*) * MAX_PARAMETERS);
-  if(out->p == NULL) fatalerror(ERROR_MEMORY,"dfile-p out");
-  out->v = malloc(sizeof(char*) * MAX_PARAMETERS);
-  if(out->v == NULL) fatalerror(ERROR_MEMORY,"dfile-v out");
+  out->p = smalloc(sizeof(char*) * MAX_PARAMETERS);
+  out->v = smalloc(sizeof(char*) * MAX_PARAMETERS);
   out->n = 0;
 
   /* more useful variables */
@@ -442,8 +439,7 @@ char *dfile_shrink(dfile_t *d) {
   };
   ttl++;
   /* move everything and update pointers */
-  char *newdata = malloc(ttl); /* new storage */
-  if(newdata == NULL) fatalerror(ERROR_MEMORY,"in resize dfile");
+  char *newdata = smalloc(ttl); /* new storage */
   char *c = newdata; /* cursor*/
   for(x=0;x<d->n;x++) {
     /* copy parameter */
@@ -496,8 +492,7 @@ char *load_file(char *filename) {
   int flength = ftell(fdesc);
   if(flength == -1) return NULL;
   rewind(fdesc);
-  char *buf = malloc(sizeof(char) * ( flength + 1));
-  if(buf == NULL) return NULL;
+  char *buf = smalloc(sizeof(char) * ( flength + 1));
   if(fread(buf,1,flength,fdesc) != flength) return NULL;
   fclose(fdesc);
   buf[flength] = 0;

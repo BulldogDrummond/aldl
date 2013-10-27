@@ -96,3 +96,11 @@ void printhexstring(byte *str, int length) {
   printf("\n");
 };
 
+void *smalloc(size_t size) {
+  void *m = malloc(size); 
+  if(m == NULL) {
+   fprintf(stderr, "Out of memory trying to alloc %u bytes",(unsigned int)size);
+   exit(1);
+  };
+  return m;
+};

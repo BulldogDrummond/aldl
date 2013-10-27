@@ -48,6 +48,8 @@ int main(int argc, char **argv) { /*--------------------------- */
       aldl->consoleif_enable = 1;
     } else if(faststrcmp(argv[n_arg],"datalogger") == 1) {
       aldl->datalogger_enable = 1;
+    } else {
+      fatalerror(ERROR_NULL,"Option %s not recognized",argv[n_arg]);
     };
   };
 
