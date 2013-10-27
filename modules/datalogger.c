@@ -88,6 +88,7 @@ void *datalogger_init(void *aldl_in) {
       if(logger_be_quiet(aldl) == 0) {
         printf("Reconnected.  Resuming logging...\n");
       }; 
+      continue;
     };
     cursor=linebuf; /* reset cursor */
     cursor += sprintf(cursor,"%lu",rec->t);
