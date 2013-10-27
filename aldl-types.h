@@ -105,6 +105,7 @@ typedef struct aldl_commdef {
   int shutuprepeat;        /* how many times to repeat a shutup request */
   int shutuprepeatdelay;   /* the delay, in ms, to delay in between requests */
   byte *returncommand;     /* the "return to normal" command */
+  int shutup_time; /* time in ms that a shutup state lasts */
   /* ------- data packet requests -------- */
   int n_packets;             /* the number of packets of data */
   aldl_packetdef_t *packet;  /* the actual packet definitions */
@@ -130,7 +131,6 @@ typedef struct aldl_conf {
   int maxfail; /* maximum packet retrieve fails before it's assumed that the
                   connection is no longer synchronized */
   int minmax;  /* enforce min/max values during conversion */
-  int shutup_time; /* time in ms that a shutup state lasts */
   /* plugin enables -------*/
   int debugif_enable, consoleif_enable, datalogger_enable;
   char *datalogger_config; /* path to datalogger config file */

@@ -195,7 +195,7 @@ void *aldl_acq(void *aldl_in) {
 
     /* check if lagtime exceeded, and set lag state. */
     #ifdef LAGCHECK
-    if(get_elapsed_ms(lagtime) >= aldl->shutup_time) {
+    if(get_elapsed_ms(lagtime) >= aldl->comm->shutup_time) {
       set_connstate(ALDL_LAGGY,aldl);
     };
     #endif
