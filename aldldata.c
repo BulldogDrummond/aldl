@@ -249,13 +249,13 @@ aldl_record_t *next_record_wait(aldl_conf_t *aldl, aldl_record_t *rec) {
 
 aldl_record_t *next_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec) {
   aldl_record_t *next = NULL;
-  while((next = next_record_wait) == NULL) usleep(500);
+  while((next = next_record_wait(aldl,rec)) == NULL) usleep(500);
   return next;
 };
 
 aldl_record_t *newest_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec) {
   aldl_record_t *next = NULL;
-  while((next = newest_record_wait) == NULL) usleep(500);
+  while((next = newest_record_wait(aldl,rec)) == NULL) usleep(500);
   return next;
 };
 
