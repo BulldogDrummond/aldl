@@ -124,7 +124,6 @@ char *load_config_root(dfile_t *config) {
   aldl->maxfail = configopt_int(config,"MAXFAIL",1,1000,6);
   aldl->rate = configopt_int(config,"ACQRATE",0,100000,0);
   /* plugins */
-  aldl->debugif_enable = configopt_int(config,"DEBUGIF_ENABLE",0,1,0);
   aldl->consoleif_enable = configopt_int(config,"CONSOLEIF_ENABLE",0,1,0);
   aldl->datalogger_enable = configopt_int(config,"DATALOGGER_ENABLE",0,1,0);
   aldl->datalogger_config = configopt(config,"DATALOGGER_CONFIG",NULL);

@@ -42,8 +42,6 @@ int main(int argc, char **argv) { /*--------------------------- */
     if(faststrcmp(argv[n_arg],"configtest") == 1) {
       printf("Loaded config OK.  Exiting...\n");
       exit(0);
-    } else if(faststrcmp(argv[n_arg],"debugif") == 1) {
-      aldl->debugif_enable = 1;
     } else if(faststrcmp(argv[n_arg],"consoleif") == 1) {
       aldl->consoleif_enable = 1;
     } else if(faststrcmp(argv[n_arg],"datalogger") == 1) {
@@ -54,10 +52,7 @@ int main(int argc, char **argv) { /*--------------------------- */
   };
 
   /* compatibility checking */
-  if(aldl->debugif_enable == 1 && aldl->consoleif_enable == 1) {
-    fatalerror(ERROR_PLUGIN,"consoleif and debugif plugins are incompat");
-  };
-  if(aldl->debugif_enable == 0 && aldl->consoleif_enable == 0 &&
+  if(aldl->consoleif_enable == 0 &&
      aldl->datalogger_enable == 0) {
     fatalerror(ERROR_PLUGIN,"no plugins are enabled");
   };
@@ -77,16 +72,11 @@ int main(int argc, char **argv) { /*--------------------------- */
 
   /* configure threading */
   pthread_t thread_acq; 
-  pthread_t thread_debugif;
   pthread_t thread_consoleif;
   pthread_t thread_datalogger;
 
   /* spawn acq thread */
   pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
-
-  if(aldl->debugif_enable == 1) {
-    pthread_create(&thread_debugif,NULL,debugif_init,(void *)aldl);
-  };
 
   if(aldl->consoleif_enable == 1) {
     pthread_create(&thread_consoleif,NULL,consoleif_init,(void *) aldl);
