@@ -9,17 +9,19 @@
 #include "../aldl-io.h"
 #include "../config.h"
 #include "../loadconfig.h"
+#include "../useful.h"
 
 enum {
   RED_ON_BLACK = 1,
   BLACK_ON_RED = 2,
   GREEN_ON_BLACK = 3,
   CYAN_ON_BLACK = 4,
-  WHITE_ON_BLACK = 5
+  WHITE_ON_BLACK = 5,
+  WHITE_ON_RED = 6
 };
 
 typedef enum _gaugetype {
-  GAUGE_PROGRESSBAR,
+  GAUGE_HBAR,
   GAUGE_TEXT
 } gaugetype_t;
 
@@ -41,7 +43,6 @@ typedef struct _consoleif_conf {
 } consoleif_conf_t;
 
 #define COLOR_STATUSSCREEN RED_ON_BLACK
-#define COLOR_PROGRESSBAR RED_ON_BLACK
 
 /* --- variables ---------------------------- */
 
@@ -68,9 +69,13 @@ void statusmessage(char *str);
 /* clear screen and display waiting for connection messages */
 void cons_wait_for_connection();
 
+/* get a config string for a particular gauge */
 char *gconfig(char *parameter, int n);
 
+/* gauges -------------------*/
 void draw_h_progressbar(gauge_t *g);
+void draw_simpletext_a(gauge_t *g);
+void gauge_blank(gauge_t *g);
 void draw_statusbar();
 
 /* --------------------------------------------*/
@@ -96,6 +101,7 @@ void *consoleif_init(void *aldl_in) {
   init_pair(GREEN_ON_BLACK,COLOR_GREEN,COLOR_BLACK);
   init_pair(CYAN_ON_BLACK,COLOR_CYAN,COLOR_BLACK);
   init_pair(WHITE_ON_BLACK,COLOR_WHITE,COLOR_BLACK);
+  init_pair(WHITE_ON_RED,COLOR_WHITE,COLOR_RED);
 
   /* get initial screen size */
   getmaxyx(stdscr,w_height,w_width);
@@ -105,6 +111,7 @@ void *consoleif_init(void *aldl_in) {
   rec = newest_record(aldl);
 
   int x;
+  gauge_t *gauge;
 
   while(1) {
     rec = newest_record_wait(aldl,rec);
@@ -113,7 +120,17 @@ void *consoleif_init(void *aldl_in) {
       continue;
     };
     for(x=0;x<conf->n_gauges;x++) {
-      draw_h_progressbar(&conf->gauge[x]);
+      gauge = &conf->gauge[x];
+      switch(gauge->gaugetype) {
+        case GAUGE_HBAR:
+          draw_h_progressbar(gauge);
+          break;
+        case GAUGE_TEXT:
+          draw_simpletext_a(gauge);
+          break;
+        default:
+          break;
+      };
     };
     if(conf->statusbar == 1) {
       draw_statusbar();
@@ -178,31 +195,54 @@ void cons_wait_for_connection() {
   clear();
 }
 
+/* --- GAUGES ---------------------------------- */
+
+void draw_simpletext_a(gauge_t *g) {
+  aldl_define_t *def = &aldl->def[g->data_a];
+  float data = rec->data[g->data_a].f;
+  /* FIXME this needs more work */
+  mvprintw(g->y,g->x,"%s: %.1f %s    ",def->name,data,def->uom);
+};
+
 void draw_h_progressbar(gauge_t *g) {
   aldl_define_t *def = &aldl->def[g->data_a];
   float data = rec->data[g->data_a].f;
   int x;
-  /* blank out title section */
-  move(g->y,g->x);   
-  for(x=0;x<g->width;x++) addch(' ');
-  /* draw output text */
-  sprintf(bigbuf,"%.1f %s",data,def->uom);
-  mvaddstr(g->y,g->x + g->width - strlen(bigbuf),bigbuf);
-  /* draw title text */
-  mvaddstr(g->y,g->x,def->name);
-  /* draw progress bar */
-  move(g->y + 1, g->x);
-  int filled = data / ( g->top / g->width );
-  int remainder = g->width - filled;
-  attron(COLOR_PAIR(COLOR_PROGRESSBAR)); 
-  for(x=0;x<filled;x++) { /* draw filled section */
-    addch(' '|A_REVERSE);
-  }; 
-  for(x=0;x<remainder;x++) { /* draw unfilled section */
-    addch('-');
+  char *curs;
+
+  /* get rh text width */
+  int width_rhtext = sprintf(bigbuf,"] %.0f",g->top);
+
+  /* print LH text */
+  int width_lhtext = sprintf(bigbuf,"%s [",def->name);
+  
+  curs = bigbuf + width_lhtext; /* set cursor after initial text */
+  int pbwidth = g->width - width_lhtext - width_rhtext;
+  int filled = data / ( g->top / pbwidth );
+  int remainder = pbwidth - filled;
+
+  /* draw progress bar content */
+  for(x=0;x<filled;x++) { /* filled section */
+    curs[0] = '*';
+    curs++;
   };
-  attroff(COLOR_PAIR(COLOR_PROGRESSBAR));
+  for(x=0;x<remainder;x++) { /* unfilled section */
+    curs[0] = ' ';
+    curs++;
+  };
+  sprintf(curs,"] %.0f",data);
+  move(g->y,g->x); 
+  gauge_blank(g);
+  mvaddstr(g->y,g->x,bigbuf);
 };
+
+void gauge_blank(gauge_t *g) {
+  move(g->y,g->x);
+  int x;
+  for(x=0;x<g->width;x++) addch(' ');
+};
+
+/*---- * LOAD CONFIG *--------------------------- */
 
 consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
   consoleif_conf_t *conf = malloc(sizeof(consoleif_conf_t));
@@ -231,6 +271,15 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
     gauge->height = configopt_int(config,gconfig("HEIGHT",n),0,10000,1);
     gauge->bottom = configopt_float_fatal(config,gconfig("MIN",n));
     gauge->top = configopt_float_fatal(config,gconfig("MAX",n));
+    /* TYPE SELECTOR */
+    char *gtypestr = configopt_fatal(config,gconfig("TYPE",n));
+    if(faststrcmp(gtypestr,"HBAR") == 1) {
+      gauge->gaugetype = GAUGE_HBAR;
+    } else if(faststrcmp(gtypestr,"TEXT") == 1) {
+      gauge->gaugetype = GAUGE_TEXT;
+    } else {
+      fatalerror(ERROR_CONFIG,"consoleif: gauge %i bad type %s",n,gtypestr);
+    };
   };
   return conf;
 };
