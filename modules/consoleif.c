@@ -265,6 +265,8 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
     /*FIXME need to be able to retrieve by ID too ... */
     gauge->data_a = get_index_by_name(aldl,configopt_fatal(config,
                                  gconfig("A_NAME",n)));
+    if(gauge->data_a == -1) fatalerror(ERROR_CONFIG,
+                       "consoleif: gauge %i invalid name",n);
     gauge->x = configopt_int_fatal(config,gconfig("X",n),0,10000);
     gauge->y = configopt_int_fatal(config,gconfig("Y",n),0,10000);
     gauge->width = configopt_int_fatal(config,gconfig("WIDTH",n),0,10000);
