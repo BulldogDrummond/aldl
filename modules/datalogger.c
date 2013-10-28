@@ -17,6 +17,7 @@ typedef struct _datalogger_conf {
   char *log_filename;
   int log_all;
   int sync;
+  int rate;
   int skip;
   int marker;
   FILE *fdesc;
@@ -24,22 +25,21 @@ typedef struct _datalogger_conf {
 
 int logger_be_quiet(aldl_conf_t *aldl);
 
-void datalogger_make_file(datalogger_conf_t *conf);
+void datalogger_make_file(datalogger_conf_t *conf,aldl_conf_t *aldl);
 
 datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl);
 
 void *datalogger_init(void *aldl_in) {
   unsigned int n_records = 0; /* number of record counter */
+  unsigned long last_timestamp = 0;
   float pps; /* packet per second rate */
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
 
   /* grab config data */
   datalogger_conf_t *conf = datalogger_load_config(aldl);
 
-  /* print hello string if consoleif is disabled */
-  if(logger_be_quiet(aldl) == 0) {
-    printf("Logging data to file: %s\n",conf->log_filename);
-  };
+  /* create config file */
+  datalogger_make_file(conf,aldl);
 
   /* wait for buffered connection */
   pause_until_buffered(aldl);
@@ -50,8 +50,10 @@ void *datalogger_init(void *aldl_in) {
   char *linebuf = smalloc(aldl->n_defs * 128);
   char *cursor = linebuf;
 
-  int x;
-  cursor += sprintf(cursor,"TIMESTAMP(ms)");
+  int x; /* tmp counter */
+  cursor += sprintf(cursor,"TIMESTAMP(ms)"); /* string cursor */
+
+  /* write csv header */
   for(x=0;x<aldl->n_defs;x++) {
     if(conf->log_all == 0) {
       if(aldl->def[x].log == 0) continue;
@@ -74,15 +76,16 @@ void *datalogger_init(void *aldl_in) {
     };
     if(rec == NULL) {
       if(logger_be_quiet(aldl) == 0) {
-        printf("Connection state: %s.  Waiting for connection...\n",
+        printf("datalogger: Connection state: %s.  Waiting for connection...\n",
                 get_state_string(get_connstate(aldl)));
       };
       pause_until_connected(aldl);
       if(logger_be_quiet(aldl) == 0) {
-        printf("Reconnected.  Resuming logging...\n");
+        printf("datalogger: Reconnected.  Resuming logging...\n");
       }; 
       continue;
     };
+    if(last_timestamp + conf->rate >= rec->t) continue; /* skip record */
     cursor=linebuf; /* reset cursor */
     cursor += sprintf(cursor,"%lu",rec->t);
     for(x=0;x<aldl->n_defs;x++) {
@@ -109,9 +112,10 @@ void *datalogger_init(void *aldl_in) {
         lock_stats();
         pps = aldl->stats->packetspersecond;
         unlock_stats();
-        printf("Logged %u pkts @ %.2f/sec\n",n_records,pps);
+        printf("datalogger: Logged %u pkts @ %.2f/sec\n",n_records,pps);
       };
     };
+    last_timestamp = rec->t; /* update timestamp */
   };
 
   fclose(conf->fdesc);
@@ -119,7 +123,7 @@ void *datalogger_init(void *aldl_in) {
   return NULL;
 };
 
-void datalogger_make_file(datalogger_conf_t *conf) {
+void datalogger_make_file(datalogger_conf_t *conf,aldl_conf_t *aldl) {
   /* alloc and fill filename buffer */
   int maxfnlength = strlen(conf->log_filename) * 2 + 50;
   struct tm *tm;
@@ -139,6 +143,12 @@ void datalogger_make_file(datalogger_conf_t *conf) {
   /* open file */
   conf->fdesc = fopen(filename, "a");
   if(conf->fdesc == NULL) fatalerror(ERROR_PLUGIN,"cannot append to log");
+
+  /* print hello string if consoleif is disabled */
+  if(logger_be_quiet(aldl) == 0) {
+    printf("datalogger: Logging data to file: %s\n",filename);
+  };
+
   free(filename); /* shouldn't need to re-open it */
 };
 
@@ -156,6 +166,7 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl) {
   conf->sync = configopt_int(config,"SYNC",0,1,1);
   conf->skip = configopt_int(config,"SKIP",0,1,1);
   conf->marker = configopt_int(config,"MARKER",0,10000,100);
+  conf->rate = configopt_int(config,"RATE",1,10000,1);
   return conf;
 };
 
