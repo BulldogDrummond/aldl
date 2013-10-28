@@ -43,8 +43,11 @@ typedef struct aldl_define {
   int id;             /* unique identifier for each definition */
   char *name;         /* short name */
   char *description;  /* description of each definition */
+  /* ----- stuff for modules ----------------------------*/
   int log;            /* log data from this definition */
   int display;        /* display data from this definition */
+  int alarm_low_enable, alarm_high_enable;  /* enable high/low alarms */
+  aldl_data_t alarm_low, alarm_high; /* value for alarms */
   /* ----- output definition -------------------------- */
   aldl_datatype_t type; /* the OUTPUT type */
   char *uom;     /* unit of measure */

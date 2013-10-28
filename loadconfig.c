@@ -225,6 +225,8 @@ void load_config_c(dfile_t *config) {
         d->max.f=configopt_float(config,dconfig(configstr,"MAX",x),9999999);
         d->adder.f=configopt_float(config,dconfig(configstr,"ADDER",x),0);
         d->multiplier.f=configopt_float(config,dconfig(configstr,"MULTIPLIER",x),1);
+        d->alarm_low.f=configopt_float(config,dconfig(configstr,"ALARM_LOW",x),0);
+        d->alarm_high.f=configopt_float(config,dconfig(configstr,"ALARM_HIGH",x),0);
       } else if(faststrcmp(tmp,"INT") == 1) {
         d->type=ALDL_INT; 
         d->min.i=configopt_int(config,dconfig(configstr,"MIN",x),-32678,32767,0);
@@ -232,6 +234,10 @@ void load_config_c(dfile_t *config) {
         d->adder.i=configopt_int(config,dconfig(configstr,"ADDER",x),-32678,32767,0);
         d->multiplier.i=configopt_int(config,dconfig(configstr,"MULTIPLIER",x),
                                          -32678,32767,1);
+        d->alarm_low.i=configopt_int(config,dconfig(configstr,"ALARM_LOW",x),
+                                                  0,32767,0);
+        d->alarm_high.i=configopt_int(config,dconfig(configstr,"ALARM_HIGH",x),
+                                                  0,32767,0);
       } else {
         fatalerror(ERROR_CONFIG,"invalid data type %s in def %i",tmp,x);
       };
@@ -244,6 +250,10 @@ void load_config_c(dfile_t *config) {
       if(aldl->def[z].id == d->id) fatalerror(ERROR_CONFIG,
                     "id %i not unique! def number %i and %i",d->id,x,z);
     };
+    d->alarm_low_enable=configopt_int(config,dconfig(configstr,
+                        "ALARM_LOW_ENABLE",x),0,1,0);
+    d->alarm_high_enable=configopt_int(config,dconfig(configstr,
+                        "ALARM_HIGH_ENABLE",x),0,1,0);
     d->offset=configopt_byte_fatal(config,dconfig(configstr,"OFFSET",x));
     d->packet=configopt_byte(config,dconfig(configstr,"PACKET",x),0x00);
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,
