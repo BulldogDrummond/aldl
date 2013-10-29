@@ -57,6 +57,7 @@ aldl_record_t *rec; /* current record */
 /* --- local functions ------------------------*/
 
 consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl);
+void consoleif_setup_colors();
 
 /* center half-width of an element on the screen */
 int xcenter(int width);
@@ -95,20 +96,14 @@ void *consoleif_init(void *aldl_in) {
   };
 
   curs_set(0);
-  start_color();
-  init_pair(RED_ON_BLACK,COLOR_RED,COLOR_BLACK);
-  init_pair(BLACK_ON_RED,COLOR_BLACK,COLOR_RED);
-  init_pair(GREEN_ON_BLACK,COLOR_GREEN,COLOR_BLACK);
-  init_pair(CYAN_ON_BLACK,COLOR_CYAN,COLOR_BLACK);
-  init_pair(WHITE_ON_BLACK,COLOR_WHITE,COLOR_BLACK);
-  init_pair(WHITE_ON_RED,COLOR_WHITE,COLOR_RED);
+
+  /* setup colors */
+  void consoleif_setup_colors();
 
   /* get initial screen size */
   getmaxyx(stdscr,w_height,w_width);
 
   cons_wait_for_connection();
-
-  rec = newest_record(aldl);
 
   int x;
   gauge_t *gauge;
@@ -158,6 +153,16 @@ int ycenter(int height) {
 
 void print_centered_string(char *str) {
   mvaddstr(ycenter(0),xcenter(strlen(str)),str);
+};
+
+void consoleif_setup_colors() {
+  start_color();
+  init_pair(RED_ON_BLACK,COLOR_RED,COLOR_BLACK);
+  init_pair(BLACK_ON_RED,COLOR_BLACK,COLOR_RED);
+  init_pair(GREEN_ON_BLACK,COLOR_GREEN,COLOR_BLACK);
+  init_pair(CYAN_ON_BLACK,COLOR_CYAN,COLOR_BLACK);
+  init_pair(WHITE_ON_BLACK,COLOR_WHITE,COLOR_BLACK);
+  init_pair(WHITE_ON_RED,COLOR_WHITE,COLOR_RED);
 };
 
 void draw_statusbar() {
