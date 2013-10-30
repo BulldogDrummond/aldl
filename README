@@ -1,23 +1,23 @@
-overview------------------------
+## overview
 
 this is a program designed to manage aldl datastreams from the 8192 baud series
 of OBD-I GM ECMs under gnu/linux based operating systems, but specifically EE
 mask LT1 ecms.
 
-goals---------------------------
+## goals
 
-- adaptable to any ecm that adheres to the standard 8192 baud aldl protocol
-- low cpu use for low power devices such as raspberry pi and netbooks
-- easy configuration that's easily adapted from other formats
-- portable to at least ARM and x86
-- highest throughput possible but with adjustable throttling
-- highest connection stability and reconnect rate possible
-- transparent and stupid simple api
-- very easy to make plugins thread-safe
-- fast and easy automatic datalogging to csv format
-- simple ncurses interface for raspberry pi based dashboard
+* adaptable to any ecm that adheres to the standard 8192 baud aldl protocol
+* low cpu use for low power devices such as raspberry pi and netbooks
+* easy configuration that's easily adapted from other formats
+* portable to at least ARM and x86
+* highest throughput possible but with adjustable throttling
+* highest connection stability and reconnect rate possible
+* transparent and stupid simple api
+* very easy to make plugins thread-safe
+* fast and easy automatic datalogging to csv format
+* simple ncurses interface for raspberry pi based dashboard
 
-building------------------------
+## building
 
 dependancies:
   libftdi (optional)
@@ -30,7 +30,7 @@ currently supported:
   make serio-ftdi  # uses libftdi for direct raw usb access
   make serio-dummy  # a fake lt1 ecm for debugging
 
-contents------------------------
+## contents
 
 main.c: sets up initial structures and spawns some threads, to get things going
         facilitates loading of modules and main config data, etc.
@@ -71,7 +71,7 @@ serio-dummy.c: a really stupid fake serial driver for debugging, that pretends
 modules/*: various output modules which can be executed by main.c to actually
            do stuff with the data, incl. display and logging.
 
-notes----------------------
+#notes
 
 string to identify your ftdi interface (pick one):
    d:devicenode (usually at /proc/bus/usb)
