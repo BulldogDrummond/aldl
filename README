@@ -1,26 +1,45 @@
-for detailed project overview, see: http://resflter.github.io/aldl
+overview------------------------
 
-dependancies: libftdi, pthreads
+this is a program designed to manage aldl datastreams from the 8192 baud series
+of OBD-I GM ECMs under gnu/linux based operating systems, but specifically EE
+mask LT1 ecms.
 
-the build is now statically compiled with a serial driver.
+goals---------------------------
 
-to build a version with an ftdi driver: make aldl-ftdi
+- adaptable to any ecm that adheres to the standard 8192 baud aldl protocol
+- low cpu use for low power devices such as raspberry pi and netbooks
+- easy configuration that's easily adapted from other formats
+- portable to at least ARM and x86
+- highest throughput possible but with adjustable throttling
+- highest connection stability and reconnect rate possible
+- transparent and stupid simple api
+- very easy to make plugins thread-safe
+- fast and easy automatic datalogging to csv format
+- simple ncurses interface for raspberry pi based dashboard
 
-there is a rough 'demo simulator' serial driver that pretends to be an LT1 ECM.
-to use it, make aldl-dummy
+building------------------------
 
-contents:
+dependancies:
+  libftdi (optional)
+  pthreads
+
+the program is built with a statically compiled serial driver.
+
+currently supported:
+
+  make serio-ftdi  # uses libftdi for direct raw usb access
+  make serio-dummy  # a fake lt1 ecm for debugging
+
+contents------------------------
 
 main.c: sets up initial structures and spawns some threads, to get things going
+        facilitates loading of modules and main config data, etc.
 
 acquire.c: an object that runs an event loop full of functions from aldl-io,
            maintaining connection state and constructing a linked list buffer
            of parsed and verified aldl data.
 
 error.c: a global error handling object.
-
-debugif/  a testing display module just to spit out raw data to make sure it's
-          working.
 
 aldl-io.h: all public functions are exported here.  this also explicitly
            includes aldl-types.h.
@@ -35,6 +54,12 @@ aldlcomm.c: provides communication protocols for dealing with the ECM, including
             sending and generating requests, retrieving raw packets of data,
             and verifying them.
 
+useful.c: generic useful functions that are used by many different objects.
+
+loadconfig.c: a stupid but useful configuration file routine that is bound to
+              the equals sign.  includes routines for parsing the main config
+              files directly, but has enough of an api to be used by modules.
+
 serio-ftdi.c: an object that allows serial communications using the libftdi
               userland driver (via libusb).  this is the reccommended and only
               currently supported interface.
@@ -43,7 +68,10 @@ serio-dummy.c: a really stupid fake serial driver for debugging, that pretends
                to be an LT1 ecm.  seriously, it's really stupid, doesn't even
                check input, just spits out data in a serialized operation scope
 
-NOTES:
+modules/*: various output modules which can be executed by main.c to actually
+           do stuff with the data, incl. display and logging.
+
+notes----------------------
 
 string to identify your ftdi interface (pick one):
    d:devicenode (usually at /proc/bus/usb)
