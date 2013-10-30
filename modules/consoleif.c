@@ -31,6 +31,8 @@ typedef struct _gauge {
   int data_a, data_b; /* assoc. data index */
   aldl_data_t prev_a, prev_b; /* prev. value */
   float bottom, top; /* bottom and top of a graph */
+  int smoothing; /* averaging */
+  int weight;  /* smoothing weight */
   gaugetype_t gaugetype;
 } gauge_t;
 
@@ -71,6 +73,8 @@ void cons_wait_for_connection();
 
 /* get a config string for a particular gauge */
 char *gconfig(char *parameter, int n);
+
+float smooth_float(gauge_t *g);
 
 /* gauges -------------------*/
 void draw_h_progressbar(gauge_t *g);
@@ -206,7 +210,7 @@ void draw_simpletext_a(gauge_t *g) {
 
 void draw_h_progressbar(gauge_t *g) {
   aldl_define_t *def = &aldl->def[g->data_a];
-  float data = rec->data[g->data_a].f;
+  float data = smooth_float(g);
   int x;
   char *curs;
 
@@ -288,6 +292,8 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
     gauge->height = configopt_int(config,gconfig("HEIGHT",n),0,10000,1);
     gauge->bottom = configopt_float_fatal(config,gconfig("MIN",n));
     gauge->top = configopt_float_fatal(config,gconfig("MAX",n));
+    gauge->smoothing = configopt_int(config,gconfig("SMOOTHING",n),0,40,0);
+    gauge->weight = configopt_int(config,gconfig("WEIGHT",n),0,500,0);
     /* TYPE SELECTOR */
     char *gtypestr = configopt_fatal(config,gconfig("TYPE",n));
     if(faststrcmp(gtypestr,"HBAR") == 1) {
@@ -305,3 +311,17 @@ char *gconfig(char *parameter, int n) {
   sprintf(bigbuf,"G%i.%s",n,parameter);
   return bigbuf;
 };
+
+float smooth_float(gauge_t *g) {
+  if(g->smoothing == 0) return rec->data[g->data_a].f;
+  int x;
+  aldl_record_t *r = rec;
+  float avg = 0;
+  for(x=0;x<=g->smoothing;x++) {
+    avg += r->data[g->data_a].f; 
+    r = r->prev;
+  };
+  avg += rec->data[g->data_a].f * g->weight;
+  return avg / ( g->smoothing + g->weight + 1 );
+};
+
