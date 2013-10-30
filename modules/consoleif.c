@@ -292,7 +292,13 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
     gauge->height = configopt_int(config,gconfig("HEIGHT",n),0,10000,1);
     gauge->bottom = configopt_float_fatal(config,gconfig("MIN",n));
     gauge->top = configopt_float_fatal(config,gconfig("MAX",n));
-    gauge->smoothing = configopt_int(config,gconfig("SMOOTHING",n),0,40,0);
+    gauge->smoothing = configopt_int(config,gconfig("SMOOTHING",n),0,1000,0);
+    if(gauge->smoothing > aldl->bufstart - 1) {
+      fatalerror(ERROR_BUFFER,"gauge %i has its smoothing setting too high\n\
+                  gauge smoothing %i, but prebuffer is %i\n\
+              please decrease smoothing or increase prebuffer.",
+                 n,gauge->smoothing,aldl->bufstart);
+    };
     gauge->weight = configopt_int(config,gconfig("WEIGHT",n),0,500,0);
     /* TYPE SELECTOR */
     char *gtypestr = configopt_fatal(config,gconfig("TYPE",n));
@@ -319,6 +325,12 @@ float smooth_float(gauge_t *g) {
   float avg = 0;
   for(x=0;x<=g->smoothing;x++) {
     avg += r->data[g->data_a].f; 
+    if(r->prev == NULL) { /* attempt to trap underrun (might not work) */
+      fatalerror(ERROR_BUFFER,"buffer underrun caught in %s gauge\n\
+           %i smoothing w/ %i total buffer, and %i prebuffer.\n\
+            please decrease smoothing or increase prebuffer settings!!",
+         aldl->def[g->data_a].name,g->smoothing,aldl->bufsize,aldl->bufstart);
+    };
     r = r->prev;
   };
   avg += rec->data[g->data_a].f * g->weight;
