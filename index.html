@@ -1,61 +1,146 @@
-<!DOCTYPE html>
+<!doctype html>
+<!-- The Time Machine GitHub pages theme was designed and developed by Jon Rohan, on Feb 7, 2012. -->
+<!-- Follow him for fun. http://twitter.com/jonrohan. Tail his code on http://github.com/jonrohan -->
 <html>
-  <head>
-    <meta charset='utf-8'>
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+  <link rel="stylesheet" href="stylesheets/stylesheet.css" media="screen"/>
+  <link rel="stylesheet" href="stylesheets/pygment_trac.css"/>
+  <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script type="text/javascript" src="javascripts/script.js"></script>
 
-    <title>Aldl by resfilter</title>
-  </head>
+  <title>Aldl</title>
+  <meta name="description" content="A handler for gm obd-i aldl serial diagnostic systems.">
 
-  <body>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
 
+</head>
+
+<body>
+
+  <div class="wrapper">
     <header>
-      <div class="container">
-        <h1>Aldl</h1>
-        <h2>A handler for gm obd-i aldl serial diagnostic systems.</h2>
-
-        <section id="downloads">
-          <a href="https://github.com/resfilter/aldl/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/resfilter/aldl/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/resfilter/aldl" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
+      <h1 class="title">Aldl</h1>
     </header>
+    <div id="container">
+      <p class="tagline">A handler for gm obd-i aldl serial diagnostic systems.</p>
+      <div id="main" role="main">
+        <div class="download-bar">
+        <div class="inner">
+          <a href="https://github.com/resfilter/aldl/tarball/master" class="download-button tar"><span>Download</span></a>
+          <a href="https://github.com/resfilter/aldl/zipball/master" class="download-button zip"><span>Download</span></a>
+          <a href="https://github.com/resfilter/aldl" class="code">View Aldl on GitHub</a>
+        </div>
+        <span class="blc"></span><span class="trc"></span>
+        </div>
+        <article class="markdown-body">
+          <h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>overview</h2>
 
-    <div class="container">
-      <section id="main_content">
-        <p>This is a program designed to manage aldl datastreams from the 8192 baud series of OBD-I GM ECMs under gnu/linux based operating systems.</p>
+<p>this is a program designed to manage aldl datastreams from the 8192 baud series
+of OBD-I GM ECMs under gnu/linux based operating systems, but specifically EE
+mask LT1 ecms.</p>
 
-<p>Right now it's fairly functional.  Plugins and definition files need to be written, and more testing needs to be done.</p>
-
-<p>Although this may prove to be an excellent laptop datalogger,
-the main goal is to turn small low-power linux devices such as the raspberry pi into a powerful auxiliary dashboard or perpetual datalogger:</p>
+<h2>
+<a name="goals" class="anchor" href="#goals"><span class="octicon octicon-link"></span></a>goals</h2>
 
 <ul>
-<li>Maintain stable diagnostic mode, with methods that are adaptable to all GM ECMs.</li>
-<li>Low memory and CPU usage with pure optimized C</li>
-<li>Portable to at least x86 and ARM</li>
-<li>Parse multiple datastreams efficiently with maximum throughput allowable</li>
-<li>Accurate unit conversions for all known data that are transparent to plugins</li>
-<li>Stupid simple plug-in API that requires no knowledge of the datastream</li>
-<li>Parallel processing of output plugins with a single serial input</li>
-<li>Script to convert ADF format spec</li>
-</ul><p>Possible plugins and applications for target devices include:</p>
+<li>adaptable to any ecm that adheres to the standard 8192 baud aldl protocol</li>
+<li>low cpu use for low power devices such as raspberry pi and netbooks</li>
+<li>easy configuration that's easily adapted from other formats</li>
+<li>portable to at least ARM and x86</li>
+<li>highest throughput possible but with adjustable throttling</li>
+<li>highest connection stability and reconnect rate possible</li>
+<li>transparent and stupid simple api</li>
+<li>very easy to make plugins thread-safe</li>
+<li>fast and easy automatic datalogging to csv format</li>
+<li>simple ncurses interface for raspberry pi based dashboard</li>
+</ul><h2>
+<a name="building" class="anchor" href="#building"><span class="octicon octicon-link"></span></a>building</h2>
 
-<ul>
-<li>ncurses or GTK display interfaces for supplimental dashboards</li>
-<li>lightweight multi-format dataloggers</li>
-<li>warning buzzer or warning light widgets</li>
-<li>simple scripting engines, which, combined with a GPIO header, could allow this to become a fairly capable piggyback ECM for boost control, cutout actuation, or whatever</li>
-</ul>
-<a href="http://www.flickr.com/photos/rfesu/10451998544/" title="aldlio2 by rfesu, on Flickr"><img src="http://farm8.staticflickr.com/7306/10451998544_eb4ecfefa2.jpg" width="500" height="291" alt="aldlio2"></a>
-      </section>
+<p>dependancies:
+  libftdi (optional)
+  pthreads</p>
+
+<p>the program is built with a statically compiled serial driver.</p>
+
+<p>currently supported:</p>
+
+<p>make serio-ftdi  # uses libftdi for direct raw usb access
+  make serio-dummy  # a fake lt1 ecm for debugging</p>
+
+<h2>
+<a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a>contents</h2>
+
+<p>main.c: sets up initial structures and spawns some threads, to get things going
+        facilitates loading of modules and main config data, etc.</p>
+
+<p>acquire.c: an object that runs an event loop full of functions from aldl-io,
+           maintaining connection state and constructing a linked list buffer
+           of parsed and verified aldl data.</p>
+
+<p>error.c: a global error handling object.</p>
+
+<p>aldl-io.h: all public functions are exported here.  this also explicitly
+           includes aldl-types.h.</p>
+
+<p>aldl-types.h: defines all public data structures used in this library.</p>
+
+<p>aldldata.c: provides functions for data management, including construction of
+            the linked list of records, parsing and conversion of raw data, and
+            thread-safe read/write of critical data.</p>
+
+<p>aldlcomm.c: provides communication protocols for dealing with the ECM, including
+            sending and generating requests, retrieving raw packets of data,
+            and verifying them.</p>
+
+<p>useful.c: generic useful functions that are used by many different objects.</p>
+
+<p>loadconfig.c: a stupid but useful configuration file routine that is bound to
+              the equals sign.  includes routines for parsing the main config
+              files directly, but has enough of an api to be used by modules.</p>
+
+<p>serio-ftdi.c: an object that allows serial communications using the libftdi
+              userland driver (via libusb).  this is the reccommended and only
+              currently supported interface.</p>
+
+<p>serio-dummy.c: a really stupid fake serial driver for debugging, that pretends
+               to be an LT1 ecm.  seriously, it's really stupid, doesn't even
+               check input, just spits out data in a serialized operation scope</p>
+
+<p>modules/*: various output modules which can be executed by main.c to actually
+           do stuff with the data, incl. display and logging.</p>
+
+<h2>
+<a name="notes" class="anchor" href="#notes"><span class="octicon octicon-link"></span></a>notes</h2>
+
+<p>string to identify your ftdi interface (pick one):
+   d:devicenode (usually at /proc/bus/usb)
+   i:vendor:product
+   i:vendor:product:index
+   s:vendor:product:serial</p>
+        </article>
+      </div>
     </div>
+    <footer>
+      <div class="owner">
+      <p><a href="https://github.com/resfilter" class="avatar"><img src="https://1.gravatar.com/avatar/e396a01cc3d22824d9ef1673fb541c81?d=https%3A%2F%2Fidenticons.github.com%2F292fb5b57f7b7438776bb841e30164a4.png&amp;r=x&amp;s=60" width="48" height="48"/></a> <a href="https://github.com/resfilter">resfilter</a> maintains <a href="https://github.com/resfilter/aldl">Aldl</a></p>
 
-    
-  </body>
+
+      </div>
+      <div class="creds">
+        <small>This page generated using <a href="https://pages.github.com/">GitHub Pages</a><br/>theme by <a href="https://twitter.com/jonrohan/">Jon Rohan</a></small>
+      </div>
+    </footer>
+  </div>
+  <div class="current-section">
+    <a href="#top">Scroll to top</a>
+    <a href="https://github.com/resfilter/aldl/tarball/master" class="tar">tar</a><a href="https://github.com/resfilter/aldl/zipball/master" class="zip">zip</a><a href="" class="code">source code</a>
+    <p class="name"></p>
+  </div>
+
+  
+</body>
 </html>
