@@ -106,4 +106,7 @@ void printhexstring(byte *str, int length);
 /* return a string that describes a connection state */
 char *get_state_string(aldl_state_t s);
 
+/* cleanup function in main */
+void main_exit();
+
 #endif

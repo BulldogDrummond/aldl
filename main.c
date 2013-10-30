@@ -96,8 +96,13 @@ int main(int argc, char **argv) { /*--------------------------- */
 
 } /*-----------------------------------------------------------*/
 
-int aldl_finish() {
+void main_exit() {
+  consoleif_exit();
   serial_close();
+  aldl_finish();
+}
+
+int aldl_finish() {
   return 0;
 }
 

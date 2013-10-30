@@ -337,3 +337,6 @@ float smooth_float(gauge_t *g) {
   return avg / ( g->smoothing + g->weight + 1 );
 };
 
+void consoleif_exit() {
+  endwin();
+}

@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "error.h"
+#include "aldl-io.h"
 
 /* list of error code to string, array index matches enumerated values in
    error_t.  these will have ERROR printed AFTER them, so GENERAL will come
@@ -33,7 +34,7 @@ void fatalerror(error_t code, char *str, ...) {
     va_end(arg);
     fprintf(stderr,"\n");
   };
-  exit(1);
+  main_exit();
 };
 
 void nonfatalerror(error_t code, char *str, ...) {
