@@ -57,25 +57,8 @@ int serial_init(char *port) {
     fatalerror(ERROR_FTDI,"ftdi_new failed");
   };
 
-  if(port != NULL) { /* static device config */
-    res = ftdi_usb_open_string(ftdi,port);
-    ftdierror(2,res); /* trap error */
-  } else { /* autodetect mode */
-    struct ftdi_device_list **devlist = malloc(sizeof(
-                          struct ftdi_device_list *) * FTDI_AUTO_MAXDEVS);
-    int n_devices = ftdi_usb_find_all(ftdi,devlist,0,0);
-    if(n_devices > 0) { /* device found */
-      /* right now this just grabs the first available ftdi device .. */
-      res = ftdi_usb_open_dev(ftdi,devlist[0]->dev);
-      ftdierror(2,res);
-      ftdi_list_free(devlist);
-    } else if(n_devices == 0) { /* nothing found */
-      fatalerror(ERROR_FTDI,"no ftdi devices found");
-    } else {
-      fatalerror(ERROR_FTDI,"detection failed for some reason.");
-    };
-  };
-
+  res = ftdi_usb_open_string(ftdi,port);
+  ftdierror(2,res); /* trap error */
   if(res < 0) return 0;
 
   #ifdef SERIAL_VERBOSE
