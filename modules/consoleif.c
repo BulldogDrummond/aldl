@@ -215,7 +215,7 @@ void draw_h_progressbar(gauge_t *g) {
   char *curs;
 
   /* get rh text width */
-  int width_rhtext = sprintf(bigbuf,"] %.0f",g->top);
+  int width_rhtext = sprintf(bigbuf,"] %.0f%s",g->top,def->uom);
 
   /* print LH text */
   int width_lhtext = sprintf(bigbuf,"%s [",def->name);
@@ -234,7 +234,7 @@ void draw_h_progressbar(gauge_t *g) {
     curs[0] = ' ';
     curs++;
   };
-  sprintf(curs,"] %.0f",data);
+  sprintf(curs,"] %.0f%s",data,def->uom);
   move(g->y,g->x); 
   gauge_blank(g);
   if( ( def->alarm_low_enable == 1 && data < def->alarm_low.f ) || 
