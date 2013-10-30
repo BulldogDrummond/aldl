@@ -233,7 +233,14 @@ void draw_h_progressbar(gauge_t *g) {
   sprintf(curs,"] %.0f",data);
   move(g->y,g->x); 
   gauge_blank(g);
-  mvaddstr(g->y,g->x,bigbuf);
+  if( ( def->alarm_low_enable == 1 && data < def->alarm_low.f ) || 
+    ( def->alarm_high_enable == 1 && data > def->alarm_high.f) ) {
+    attron(COLOR_PAIR(RED_ON_BLACK));
+    mvaddstr(g->y,g->x,bigbuf);
+    attroff(COLOR_PAIR(RED_ON_BLACK));
+  } else {
+    mvaddstr(g->y,g->x,bigbuf);
+  };
 };
 
 void gauge_blank(gauge_t *g) {
