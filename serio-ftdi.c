@@ -142,3 +142,26 @@ void ftdierror(int loc,int errno) {
   fatalerror(ERROR_FTDI,"*** See above FTDI DRIVER error message @ stderr");
 };
 
+void serial_help_devs() {
+  int ret, i;
+  struct ftdi_device_list *devlist, *curdev;
+  char mfr[128], desc[128];
+
+  if((ftdi = ftdi_new()) == NULL) fatalerror(ERROR_FTDI,"ftdi_new failed");
+
+  ret = ftdi_usb_find_all(ftdi, &devlist, 0x0403, 0x6001);
+  ftdierror(99,ret);
+  printf("Number of FTDI devices found: %d\n", ret);
+
+  i=0;
+  for (curdev = devlist; curdev != NULL; i++) {
+    printf("Checking device: %d\n", i);
+    ftdierror(101,ftdi_usb_get_strings(ftdi, curdev->dev, mfr, 128,
+                  desc,128,NULL,0));
+    printf("Manufacturer: %s, Description: %s\n\n", mfr, desc);
+    curdev = curdev->next;
+  }
+
+  ftdi_list_free(&devlist);
+  ftdi_deinit(ftdi);
+};

@@ -23,5 +23,8 @@ void serial_purge(); /* both buffers */
 void serial_purge_rx(); /* rx only */
 void serial_purge_tx(); /* tx only */
 
+/* device search helper */
+void serial_help_devs();
+
 #endif
 

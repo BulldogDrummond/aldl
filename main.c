@@ -13,6 +13,7 @@
 #include "error.h"
 #include "aldl-io.h"
 #include "useful.h"
+#include "serio.h"
 
 #include "modules/modules.h"
 
@@ -41,6 +42,9 @@ int main(int argc, char **argv) { /*--------------------------- */
   for(n_arg=1;n_arg<argc;n_arg++) {
     if(faststrcmp(argv[n_arg],"configtest") == 1) {
       printf("Loaded config OK.  Exiting...\n");
+      exit(0);
+    } else if(faststrcmp(argv[n_arg],"devices") == 1) {
+      serial_help_devs();
       exit(0);
     } else if(faststrcmp(argv[n_arg],"consoleif") == 1) {
       aldl->consoleif_enable = 1;

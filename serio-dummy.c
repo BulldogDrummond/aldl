@@ -94,3 +94,6 @@ inline int serial_read(byte *str, int len) {
   return 0;
 }
 
+void serial_help_devs() {
+  fatalerror(ERROR_GENERAL,"this serial driver has no devices......");
+};
