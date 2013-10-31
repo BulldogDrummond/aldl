@@ -1,5 +1,5 @@
 # compiler flags
-CFLAGS= -g -Wall
+CFLAGS= -O2 -Wall
 OBJS= acquire.o error.o loadconfig.o useful.o aldlcomm.o aldldata.o
 MODULES= modules/*.o
 LIBS= -lpthread -lrt -lncurses

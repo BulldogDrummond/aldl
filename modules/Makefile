@@ -1,5 +1,5 @@
 # compiler flags
-CFLAGS= -g -Wall
+CFLAGS= -O2 -Wall
 
 all: consoleif.o datalogger.o
 
