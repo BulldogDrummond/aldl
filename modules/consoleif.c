@@ -74,7 +74,11 @@ void cons_wait_for_connection();
 /* get a config string for a particular gauge */
 char *gconfig(char *parameter, int n);
 
+/* "smooth" a float */
 float smooth_float(gauge_t *g);
+
+/* check if a value is past alarm range */
+int alarm_range(gauge_t *g);
 
 /* gauges -------------------*/
 void draw_h_progressbar(gauge_t *g);
@@ -203,9 +207,40 @@ void cons_wait_for_connection() {
 
 void draw_simpletext_a(gauge_t *g) {
   aldl_define_t *def = &aldl->def[g->data_a];
-  float data = rec->data[g->data_a].f;
-  /* FIXME this needs more work */
-  mvprintw(g->y,g->x,"%s: %.1f %s    ",def->name,data,def->uom);
+  gauge_blank(g);
+  aldl_data_t *data = &rec->data[g->data_a];
+  if(alarm_range(g) == 1) attron(COLOR_PAIR(RED_ON_BLACK));
+  switch(def->type) {
+    case ALDL_FLOAT:
+      mvprintw(g->y,g->x,"%s: %.1f %s",
+            def->name,smooth_float(g),def->uom);
+      break;
+    case ALDL_INT:
+      mvprintw(g->y,g->x,"%s: %i %s",
+          def->name,data->i,def->uom);
+      break;
+    default:
+      return;
+  };
+  if(alarm_range(g) == 1) attroff(COLOR_PAIR(RED_ON_BLACK));
+};
+
+int alarm_range(gauge_t *g) {
+  aldl_define_t *def = &aldl->def[g->data_a];
+  aldl_data_t *data = &rec->data[g->data_a];
+  switch(def->type) {
+    case ALDL_FLOAT:
+      if( ( def->alarm_low_enable == 1 && data->f < def->alarm_low.f ) ||
+      ( def->alarm_high_enable == 1 && data->f > def->alarm_high.f) ) return 1;
+      return 0;
+      break;
+    case ALDL_INT:
+      if( ( def->alarm_low_enable == 1 && data->i < def->alarm_low.i ) ||
+      ( def->alarm_high_enable == 1 && data->i > def->alarm_high.i) ) return 1;
+      return 0;
+    default:
+      return 0;
+  };
 };
 
 void draw_h_progressbar(gauge_t *g) {
@@ -237,14 +272,10 @@ void draw_h_progressbar(gauge_t *g) {
   sprintf(curs,"] %.0f%s",data,def->uom);
   move(g->y,g->x); 
   gauge_blank(g);
-  if( ( def->alarm_low_enable == 1 && data < def->alarm_low.f ) || 
-    ( def->alarm_high_enable == 1 && data > def->alarm_high.f) ) {
-    attron(COLOR_PAIR(RED_ON_BLACK));
-    mvaddstr(g->y,g->x,bigbuf);
-    attroff(COLOR_PAIR(RED_ON_BLACK));
-  } else {
-    mvaddstr(g->y,g->x,bigbuf);
-  };
+
+  if(alarm_range(g) == 1) attron(COLOR_PAIR(RED_ON_BLACK));
+  mvaddstr(g->y,g->x,bigbuf);
+  if(alarm_range(g) == 1) attroff(COLOR_PAIR(RED_ON_BLACK));
 };
 
 void gauge_blank(gauge_t *g) {
@@ -288,10 +319,10 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
     };
     gauge->x = configopt_int_fatal(config,gconfig("X",n),0,10000);
     gauge->y = configopt_int_fatal(config,gconfig("Y",n),0,10000);
-    gauge->width = configopt_int_fatal(config,gconfig("WIDTH",n),0,10000);
+    gauge->width = configopt_int(config,gconfig("WIDTH",n),0,10000,30);
     gauge->height = configopt_int(config,gconfig("HEIGHT",n),0,10000,1);
-    gauge->bottom = configopt_float_fatal(config,gconfig("MIN",n));
-    gauge->top = configopt_float_fatal(config,gconfig("MAX",n));
+    gauge->bottom = configopt_float(config,gconfig("MIN",n),0);
+    gauge->top = configopt_float(config,gconfig("MAX",n),65535);
     gauge->smoothing = configopt_int(config,gconfig("SMOOTHING",n),0,1000,0);
     if(gauge->smoothing > aldl->bufstart - 1) {
       fatalerror(ERROR_BUFFER,"gauge %i has its smoothing setting too high\n\
