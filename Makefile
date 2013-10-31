@@ -7,7 +7,7 @@ LIBS= -lpthread -lrt -lncurses
 all: aldl-ftdi aldl-dummy
 
 aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
-	gcc $(CFLAGS) -lftdi $(LIBS) main.c -o aldl-ftdi $(OBJS) $(MODULES) serio-ftdi.o
+	gcc $(CFLAGS) $(LIBS) -lftdi main.c -o aldl-ftdi $(OBJS) $(MODULES) serio-ftdi.o
 
 aldl-dummy: main.c serio-dummy.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
 	gcc $(CFLAGS) $(LIBS) main.c -o aldl-dummy $(OBJS) $(MODULES) serio-dummy.o
