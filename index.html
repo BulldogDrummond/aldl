@@ -53,18 +53,39 @@ for my LT1 based car.</p>
 <li>fast and easy automatic datalogging to csv format</li>
 <li>simple ncurses interface for raspberry pi based dashboard</li>
 </ul><h2>
-<a name="building" class="anchor" href="#building"><span class="octicon octicon-link"></span></a>building</h2>
+<a name="instructions" class="anchor" href="#instructions"><span class="octicon octicon-link"></span></a>instructions</h2>
 
-<p>dependancies:
-  libftdi (optional)
-  pthreads</p>
+<p>to build and run it, you'll need to:</p>
 
-<p>the program is built with a statically compiled serial driver.</p>
+<p>install libftdi and libncurses.</p>
 
-<p>currently supported:</p>
+<p>if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev</p>
 
-<p>make serio-ftdi  # uses libftdi for direct raw usb access
-  make serio-dummy  # a fake lt1 ecm for debugging</p>
+<p>rmmod ftdi_sio.  this removes the the in-kernel ftdi driver, this one uses raw usb and wont work while the kernel driver is loaded.  most people should just blacklist this driver, and make sure your user has permissions to read/write usb devices.</p>
+
+<p>the config files are in examples/ and it's built to use this directory by default for testing.</p>
+
+<p>the only thing you should have to change is identifying your ftdi device somehow in examples/aldl.conf</p>
+
+<p>there are instructions at the bottom of this file on various ways to do that.  but briefly, if you run lsusb, and you find your device, it'll be like:</p>
+
+<p>Bus 001 Device 003: ID 0424:ec00 Some FTDI Device</p>
+
+<p>there is also a command, ./aldl-ftdi devices  which may give you more detailed information about the ftdi devices on your system, or may not.  i haven't tested it.</p>
+
+<p>then look in examples/aldl.conf.  there's a PORT="d:bus/device" line.  for this example, PORT="D:001/003" would work</p>
+
+<p>then:</p>
+
+<p>./aldl-ftdi</p>
+
+<p>and you're good to go.  go ahead and run it before you start your car, it'll auto-connect when your car is powered up.</p>
+
+<p>by default, it only runs the ncurses display interface.  the default modules that run are also specified in aldl.conf.</p>
+
+<p>if you want datalogging to run, you can just ./aldl-ftdi datalogger will run the datalogger too.  it logs to /tmp by default.</p>
+
+<p>look at all the config files if you want to try anything out, they're pretty straightforward</p>
 
 <h2>
 <a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a>contents</h2>
