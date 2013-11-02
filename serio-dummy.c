@@ -31,7 +31,7 @@ void gen_pkt() {
   databuff[0]=0xF4;
   databuff[1]=0x92;
   databuff[2]=0x01;
-  for(x=3;x<63;x++) databuff[x] = (byte)rand() % 254;
+  for(x=3;x<63;x++) databuff[x] = ( (byte)rand() % 256 ) - 1;
   databuff[63] = checksum_generate(databuff,63);
 };
 
