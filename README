@@ -21,29 +21,33 @@ EE mask LT1 ecms.
 
 to build and run it, you'll need to:
 
-1. install libftdi and libncurses.
+* install libftdi and libncurses.
 
 if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev
 
-2. 'rmmod ftdi_sio'  or blacklist it.
+* 'rmmod ftdi_sio'  or blacklist it.
 
-this removes the the in-kernel ftdi driver, this one uses raw usb and wont work
-while the kernel driver is loaded. most people should just blacklist this
-driver, and make sure your user has permissions to read/write usb devices.
+this removes the the in-kernel ftdi driver.  this program uses libftdi for raw
+access to the usb-serial adaptor, and will not work while ftdi_sio is loaded.
 
-3. configuration.  see below.
+* make sure your user has permissions to read/write usb devices.
 
-4. './aldl-ftdi' or './aldl-ftdi datalogger'
+* configuration.  see below.
 
-by default, it only runs the ncurses display interface. the default modules
-that run are also specified in aldl.conf.  if you run ./aldl-ftdi datalogger,
-it runs both the display and the datalogger by default.
+* run it! './aldl-ftdi'
+
+by default, it only uses the ncurses display interface. the default modules
+that run are also specified in aldl.conf.
+
+if you want the datalogger and the display interface: ./aldl-ftdi datalogger
 
 ## configuration
 
-!! the config files are in examples !! and it's built to use this directory by
-default for testing.  if you're just playing with it, you might want to keep it
-that way.
+!! the config files are in examples/ !! 
+
+it's built to use this directory by default for testing.  you can change the
+default 'root' config file (aldl.conf) in config.h, then edit aldl.conf's paths
+if you want to store them somewhere else.
 
 * aldl.conf: the root config file, specifies locations of the other config
 files, as well as configures the serial driver, and a few timing options.
@@ -51,8 +55,8 @@ files, as well as configures the serial driver, and a few timing options.
 * datalogger.conf: configures the datalogger, including location and naming or
 the logs themselves
 
-the only thing you should have to change is identifying your ftdi device
-somehow in aldl.conf.
+the only thing you should have to change to get this program up and running on
+an LT1 is identifying your ftdi device somehow in aldl.conf.
 
 there are instructions at the bottom of this file on various ways to do that.
 but briefly, if you run lsusb, and you find your device, it'll be like:
