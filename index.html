@@ -54,29 +54,32 @@ EE mask LT1 ecms.</p>
 
 <p>to build and run it, you'll need to:</p>
 
-<ol>
+<ul>
 <li>install libftdi and libncurses.</li>
-</ol><p>if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev</p>
+</ul><p>if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev</p>
 
-<ol>
+<ul>
 <li>'rmmod ftdi_sio'  or blacklist it.</li>
-</ol><p>this removes the the in-kernel ftdi driver, this one uses raw usb and wont work
-while the kernel driver is loaded. most people should just blacklist this
-driver, and make sure your user has permissions to read/write usb devices.</p>
+</ul><p>this removes the the in-kernel ftdi driver.  this program uses libftdi for raw
+access to the usb-serial adaptor, and will not work while ftdi_sio is loaded.</p>
 
-<ol>
+<ul>
+<li><p>make sure your user has permissions to read/write usb devices.</p></li>
 <li><p>configuration.  see below.</p></li>
-<li><p>'./aldl-ftdi' or './aldl-ftdi datalogger'</p></li>
-</ol><p>by default, it only runs the ncurses display interface. the default modules
-that run are also specified in aldl.conf.  if you run ./aldl-ftdi datalogger,
-it runs both the display and the datalogger by default.</p>
+<li><p>run it! './aldl-ftdi'</p></li>
+</ul><p>by default, it only uses the ncurses display interface. the default modules
+that run are also specified in aldl.conf.</p>
+
+<p>if you want the datalogger and the display interface: ./aldl-ftdi datalogger</p>
 
 <h2>
 <a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>configuration</h2>
 
-<p>!! the config files are in examples !! and it's built to use this directory by
-default for testing.  if you're just playing with it, you might want to keep it
-that way.</p>
+<p>!! the config files are in examples/ !! </p>
+
+<p>it's built to use this directory by default for testing.  you can change the
+default 'root' config file (aldl.conf) in config.h, then edit aldl.conf's paths
+if you want to store them somewhere else.</p>
 
 <ul>
 <li>aldl.conf: the root config file, specifies locations of the other config
@@ -84,8 +87,8 @@ files, as well as configures the serial driver, and a few timing options.</li>
 <li>lt1.conf: this is a sample definition file for an LT1 F-body or B-Body.</li>
 <li>datalogger.conf: configures the datalogger, including location and naming or
 the logs themselves</li>
-</ul><p>the only thing you should have to change is identifying your ftdi device
-somehow in aldl.conf.</p>
+</ul><p>the only thing you should have to change to get this program up and running on
+an LT1 is identifying your ftdi device somehow in aldl.conf.</p>
 
 <p>there are instructions at the bottom of this file on various ways to do that.
 but briefly, if you run lsusb, and you find your device, it'll be like:</p>
