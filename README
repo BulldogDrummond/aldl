@@ -21,23 +21,38 @@ mask LT1 ecms.
 
 to build and run it, you'll need to:
 
-install libftdi and libncurses.
+1. install libftdi and libncurses.
 
-if you run debian/ubuntu/whatever, then:
+if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev
 
-apt-get install ncurses-dev libftdi-dev
-
-rmmod ftdi_sio
+2. 'rmmod ftdi_sio'  or blacklist it.
 
 this removes the the in-kernel ftdi driver, this one uses raw usb and wont work
 while the kernel driver is loaded. most people should just blacklist this
 driver, and make sure your user has permissions to read/write usb devices.
 
-the config files are in examples/ and it's built to use this directory by
-default for testing.
+3. configuration.  see below.
+
+4. './aldl-ftdi' or './aldl-ftdi datalogger'
+
+by default, it only runs the ncurses display interface. the default modules
+that run are also specified in aldl.conf.  if you run ./aldl-ftdi datalogger,
+it runs both the display and the datalogger by default.
+
+## configuration
+
+!! the config files are in examples !! and it's built to use this directory by
+default for testing.  if you're just playing with it, you might want to keep it
+that way.
+
+* aldl.conf: the root config file, specifies locations of the other config
+files, as well as configures the serial driver, and a few timing options.
+* lt1.conf: this is a sample definition file for an LT1 F-body or B-Body.
+* datalogger.conf: configures the datalogger, including location and naming or
+the logs themselves
 
 the only thing you should have to change is identifying your ftdi device
-somehow in examples/aldl.conf
+somehow in aldl.conf.
 
 there are instructions at the bottom of this file on various ways to do that.
 but briefly, if you run lsusb, and you find your device, it'll be like:
@@ -45,27 +60,12 @@ but briefly, if you run lsusb, and you find your device, it'll be like:
 Bus 001 Device 003: ID 0424:ec00 Some FTDI Device
 
 there is also a command, ./aldl-ftdi devices which may give you more detailed
-information about the ftdi devices on your system, or may not.
-i haven't tested it.
+information about the ftdi devices on your system, or may not.  poorly tested.
 
 then look in examples/aldl.conf. there's a PORT="d:bus/device" line. for this
 example, PORT="D:001/003" would work
 
-then:
-
-./aldl-ftdi
-
-and you're good to go. go ahead and run it before you start your car, it'll
-auto-connect when your car is powered up.
-
-by default, it only runs the ncurses display interface. the default modules
-that run are also specified in aldl.conf.
-
-if you want datalogging to run, you can just ./aldl-ftdi datalogger will run
-the datalogger too. it logs to /tmp by default.
-
-look at all the config files if you want to try anything out, they're pretty
-straightforward
+check out config.h if you're interested in 'tweaking' anything.
 
 ## contents
 
