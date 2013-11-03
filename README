@@ -1,8 +1,8 @@
 ## overview
 
 this is a program designed to manage aldl datastreams from the 8192 baud series
-of OBD-I GM ECMs under gnu/linux based operating systems, but specifically EE
-mask LT1 ecms.
+of OBD-I GM ECMs under gnu/linux based operating systems, but best tested with
+EE mask LT1 ecms.
 
 ## goals
 
