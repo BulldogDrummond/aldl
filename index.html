@@ -1,42 +1,39 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
-    <meta charset='utf-8'>
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
-
     <title>Aldl-io by resfilter</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
   </head>
-
   <body>
-
-    <header>
-      <div class="container">
+    <div class="wrapper">
+      <header>
         <h1>Aldl-io</h1>
-        <h2>Make use of ALDL datastreams in gnu/linux</h2>
+        <p>Make use of ALDL datastreams in gnu/linux</p>
 
-        <section id="downloads">
-          <a href="https://github.com/resfilter/aldl/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/resfilter/aldl/tarball/master" class="btn">Download as .tar.gz</a>
-          <a href="https://github.com/resfilter/aldl" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>
-    </header>
+        <p class="view"><a href="https://github.com/resfilter/aldl">View the Project on GitHub <small>resfilter/aldl</small></a></p>
 
-    <div class="container">
-      <section id="main_content">
+
+        <ul>
+          <li><a href="https://github.com/resfilter/aldl/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/resfilter/aldl/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/resfilter/aldl">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
         <h2>
 <a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>overview</h2>
 
 <p>this is a program designed to manage aldl datastreams from the 8192 baud series
-of OBD-I GM ECMs under gnu/linux based operating systems, but specifically EE
-mask LT1 ecms.</p>
-
-<p>i started this project in an attempt to make a raspberry pi powered dashboard
-for my LT1 based car.</p>
+of OBD-I GM ECMs under gnu/linux based operating systems, but best tested with
+EE mask LT1 ecms.</p>
 
 <h2>
 <a name="goals" class="anchor" href="#goals"><span class="octicon octicon-link"></span></a>goals</h2>
@@ -57,35 +54,51 @@ for my LT1 based car.</p>
 
 <p>to build and run it, you'll need to:</p>
 
-<p>install libftdi and libncurses.</p>
+<ol>
+<li>install libftdi and libncurses.</li>
+</ol><p>if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev</p>
 
-<p>if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev</p>
+<ol>
+<li>'rmmod ftdi_sio'  or blacklist it.</li>
+</ol><p>this removes the the in-kernel ftdi driver, this one uses raw usb and wont work
+while the kernel driver is loaded. most people should just blacklist this
+driver, and make sure your user has permissions to read/write usb devices.</p>
 
-<p>rmmod ftdi_sio.  this removes the the in-kernel ftdi driver, this one uses raw usb and wont work while the kernel driver is loaded.  most people should just blacklist this driver, and make sure your user has permissions to read/write usb devices.</p>
+<ol>
+<li><p>configuration.  see below.</p></li>
+<li><p>'./aldl-ftdi' or './aldl-ftdi datalogger'</p></li>
+</ol><p>by default, it only runs the ncurses display interface. the default modules
+that run are also specified in aldl.conf.  if you run ./aldl-ftdi datalogger,
+it runs both the display and the datalogger by default.</p>
 
-<p>the config files are in examples/ and it's built to use this directory by default for testing.</p>
+<h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>configuration</h2>
 
-<p>the only thing you should have to change is identifying your ftdi device somehow in examples/aldl.conf</p>
+<p>!! the config files are in examples !! and it's built to use this directory by
+default for testing.  if you're just playing with it, you might want to keep it
+that way.</p>
 
-<p>there are instructions at the bottom of this file on various ways to do that.  but briefly, if you run lsusb, and you find your device, it'll be like:</p>
+<ul>
+<li>aldl.conf: the root config file, specifies locations of the other config
+files, as well as configures the serial driver, and a few timing options.</li>
+<li>lt1.conf: this is a sample definition file for an LT1 F-body or B-Body.</li>
+<li>datalogger.conf: configures the datalogger, including location and naming or
+the logs themselves</li>
+</ul><p>the only thing you should have to change is identifying your ftdi device
+somehow in aldl.conf.</p>
+
+<p>there are instructions at the bottom of this file on various ways to do that.
+but briefly, if you run lsusb, and you find your device, it'll be like:</p>
 
 <p>Bus 001 Device 003: ID 0424:ec00 Some FTDI Device</p>
 
-<p>there is also a command, ./aldl-ftdi devices  which may give you more detailed information about the ftdi devices on your system, or may not.  i haven't tested it.</p>
+<p>there is also a command, ./aldl-ftdi devices which may give you more detailed
+information about the ftdi devices on your system, or may not.  poorly tested.</p>
 
-<p>then look in examples/aldl.conf.  there's a PORT="d:bus/device" line.  for this example, PORT="D:001/003" would work</p>
+<p>then look in examples/aldl.conf. there's a PORT="d:bus/device" line. for this
+example, PORT="D:001/003" would work</p>
 
-<p>then:</p>
-
-<p>./aldl-ftdi</p>
-
-<p>and you're good to go.  go ahead and run it before you start your car, it'll auto-connect when your car is powered up.</p>
-
-<p>by default, it only runs the ncurses display interface.  the default modules that run are also specified in aldl.conf.</p>
-
-<p>if you want datalogging to run, you can just ./aldl-ftdi datalogger will run the datalogger too.  it logs to /tmp by default.</p>
-
-<p>look at all the config files if you want to try anything out, they're pretty straightforward</p>
+<p>check out config.h if you're interested in 'tweaking' anything.</p>
 
 <h2>
 <a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a>contents</h2>
@@ -129,8 +142,8 @@ for my LT1 based car.</p>
 <p>modules/*: various output modules which can be executed by main.c to actually
            do stuff with the data, incl. display and logging.</p>
 
-<h2>
-<a name="notes" class="anchor" href="#notes"><span class="octicon octicon-link"></span></a>notes</h2>
+<h1>
+<a name="notes" class="anchor" href="#notes"><span class="octicon octicon-link"></span></a>notes</h1>
 
 <p>string to identify your ftdi interface (pick one):
    d:devicenode (usually at /proc/bus/usb)
@@ -138,8 +151,12 @@ for my LT1 based car.</p>
    i:vendor:product:index
    s:vendor:product:serial</p>
       </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/resfilter">resfilter</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
     </div>
-
+    <script src="javascripts/scale.fix.js"></script>
     
   </body>
 </html>
