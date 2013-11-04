@@ -107,6 +107,7 @@ void main_exit() {
 }
 
 int aldl_finish() {
+  exit(1);
   return 0;
 }
 
