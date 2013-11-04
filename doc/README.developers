@@ -22,13 +22,13 @@ Access of Data:
   conf->def[x] and record->data[x].  This can be leveraged to easily get data
   from a definition.
 
-  This is an example of a stupid plugin that has some initial knowledge of the
-  unique ID of the RPM definition, and displays RPM in a loop, it's thread-safe
-
 - There is a statistical structure that requires locking, lock_stats() and
   unlock_stats() need to be called.
 
 /*------------------------------------------------------------------------*/
+
+/* this is a small example module that simply displays data from a defintion
+   labeled "RPM". */
 
 void display_rpm(aldl_conf_t *aldl) {
 
@@ -40,12 +40,15 @@ void display_rpm(aldl_conf_t *aldl) {
   aldl_record_t *rec = newest_record(aldl); /* ptr to the most current record */
 
   while(1) {
+
     /* pause until new data is available, then point to new record */
     rec = next_record_wait(aldl,rec);
+
+    /* check return value.  if it's NULL that means..... */
     if(rec == NULL) { /* we've disconnected ... */
       printf("disconnected; waiting for connection...");
       pause_until_connected(aldl);
-      continue;
+      continue; /* right now rec is NULL, we need to go back and get a rec */
     };
 
     /* in that record, get data field rpmindex, and the floating point value
@@ -58,20 +61,25 @@ void display_rpm(aldl_conf_t *aldl) {
 
 RULES FOR PLUGIN DEVELOPERS:
 
-- Always call pause_until_connected before your intial data retrieval, this
+- Always call pause_until_buffered before your intial data retrieval, this
   ensures the buffer is full enough, and the connection has happened.  after
   one call, the buffer will ALWAYS be full enough.
 
 - Never access the linked list pointers directly, use the following functions:
+
   aldl_record_t *newest_record(aldl_conf_t *aldl);
   aldl_record_t *next_record_wait(aldl_record_t *rec);
   aldl_record_t *next_record(aldl_record_t *rec);
-  these ensure thread safety on the structural components themselves...
 
-- Never, under any circumstances, write directly to any data structure.
+  These ensure thread safety on the structural components themselves.  Be sure
+  to check the return value, as a NULL pointer is returned if the connection
+  is lost while waiting for a record.
+
+- Never, under any circumstances, write directly to any data structure from
+  aldl-types.h
 
 - Ending the program via a plugin should always be done by running:
-  while(1) set_commstate(ALDL_QUIT);
+  while(1) set_commstate(ALDL_QUIT); (not implemented yet)
 
 - Speed is important when using next_record or next_record_wait, your routine
   must theoretically execute in average speed more quickly than:
@@ -79,14 +87,12 @@ RULES FOR PLUGIN DEVELOPERS:
   t = ( 0.122ms * number of bytes in all pkts * 1.2 )
 
   On an LT1 using 64 byte packets this allows approx. 10ms once calculation
-  overhead is taken into account.  If your route is slower than this on average
-  over the buffer size, you must use newest_record() to allow frame skipping,
-  in which case your routine can take t * bufsize with no problems.
+  overhead is taken into account.  If your routine is slower on average, you
+  must use newest_record() to allow frame skipping, in which case your routine
+  can take t * bufsize time with no problems.
 
   Results are UNDEFINED BEHAVIOR if you try to retrieve data from the last
   record, no locking is done on deletion, as it is assumed any routine that
   operates so slowly is a display routine, that will want frame skipping
   anyway.
 
-- All plugins must call pause_until_buffered(), just once, before ever using
-  the data structures, otherwise data might not be there..
