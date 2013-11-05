@@ -212,7 +212,7 @@ void load_config_c(dfile_t *config) {
 
   for(x=0;x<aldl->n_defs;x++) {
     d = &aldl->def[x]; /* shortcut to def */
-    tmp=configopt_fatal(config,dconfig(configstr,"TYPE",x));
+    tmp=configopt(config,dconfig(configstr,"TYPE",x),"FLOAT");
     if(faststrcmp(tmp,"BINARY") == 1) {
       d->type=ALDL_BOOL;
       d->binary=configopt_int_fatal(config,dconfig(configstr,"BINARY",x),0,7);
