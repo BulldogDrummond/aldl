@@ -245,11 +245,6 @@ void load_config_c(dfile_t *config) {
       d->size=configopt_int(config,dconfig(configstr,"SIZE",x),1,32,8);     
       /* FIXME no support for signed input type */
     };
-    d->id=configopt_int(config,dconfig(configstr,"ID",x),0,32767,x);
-    for(z=x-1;z>=0;z--) { /* check for duplicate unique id */
-      if(aldl->def[z].id == d->id) fatalerror(ERROR_CONFIG,
-                    "id %i not unique! def number %i and %i",d->id,x,z);
-    };
     d->alarm_low_enable=configopt_int(config,dconfig(configstr,
                         "ALARM_LOW_ENABLE",x),0,1,0);
     d->alarm_high_enable=configopt_int(config,dconfig(configstr,
@@ -259,6 +254,11 @@ void load_config_c(dfile_t *config) {
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,
                         "packet %i out of range in def %i",d->packet,x);
     d->name=configopt_fatal(config,dconfig(configstr,"NAME",x));
+    for(z=x-1;z>=0;z--) { /* check for duplicate name */
+      if(faststrcmp(aldl->def[z].name,d->name) == 1) fatalerror(ERROR_CONFIG,
+                    "duplicate name %s at id %i and %i",
+                     d->name,x,z);
+    };
     d->description=configopt_fatal(config,dconfig(configstr,"DESC",x));
     d->log=configopt_int(config,dconfig(configstr,"LOG",x),0,1,0);
     d->display=configopt_int(config,dconfig(configstr,"DISPLAY",x),0,1,0);

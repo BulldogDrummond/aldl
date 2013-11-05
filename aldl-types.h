@@ -40,8 +40,7 @@ typedef union aldl_data {
    the converted data. */
 
 typedef struct aldl_define {
-  int id;             /* unique identifier for each definition */
-  char *name;         /* short name */
+  char *name;         /* unique name and identifier */
   char *description;  /* description of each definition */
   /* ----- stuff for modules ----------------------------*/
   int log;            /* log data from this definition */

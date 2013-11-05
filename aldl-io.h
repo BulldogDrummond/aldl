@@ -61,7 +61,6 @@ aldl_record_t *next_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec);
 aldl_record_t *newest_record_waitf(aldl_conf_t *aldl, aldl_record_t *rec);
 
 /* get definition or data array index, returns -1 if not found */
-int get_index_by_id(aldl_conf_t *aldl, int id);
 int get_index_by_name(aldl_conf_t *aldl, char *name);
 
 /* connection state management ----------------------------*/

@@ -299,14 +299,6 @@ void pause_until_buffered(aldl_conf_t *aldl) {
   while(aldl->ready ==0) usleep(50);
 };
 
-int get_index_by_id(aldl_conf_t *aldl, int id) {
-  int x;
-  for(x=0;x<aldl->n_defs;x++) {
-    if(id == aldl->def[x].id) return x;
-  };
-  return -1; /* not found */
-};
-
 int get_index_by_name(aldl_conf_t *aldl, char *name) {
   int x;
   for(x=0;x<aldl->n_defs;x++) {

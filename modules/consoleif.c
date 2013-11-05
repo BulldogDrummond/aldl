@@ -310,12 +310,8 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
       gauge->data_a = get_index_by_name(aldl,idstring);
       if(gauge->data_a == -1) fatalerror(ERROR_CONFIG,
                          "consoleif: gauge %i invalid name %s",n,idstring);
-    } else { /* A_NAME not present, fallback to ID */
-      /* at this point default to fatal err */
-      gauge->data_a = get_index_by_id(aldl,configopt_int_fatal(config,
-                         gconfig("A_ID",n),0,32767));
-      if(gauge->data_a == -1) fatalerror(ERROR_CONFIG,
-                         "consoleif: gauge %i invalid id number %s",n,idstring);
+    } else {
+      fatalerror(ERROR_CONFIG,"consoleif: name missing from %i",n);
     };
     gauge->x = configopt_int_fatal(config,gconfig("X",n),0,10000);
     gauge->y = configopt_int_fatal(config,gconfig("Y",n),0,10000);
