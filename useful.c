@@ -42,6 +42,20 @@ inline int faststrcmp(char *a, char *b) {
   return 0;
 };
 
+char faststrcmp_list(char *str, char *list) {
+  int x = 0;
+  int y = 0;
+  while(list[x] != 0) {
+    y = 0;
+    while(str[y] != 0) {
+      if(str[y] == list[x]) return list[x];
+      y++;
+    };
+    x++;
+  };
+  return 0;
+};
+
 byte hextobyte(char *str) {
   return (int)strtol(str,NULL,16);
 };

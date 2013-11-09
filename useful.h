@@ -31,6 +31,10 @@ unsigned long get_elapsed_ms(timespec_t timestamp);
    instantly on mismatch */
 inline int faststrcmp(char *a, char *b);
 
+/* a fast string compare function.  returns 0 if none of the chars in list are
+   found in str.  otherwise returns the char found. useful for filtering */
+char faststrcmp_list(char *str, char *list);
+
 /* convert a 0xFF format string to a 'byte'... */
 byte hextobyte(char *str);
 
