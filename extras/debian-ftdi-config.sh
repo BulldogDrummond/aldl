@@ -17,6 +17,9 @@ groupadd usb
 echo "** Setting udev permissions on usb devices"
 echo 'SUBSYSTEMS=="usb", ACTION=="add", MODE="0664", GROUP="usb"' >> /etc/udev/rules.d/30-usb.rules
 
+echo "** Reloading udev rules"
+/etc/init.d/udev reload
+
 echo "** Blacklisting ftdi_sio driver"
 echo 'blacklist ftdi_sio' > /etc/modprobe.d/ftdi.conf
 
