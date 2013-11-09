@@ -4,6 +4,11 @@
 /* path to the root config file */
 #define ROOT_CONFIG_FILE "./examples/aldl.conf"
 
+/* this compacts the configuration data after parsing it.  there should be no
+   reason to undefine it, unless initial load speed is more important than
+   memory use. */
+#define REDUCE_CONFIG_MEMORY
+
 /* ----------- DEBUG OUTPUT --------------------------*/
 
 /* generally verbose behavior */

@@ -368,7 +368,9 @@ dfile_t *dfile_load(char *filename) {
   if(data == NULL) return NULL;
   dfile_t *d = dfile(data);
   dfile_strip_quotes(d);
+  #ifdef REDUCE_CONFIG_MEMORY
   dfile_shrink(d);
+  #endif
   free(data);
   return d; 
 };
