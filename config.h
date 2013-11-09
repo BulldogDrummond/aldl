@@ -91,3 +91,8 @@
    than this number of devices is found ... */
 #define FTDI_AUTO_MAXDEVS 100
 
+/* ------- MISC CONSTANTS ---------------------------*/
+
+/* bad chars that can't be used in things such as unit of measure strings or
+   unique identifier names. */
+#define CONFIG_BAD_CHARS "(),\"'"
