@@ -207,6 +207,7 @@ void load_config_c(dfile_t *config) {
   int x=0;
   char *configstr = smalloc(50);
   char *tmp;
+  char f; /* filter tmp */
   aldl_define_t *d;
   int z;
 
@@ -242,6 +243,11 @@ void load_config_c(dfile_t *config) {
         fatalerror(ERROR_CONFIG,"invalid data type %s in def %i",tmp,x);
       };
       d->uom=configopt(config,dconfig(configstr,"UOM",x),NULL);
+      /* check for illegal chars in uom */
+      f = faststrcmp_list(d->uom, CONFIG_BAD_CHARS);
+      if(f != 0) {
+        fatalerror(ERROR_CONFIG,"bad char %c in UOM of def %i",f,x);
+      }
       d->size=configopt_int(config,dconfig(configstr,"SIZE",x),1,32,8);     
       /* FIXME no support for signed input type */
     };
@@ -254,6 +260,11 @@ void load_config_c(dfile_t *config) {
     if(d->packet > comm->n_packets - 1) fatalerror(ERROR_CONFIG,
                         "packet %i out of range in def %i",d->packet,x);
     d->name=configopt_fatal(config,dconfig(configstr,"NAME",x));
+    /* check for illegal chars in name */
+    f = faststrcmp_list(d->name, CONFIG_BAD_CHARS);
+    if(f != 0) {
+      fatalerror(ERROR_CONFIG,"bad char %c in NAME of def %i",f,x);
+    }
     for(z=x-1;z>=0;z--) { /* check for duplicate name */
       if(faststrcmp(aldl->def[z].name,d->name) == 1) fatalerror(ERROR_CONFIG,
                     "duplicate name %s at id %i and %i",
