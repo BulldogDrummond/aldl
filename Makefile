@@ -15,6 +15,7 @@ aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
 	gcc $(CFLAGS) $(LIBS) -lftdi main.c -o aldl-ftdi $(OBJS) $(MODULES) serio-ftdi.o
 	@echo '***************************************************'
 	@echo ' You must blacklist or rmmod the ftdi_sio driver!!'
+	@echo ' Debian users can try the script in extras/ '
 	@echo '***************************************************'
 
 aldl-dummy: main.c serio-dummy.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
