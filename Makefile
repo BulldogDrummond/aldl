@@ -4,22 +4,32 @@ OBJS= acquire.o error.o loadconfig.o useful.o aldlcomm.o aldldata.o
 MODULES= modules/*.o
 LIBS= -lpthread -lrt -lncurses
 
+# install configuration
+CONFIGDIR= /etc/aldl
+LOGDIR= /var/log/aldl
+BINDIR= /usr/local/bin
+BINARIES= aldl-ftdi aldl-dummy
+
 .PHONY: clean install stats _modules
 
 all: aldl-ftdi aldl-dummy
 	@echo
-	@echo '********************************************************'
-	@echo ' Run the following to install config files to your home'
-	@echo ' directory:  make install-user'
-	@echo '********************************************************'
+	@echo '*********************************************************'
+	@echo ' Run the following as root to install the binaries and'
+	@echo ' config files:  make install'
+	@echo '*********************************************************'
 	@echo
 
-install-user: 
+install: aldl-ftdi aldl-dummy
+	@echo Installing to $(BINDIR)
+	cp -fv $(BINARIES) $(BINDIR)/
+	ln -s $(BINDIR)/aldl-ftdi $(BINDIR)/aldl
 	@echo 'Creating directory structure'
-	mkdir -pv ~/aldl
-	mkdir -pv ~/aldl/logs
-	@echo 'Installing, but not overwriting, files in ~/aldl'
-	cp -nv ./examples/* ~/aldl/
+	mkdir -pv $(CONFIGDIR)
+	mkdir -pv $(CONFIGDIR)/logs
+	@echo 'Copying example configs, will not overwrite...'
+	cp -nv ./examples/* $(CONFIGDIR)/
+	@echo Install complete, see configs in $(CONFIGDIR) before running
 
 aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
 	gcc $(CFLAGS) $(LIBS) -lftdi main.c -o aldl-ftdi $(OBJS) $(MODULES) serio-ftdi.o

@@ -1,8 +1,8 @@
-#define VERSION "ALDL-IO v0.4"
+#define VERSION "ALDL-IO v0.5"
 /* ----------- FILE CONFIG ----------------------------*/
 
 /* path to the root config file */
-#define ROOT_CONFIG_FILE "~/aldl/aldl.conf"
+#define ROOT_CONFIG_FILE "/etc/aldl/aldl.conf"
 
 /* this compacts the configuration data after parsing it.  there should be no
    reason to undefine it, unless initial load speed is more important than
