@@ -7,16 +7,28 @@ LIBS= -lpthread -lrt -lncurses
 .PHONY: clean install stats _modules
 
 all: aldl-ftdi aldl-dummy
+	@echo
+	@echo '********************************************************'
+	@echo ' Run the following to install config files to your home'
+	@echo ' directory:  make install-user'
+	@echo '********************************************************'
+	@echo
 
-install: 
-	@echo 'Install not supported yet.  Please install manually'
+install-user: 
+	@echo 'Creating directory structure'
+	mkdir -pv ~/aldl
+	mkdir -pv ~/aldl/logs
+	@echo 'Installing, but not overwriting, files in ~/aldl'
+	cp -nv ./examples/* ~/aldl/
 
 aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
 	gcc $(CFLAGS) $(LIBS) -lftdi main.c -o aldl-ftdi $(OBJS) $(MODULES) serio-ftdi.o
+	@echo
 	@echo '***************************************************'
 	@echo ' You must blacklist or rmmod the ftdi_sio driver!!'
 	@echo ' Debian users can try the script in extras/ '
 	@echo '***************************************************'
+	@echo
 
 aldl-dummy: main.c serio-dummy.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
 	gcc $(CFLAGS) $(LIBS) main.c -o aldl-dummy $(OBJS) $(MODULES) serio-dummy.o

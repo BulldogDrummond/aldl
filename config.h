@@ -2,7 +2,7 @@
 /* ----------- FILE CONFIG ----------------------------*/
 
 /* path to the root config file */
-#define ROOT_CONFIG_FILE "./examples/aldl.conf"
+#define ROOT_CONFIG_FILE "~/aldl/aldl.conf"
 
 /* this compacts the configuration data after parsing it.  there should be no
    reason to undefine it, unless initial load speed is more important than
