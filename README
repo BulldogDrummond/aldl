@@ -30,6 +30,8 @@ if you run debian/ubuntu/whatever, then: apt-get install ncurses-dev libftdi-dev
 this removes the the in-kernel ftdi driver.  this program uses libftdi for raw
 access to the usb-serial adaptor, and will not work while ftdi_sio is loaded.
 
+there is a script in extras/ that might help with debian-like systems
+
 * make sure your user has permissions to read/write usb devices.
 
 * configuration.  see below.
@@ -43,11 +45,9 @@ if you want the datalogger and the display interface: ./aldl-ftdi datalogger
 
 ## configuration
 
-!! the config files are in examples/ !! 
+the 'make install' command places config files in /etc/aldl by default..
 
-it's built to use this directory by default for testing.  you can change the
-default 'root' config file (aldl.conf) in config.h, then edit aldl.conf's paths
-if you want to store them somewhere else.
+they should be edited before running the program...
 
 * aldl.conf: the root config file, specifies locations of the other config
 files, as well as configures the serial driver, and a few timing options.
@@ -63,13 +63,13 @@ but briefly, if you run lsusb, and you find your device, it'll be like:
 
 Bus 001 Device 003: ID 0424:ec00 Some FTDI Device
 
-there is also a command, ./aldl-ftdi devices which may give you more detailed
+there is also a command, 'aldl-ftdi devices' which may give you more detailed
 information about the ftdi devices on your system, or may not.  poorly tested.
 
-then look in examples/aldl.conf. there's a PORT="d:bus/device" line. for this
-example, PORT="D:001/003" would work
+then look in aldl.conf. there's a PORT="d:bus/device" line. for this example,
+PORT="D:001/003" would work
 
-check out config.h if you're interested in 'tweaking' anything.
+check out config.h before compile if you're interested in 'tweaking' anything.
 
 ## contents
 
