@@ -50,6 +50,8 @@ int main(int argc, char **argv) { /*--------------------------- */
       aldl->consoleif_enable = 1;
     } else if(faststrcmp(argv[n_arg],"datalogger") == 1) {
       aldl->datalogger_enable = 1;
+    } else if(faststrcmp(argv[n_arg],"dataserver") == 1) {
+      aldl->dataserver_enable = 1;
     } else {
       fatalerror(ERROR_NULL,"Option %s not recognized",argv[n_arg]);
     };
@@ -78,6 +80,7 @@ int main(int argc, char **argv) { /*--------------------------- */
   pthread_t thread_acq; 
   pthread_t thread_consoleif;
   pthread_t thread_datalogger;
+  pthread_t thread_dataserver;
 
   /* spawn acq thread */
   pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
@@ -88,6 +91,10 @@ int main(int argc, char **argv) { /*--------------------------- */
 
   if(aldl->datalogger_enable == 1) {
     pthread_create(&thread_datalogger,NULL,datalogger_init,(void *) aldl);
+  };
+
+  if(aldl->dataserver_enable == 1) {
+    pthread_create(&thread_dataserver,NULL,dataserver_init,(void *) aldl);
   };
 
   /* wait for acq thread to finish ... */
