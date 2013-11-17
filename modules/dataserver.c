@@ -27,7 +27,9 @@ typedef struct _ds_conf {
   struct sockaddr_in addr; /* server address */
 } ds_conf_t;
 
+/* local functions */
 ds_conf_t *ds_load_config(aldl_conf_t *aldl);
+void ds_get_addrstruct(ds_conf_t *conf);
 
 void *dataserver_init(void *aldl_in) {
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
@@ -37,25 +39,8 @@ void *dataserver_init(void *aldl_in) {
   /* load configuration */
   ds_conf_t *conf = ds_load_config(aldl);
 
-  /* configure address structure */
-  memset(&conf->addr,0,sizeof(struct sockaddr_in));
-  conf->addr.sin_family = AF_INET;
-  if(conf->listen_all == 1) {
-    conf->addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  } else {
-    conf->addr.sin_addr.s_addr = inet_addr(conf->listen_addr);
-    if(conf->addr.sin_addr.s_addr == INADDR_NONE) {
-      fatalerror(ERROR_NET,"specified address %s seems invalid",
-                conf->listen_addr);
-    };
-  };
-  conf->addr.sin_port = htons(conf->listen_port);
-
-  #ifdef NET_VERBOSE
-  printf("configured to listen on %s:%i\n",
-               inet_ntoa(conf->addr.sin_addr),
-               conf->listen_port);
-  #endif
+  /* configure port and address */
+  ds_get_addrstruct(conf);
 
   /* create, bind, and listen ...  */
   if((list_s = socket(AF_INET,SOCK_STREAM,0)) < 0) {
@@ -107,4 +92,26 @@ ds_conf_t *ds_load_config(aldl_conf_t *aldl) {
   conf->listen_addr = configopt(config,"LISTEN_ADDR","127.0.0.1");
 
   return conf;
+};
+
+void ds_get_addrstruct(ds_conf_t *conf) {
+  /* configure address structure */
+  memset(&conf->addr,0,sizeof(struct sockaddr_in));
+  conf->addr.sin_family = AF_INET;
+  if(conf->listen_all == 1) {
+    conf->addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  } else {
+    conf->addr.sin_addr.s_addr = inet_addr(conf->listen_addr);
+    if(conf->addr.sin_addr.s_addr == INADDR_NONE) {
+      fatalerror(ERROR_NET,"specified address %s seems invalid",
+                conf->listen_addr);
+    };
+  };
+  /* configure port */
+  conf->addr.sin_port = htons(conf->listen_port);
+  #ifdef NET_VERBOSE
+  printf("configured to listen on %s:%i\n",
+               inet_ntoa(conf->addr.sin_addr),
+               conf->listen_port);
+  #endif
 };
