@@ -23,10 +23,10 @@ all: aldl-ftdi aldl-dummy
 install: aldl-ftdi aldl-dummy
 	@echo Installing to $(BINDIR)
 	cp -fv $(BINARIES) $(BINDIR)/
-	ln -s $(BINDIR)/aldl-ftdi $(BINDIR)/aldl
+	ln -sf $(BINDIR)/aldl-ftdi $(BINDIR)/aldl
 	@echo 'Creating directory structure'
 	mkdir -pv $(CONFIGDIR)
-	mkdir -pv $(CONFIGDIR)/logs
+	mkdir -pv $(LOGDIR)
 	@echo 'Copying example configs, will not overwrite...'
 	cp -nv ./examples/* $(CONFIGDIR)/
 	@echo Install complete, see configs in $(CONFIGDIR) before running
