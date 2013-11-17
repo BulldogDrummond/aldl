@@ -137,6 +137,7 @@ typedef struct aldl_conf {
   int consoleif_enable, datalogger_enable, dataserver_enable;
   char *datalogger_config; /* path to datalogger config file */
   char *consoleif_config;  /* path to consoleif config file */
+  char *dataserver_config; /* path to dataserver conf file */
   /* structures -----------*/
   aldl_state_t state; /* connection state, do not touch */
   aldl_define_t *def; /* link to the definition set */

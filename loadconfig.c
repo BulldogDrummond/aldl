@@ -129,6 +129,7 @@ char *load_config_root(dfile_t *config) {
   aldl->dataserver_enable = configopt_int(config,"DATASERVER_ENABLE",0,1,0);
   aldl->datalogger_config = configopt(config,"DATALOGGER_CONFIG",NULL);
   aldl->consoleif_config = configopt(config,"CONSOLEIF_CONFIG",NULL);
+  aldl->dataserver_config = configopt(config,"DATASERVER_CONFIG",NULL);
   /* return definition file path */
   return configopt_fatal(config,"DEFINITION"); /* path not stored ... */
 };
