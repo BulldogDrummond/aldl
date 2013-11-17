@@ -14,13 +14,16 @@
 #include "../aldl-io.h"
 #include "../loadconfig.h"
 #include "../useful.h"
+#include "../config.h"
 
 #define DS_LISTENQ 1024
 
 typedef struct _ds_conf {
   int max_clients; /* maximum clients that can be connected */
-  int listen_port;
-  dfile_t *dconf;
+  int listen_port; /* the listen port as an integer */
+  int listen_all; /* listen on all interfaces */
+  char *listen_addr;  /* address to listen to */
+  dfile_t *dconf; /* the configuration */
   struct sockaddr_in addr; /* server address */
 } ds_conf_t;
 
@@ -37,8 +40,22 @@ void *dataserver_init(void *aldl_in) {
   /* configure address structure */
   memset(&conf->addr,0,sizeof(struct sockaddr_in));
   conf->addr.sin_family = AF_INET;
-  conf->addr.sin_addr.s_addr = htonl(INADDR_ANY);
-  conf->addr.sin_port = conf->listen_port;
+  if(conf->listen_all == 1) {
+    conf->addr.sin_addr.s_addr = htonl(INADDR_ANY);
+  } else {
+    conf->addr.sin_addr.s_addr = inet_addr(conf->listen_addr);
+    if(conf->addr.sin_addr.s_addr == INADDR_NONE) {
+      fatalerror(ERROR_NET,"specified address %s seems invalid",
+                conf->listen_addr);
+    };
+  };
+  conf->addr.sin_port = htons(conf->listen_port);
+
+  #ifdef NET_VERBOSE
+  printf("configured to listen on %s:%i\n",
+               inet_ntoa(conf->addr.sin_addr),
+               conf->listen_port);
+  #endif
 
   /* create, bind, and listen ...  */
   if((list_s = socket(AF_INET,SOCK_STREAM,0)) < 0) {
@@ -51,7 +68,26 @@ void *dataserver_init(void *aldl_in) {
   if(listen(list_s,DS_LISTENQ) < 0) {
     fatalerror(ERROR_NET,"can't listen on socket");
   };
-  fatalerror(ERROR_NET,"server not written yet...");
+
+  #ifdef NET_VERBOSE
+  printf("bound to socket\n");
+  #endif
+
+  /* event loop */
+  while(1) {
+    #ifdef NET_VERBOSE
+    printf("listening...\n");
+    #endif
+    if((conn_s = accept(list_s,NULL,NULL))<0) { /* FIXME */
+      fatalerror(ERROR_NET,"error accepting connection");
+    };
+
+    /* do stuff here ... */
+
+    if(close(conn_s) <0) {
+      fatalerror(ERROR_NET,"close error");
+    };
+  };
 
   return NULL;
 };
@@ -67,6 +103,8 @@ ds_conf_t *ds_load_config(aldl_conf_t *aldl) {
   dfile_t *config = conf->dconf;
   conf->max_clients = configopt_int(config,"MAX_CLIENTS",1,65535,1000);
   conf->listen_port = configopt_int(config,"LISTEN_PORT",2,65534,42012);
+  conf->listen_all = configopt_int(config,"LISTEN_ALL",0,1,0);
+  conf->listen_addr = configopt(config,"LISTEN_ADDR","127.0.0.1");
 
   return conf;
 };
