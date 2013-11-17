@@ -1,7 +1,7 @@
 #ifndef _ERROR_H
 #define _ERROR_H
 
-#define N_ERRORCODES 11
+#define N_ERRORCODES 12
 
 typedef enum _error {
   ERROR_GENERAL=0,
@@ -14,7 +14,8 @@ typedef enum _error {
   ERROR_BUFFER=7,
   ERROR_CONFIG_MISSING=8,
   ERROR_PLUGIN=9,
-  ERROR_LOCK=10
+  ERROR_LOCK=10,
+  ERROR_NET=11
 } error_t;
 
 void fatalerror(error_t code, char *str, ...);

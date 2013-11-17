@@ -21,7 +21,8 @@ char errstr[N_ERRORCODES][24] = {
 "BUFFER",
 "CONFIG OPTION MISSING",
 "PLUGIN LOADING",
-"THREADLOCKING"
+"THREADLOCKING",
+"NETWORK"
 };
 
 void fatalerror(error_t code, char *str, ...) {
