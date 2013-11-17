@@ -59,7 +59,8 @@ int main(int argc, char **argv) { /*--------------------------- */
 
   /* compatibility checking */
   if(aldl->consoleif_enable == 0 &&
-     aldl->datalogger_enable == 0) {
+     aldl->datalogger_enable == 0 &&
+     aldl->dataserver_enable == 0) {
     fatalerror(ERROR_PLUGIN,"no plugins are enabled");
   };
 
