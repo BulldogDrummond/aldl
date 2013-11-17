@@ -30,6 +30,9 @@
 /* verbose aldl protocol level comms on stdout */
 #undef ALDL_VERBOSE
 
+/* verbose networking */
+#define NET_VERBOSE
+
 /* --------- GLOBAL FEATURE CONFIG -----------------*/
 
 /* support multiple packets, required by some definition files */
