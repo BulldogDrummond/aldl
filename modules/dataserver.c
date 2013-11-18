@@ -15,6 +15,7 @@
 #include "../loadconfig.h"
 #include "../useful.h"
 #include "../config.h"
+#include "dataserver.h"
 
 #define DS_LISTENQ 1024
 
@@ -58,6 +59,8 @@ void *dataserver_init(void *aldl_in) {
   printf("bound to socket\n");
   #endif
 
+  unsigned char modesw = 0x00; /* mode switch char */
+
   /* event loop */
   while(1) {
     #ifdef NET_VERBOSE
@@ -67,7 +70,23 @@ void *dataserver_init(void *aldl_in) {
       fatalerror(ERROR_NET,"error accepting connection");
     };
 
-    /* do stuff here ... */
+    /* FIXME need to handle other cases here*/
+    while(read(conn_s,&modesw,1) != 1); /* read until byte */
+
+    /* get mode */
+    switch(modesw) {
+      case DATASERVER_COMM_SENDPKT:
+
+        break;
+      case DATASERVER_COMM_SENDHEADER:
+
+        break;
+      case DATASERVER_COMM_SENDSTATUS:
+
+        break;
+      default:
+        fatalerror(ERROR_NET,"undefined mode bit recieved");
+    };
 
     if(close(conn_s) <0) {
       fatalerror(ERROR_NET,"close error");
