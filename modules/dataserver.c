@@ -3,8 +3,9 @@
 #include <malloc.h>
 #include <stdlib.h>
 #include <unistd.h>
+#include <pthread.h>
 
-/* networking*/
+/* NETWORking*/
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <arpa/inet.h>
@@ -18,6 +19,7 @@
 #include "dataserver.h"
 
 #define DS_LISTENQ 1024
+#define DS_MAX_CLIENTS 256
 
 typedef struct _ds_conf {
   int max_clients; /* maximum clients that can be connected */
@@ -31,6 +33,7 @@ typedef struct _ds_conf {
 /* local functions */
 ds_conf_t *ds_load_config(aldl_conf_t *aldl);
 void ds_get_addrstruct(ds_conf_t *conf);
+void *ds_manage_conn(void *conn_s_in);
 
 void *dataserver_init(void *aldl_in) {
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
@@ -59,40 +62,55 @@ void *dataserver_init(void *aldl_in) {
   printf("bound to socket\n");
   #endif
 
-  unsigned char modesw = 0x00; /* mode switch char */
+  unsigned int n_conns = 0;
+  pthread_t connthread[DS_MAX_CLIENTS];
 
-  /* event loop */
+  /* event loop to grab connections and spawn a thread for each client */
   while(1) {
+    if((conn_s = accept(list_s,NULL,NULL))>=0) {
+      if(n_conns >= DS_MAX_CLIENTS) {
+        /* send 'server full' FIXME */
+      };
+      /* create thread to manage that connection */
+      pthread_create(&connthread[n_conns],NULL,ds_manage_conn,&conn_s);
+      n_conns++;
     #ifdef NET_VERBOSE
-    printf("listening...\n");
+    } else {
+      printf("error during accept..\n");
     #endif
-    if((conn_s = accept(list_s,NULL,NULL))<0) { /* FIXME */
-      fatalerror(ERROR_NET,"error accepting connection");
     };
+  };
+  /* FIXME this thing doesn't pthread_join or exit very well .... */
 
+  return NULL;
+};
+
+void *ds_manage_conn(void *conn_s_in) {
+  int conn_s = *((int*)conn_s_in);
+  unsigned char modesw = 0; /* mode switch char */
+
+  while(1) { /* infinite loop */
     /* FIXME need to handle other cases here*/
     while(read(conn_s,&modesw,1) != 1); /* read until byte */
 
     /* get mode */
     switch(modesw) {
-      case DATASERVER_COMM_SENDPKT:
-
+      case ALDL_COMM_STREAM:
+        printf("got sendpkt request\n");
         break;
-      case DATASERVER_COMM_SENDHEADER:
-
+      case ALDL_COMM_SENDHEADER:
+        printf("got sendheader request\n");
         break;
-      case DATASERVER_COMM_SENDSTATUS:
-
+      case ALDL_COMM_SENDSTATUS:
+        printf("got sendstatus request\n");
         break;
       default:
-        fatalerror(ERROR_NET,"undefined mode bit recieved");
-    };
-
-    if(close(conn_s) <0) {
-      fatalerror(ERROR_NET,"close error");
+        #ifdef NET_VERBOSE
+        printf("got invalid request byte\n");
+        #endif
+        continue; /* loop on bad request byte */
     };
   };
-
   return NULL;
 };
 
