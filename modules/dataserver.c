@@ -34,6 +34,7 @@ typedef struct _ds_conf {
 ds_conf_t *ds_load_config(aldl_conf_t *aldl);
 void ds_get_addrstruct(ds_conf_t *conf);
 void *ds_manage_conn(void *conn_s_in);
+void ds_send_byte(int conn, char ch);
 
 void *dataserver_init(void *aldl_in) {
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
@@ -69,11 +70,12 @@ void *dataserver_init(void *aldl_in) {
   while(1) {
     if((conn_s = accept(list_s,NULL,NULL))>=0) {
       if(n_conns >= DS_MAX_CLIENTS) {
-        /* send 'server full' FIXME */
+        ds_send_byte(conn_s,ALDL_COMM_SERVERFULL); /* send server full byte */
+        close(conn_s); /* close connection */
+      } else { /* ok to spawn thread */
+        pthread_create(&connthread[n_conns],NULL,ds_manage_conn,&conn_s);
+        n_conns++;
       };
-      /* create thread to manage that connection */
-      pthread_create(&connthread[n_conns],NULL,ds_manage_conn,&conn_s);
-      n_conns++;
     #ifdef NET_VERBOSE
     } else {
       printf("error during accept..\n");
@@ -88,6 +90,9 @@ void *dataserver_init(void *aldl_in) {
 void *ds_manage_conn(void *conn_s_in) {
   int conn_s = *((int*)conn_s_in);
   unsigned char modesw = 0; /* mode switch char */
+
+  /* initialize the new connection by sending the ok byte */
+  ds_send_byte(conn_s,ALDL_COMM_OK);
 
   while(1) { /* infinite loop */
     /* FIXME need to handle other cases here*/
@@ -151,4 +156,8 @@ void ds_get_addrstruct(ds_conf_t *conf) {
                inet_ntoa(conf->addr.sin_addr),
                conf->listen_port);
   #endif
+};
+
+void ds_send_byte(int conn, char ch) {
+  write(conn,&ch,1);
 };
