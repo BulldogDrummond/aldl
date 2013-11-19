@@ -22,7 +22,7 @@
 #define ALDL_COMM_SERVERFULL 0x12
 
 /* prefix for a valid datastream */
-#define ALDL_COMM_OK 0x13
+#define ALDL_COMM_GOOD 0x13
 
 /* the aldl stream is in a disconnected state */
 #define ALDL_COMM_DOWN 0x14
