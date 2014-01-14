@@ -12,7 +12,7 @@
 /* ----------- DEBUG OUTPUT --------------------------*/
 
 /* enable some checks for retarded values being passed to things */
-#define RETARDED
+#undef RETARDED
 
 /* generally verbose behavior */
 #undef VERBLOSITY
