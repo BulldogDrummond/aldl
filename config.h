@@ -73,6 +73,12 @@
 
 /* --------- DATA ACQ. CONFIG ----------------------*/
 
+/* increase the priority of the main acq thread so plugins dont screw with
+   it.  may reduce tendancy for timing errors on some platforms, or may not
+   be supported on your platform at all.  undefine if you want equal
+   thread priority. */
+#define ACQ_PRIORITY 1
+
 /* track packet retrieval rate */
 #define TRACK_PKTRATE
 

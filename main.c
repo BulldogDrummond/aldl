@@ -83,8 +83,19 @@ int main(int argc, char **argv) { /*--------------------------- */
   pthread_t thread_datalogger;
   pthread_t thread_dataserver;
 
-  /* spawn acq thread */
+  #ifdef ACQ_PRIORITY
+  /* configure attributes for the main acq thread */
+  struct sched_param acq_param;
+  pthread_attr_t acq_attr;
+  pthread_attr_init(&acq_attr);
+  pthread_attr_getschedparam(&acq_attr,&acq_param);
+  acq_param.sched_priority = ACQ_PRIORITY;
+  pthread_attr_setschedparam(&acq_attr,&acq_param);
+  pthread_create(&thread_acq,&acq_attr,aldl_acq,(void *)aldl); 
+  #else
   pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
+  #endif
+
 
   if(aldl->consoleif_enable == 1) {
     pthread_create(&thread_consoleif,NULL,consoleif_init,(void *) aldl);
