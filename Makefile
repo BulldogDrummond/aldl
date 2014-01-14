@@ -29,6 +29,10 @@ install: aldl-ftdi aldl-dummy
 	mkdir -pv $(LOGDIR)
 	@echo 'Copying example configs, will not overwrite...'
 	cp -nv ./examples/* $(CONFIGDIR)/
+	@echo '******* WARNING ********'
+	@echo no automatic updates of configs are done.  please see
+	@echo examples/ if this was an existing installation, and
+	@acho attempt to merge these changes manually...
 	@echo Install complete, see configs in $(CONFIGDIR) before running
 
 aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
