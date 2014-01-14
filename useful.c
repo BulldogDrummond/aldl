@@ -5,6 +5,7 @@
 
 #include "aldl-types.h"
 #include "useful.h"
+#include "error.h"
 
 timespec_t get_time() {
   timespec_t currenttime;
@@ -28,6 +29,10 @@ unsigned long get_elapsed_ms(timespec_t timestamp) {
 };
 
 inline int faststrcmp(char *a, char *b) {
+  #ifdef RETARDED
+  retardptr(a,"faststrcmp a");
+  retardptr(b,"faststrcmp b");
+  #endif
   int x = 0;
   while(a[x] == b[x]) {
     x++;
@@ -43,6 +48,10 @@ inline int faststrcmp(char *a, char *b) {
 };
 
 char faststrcmp_list(char *str, char *list) {
+  #ifdef RETARDED
+  retardptr(str,"faststrcmp str");
+  retardptr(list,"faststrcmp list");
+  #endif
   int x = 0;
   int y = 0;
   while(list[x] != 0) {
@@ -57,6 +66,9 @@ char faststrcmp_list(char *str, char *list) {
 };
 
 byte hextobyte(char *str) {
+  #ifdef RETARDED
+  retardptr(str,"hextobyte");
+  #endif
   return (int)strtol(str,NULL,16);
 };
 
@@ -69,6 +81,9 @@ unsigned int sixteenbit(byte *p) {
 };
 
 byte checksum_generate(byte *buf, int len) {
+  #ifdef RETARDED
+  retardptr(buf,"checksum buf");
+  #endif
   int x = 0;
   unsigned int sum = 0;
   for(x=0;x<len;x++) sum += buf[x];

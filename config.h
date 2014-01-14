@@ -11,6 +11,9 @@
 
 /* ----------- DEBUG OUTPUT --------------------------*/
 
+/* enable some checks for retarded values being passed to things */
+#define RETARDED
+
 /* generally verbose behavior */
 #undef VERBLOSITY
 
@@ -110,3 +113,4 @@
 /* bad chars that can't be used in things such as unit of measure strings or
    unique identifier names. */
 #define CONFIG_BAD_CHARS "(),\"'"
+

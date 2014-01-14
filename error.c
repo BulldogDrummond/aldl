@@ -22,7 +22,8 @@ char errstr[N_ERRORCODES][24] = {
 "CONFIG OPTION MISSING",
 "PLUGIN LOADING",
 "THREADLOCKING",
-"NETWORK"
+"NETWORK",
+"RETARD"
 };
 
 void fatalerror(error_t code, char *str, ...) {
@@ -48,5 +49,9 @@ void nonfatalerror(error_t code, char *str, ...) {
     va_end(arg);
     fprintf(stderr,"\n");
   };
+};
+
+void retardptr(void *p, char *note) {
+  fatalerror(ERROR_RETARD,"null pointer in %s");
 };
 
