@@ -17,6 +17,15 @@
 
 #include "modules/modules.h"
 
+/* ----- typedefs ------------*/
+
+typedef struct _aldl_threads_t {
+  pthread_t acq;
+  pthread_t consoleif;
+  pthread_t datalogger;
+  pthread_t dataserver;
+} aldl_threads_t;
+
 /* ------ local functions ------------- */
 
 /* run some post-config loading sanity checks */
@@ -25,19 +34,43 @@ void aldl_sanity_check(aldl_conf_t *aldl);
 /* run cleanup rountines for aldl and serial crap */
 int aldl_finish();
 
-int main(int argc, char **argv) { /*--------------------------- */
+/* spawn all modules */
+void modules_start(aldl_threads_t *threads, aldl_conf_t *aldl);
 
-  /*------ INITIALIZE ----------------------------------------------*/
+/* check over modules for sanity */
+void modules_verify(aldl_conf_t *aldl);
 
-  /* initialize locking mechanisms */
-  init_locks();
+/* do things with cmdline options */
+void parse_cmdline(int argc, char **argv, aldl_conf_t *aldl);
 
-  /* allocate everything and parse config */
-  aldl_conf_t *aldl = aldl_setup();
-  aldl_sanity_check(aldl); /* sanity checks */
+/* start acq thread */
+void acq_start(aldl_threads_t *thread, aldl_conf_t *aldl);
 
-  /* ----- PROC CMDLINE OPTS ---------------------------------------*/
+/*---------- functions --------------------*/
 
+int main(int argc, char **argv) {
+  /* ------- initialize some shit ------------ */
+  init_locks(); /* initialize locking mechanisms */
+  aldl_conf_t *aldl = aldl_setup(); /* alloc everything and parse conf */
+  aldl_sanity_check(aldl); /* sanity check the data from above */
+  parse_cmdline(argc,argv,aldl); /* parse cmd line opts */
+  modules_verify(aldl); /* check for bad module combos */
+  aldl_init_record(aldl); /* create init record so linked list isnt busted */
+  set_connstate(ALDL_LOADING,aldl); /* init connection state */
+  serial_init(aldl->serialstr); /* init i/o driver */
+
+  /* ------- start threads ----------- */
+  aldl_threads_t *thread = smalloc(sizeof(aldl_threads_t)); /* thread spc */
+  acq_start(thread,aldl); /* start acquisition thread */
+  modules_start(thread,aldl); /* start all other modules */
+  pthread_join(thread->acq,NULL); /* pause main thread until acq dies */
+
+  /* ----- cleanup ------------- */
+  aldl_finish();
+  return 0;
+}
+
+void parse_cmdline(int argc, char **argv, aldl_conf_t *aldl) {
   int n_arg = 0;
   for(n_arg=1;n_arg<argc;n_arg++) {
     if(faststrcmp(argv[n_arg],"configtest") == 1) {
@@ -56,68 +89,47 @@ int main(int argc, char **argv) { /*--------------------------- */
       fatalerror(ERROR_NULL,"Option %s not recognized",argv[n_arg]);
     };
   };
+}
 
+void modules_verify(aldl_conf_t *aldl) {
   /* compatibility checking */
   if(aldl->consoleif_enable == 0 &&
      aldl->datalogger_enable == 0 &&
      aldl->dataserver_enable == 0) {
     fatalerror(ERROR_PLUGIN,"no plugins are enabled");
   };
+}
 
-  /* ---- MORE INIT -----------------------------------------------*/
+void modules_start(aldl_threads_t *thread, aldl_conf_t *aldl) {
+  if(aldl->consoleif_enable == 1) {
+    pthread_create(&thread->consoleif,NULL,
+                   consoleif_init,(void *) aldl);
+  };
 
-  /* initial record so linked list isnt broken */
-  aldl_init_record(aldl);
+  if(aldl->datalogger_enable == 1) {
+    pthread_create(&thread->datalogger,NULL,
+                   datalogger_init,(void *) aldl);
+  };
 
-  /* set initial connection state */
-  set_connstate(ALDL_LOADING,aldl);
+  if(aldl->dataserver_enable == 1) {
+    pthread_create(&thread->dataserver,NULL,
+                    dataserver_init,(void *) aldl);
+  };
+}
 
-  /* configure port and initialize */
-  serial_init(aldl->serialstr);
-
-  /* ------ THREAD SPAWNING -------------------------------------*/
-
-  /* configure threading */
-  pthread_t thread_acq; 
-  pthread_t thread_consoleif;
-  pthread_t thread_datalogger;
-  pthread_t thread_dataserver;
-
+void acq_start(aldl_threads_t *thread, aldl_conf_t *aldl) {
   #ifdef ACQ_PRIORITY
-  /* configure attributes for the main acq thread */
   struct sched_param acq_param;
   pthread_attr_t acq_attr;
   pthread_attr_init(&acq_attr);
   pthread_attr_getschedparam(&acq_attr,&acq_param);
   acq_param.sched_priority = ACQ_PRIORITY;
   pthread_attr_setschedparam(&acq_attr,&acq_param);
-  pthread_create(&thread_acq,&acq_attr,aldl_acq,(void *)aldl); 
+  pthread_create(&thread->acq,&acq_attr,aldl_acq,(void *)aldl);
   #else
-  pthread_create(&thread_acq,NULL,aldl_acq,(void *)aldl);
+  pthread_create(&thread->acq,NULL,aldl_acq,(void *)aldl);
   #endif
-
-
-  if(aldl->consoleif_enable == 1) {
-    pthread_create(&thread_consoleif,NULL,consoleif_init,(void *) aldl);
-  };
-
-  if(aldl->datalogger_enable == 1) {
-    pthread_create(&thread_datalogger,NULL,datalogger_init,(void *) aldl);
-  };
-
-  if(aldl->dataserver_enable == 1) {
-    pthread_create(&thread_dataserver,NULL,dataserver_init,(void *) aldl);
-  };
-
-  /* wait for acq thread to finish ... */
-  pthread_join(thread_acq,NULL);
-
-  /* ----- CLEANUP ---------------------------------------------*/
-
-  aldl_finish();
-  return 0;
-
-} /*-----------------------------------------------------------*/
+}
 
 void main_exit() {
   consoleif_exit();
