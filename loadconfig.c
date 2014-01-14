@@ -220,6 +220,7 @@ void load_config_c(dfile_t *config) {
       d->type=ALDL_BOOL;
       d->binary=configopt_int_fatal(config,dconfig(configstr,"BINARY",x),0,7);
       d->invert=configopt_int(config,dconfig(configstr,"INVERT",x),0,1,0);
+      d->uom=NULL;
     } else {
       if(faststrcmp(tmp,"FLOAT") == 1) {
         d->type=ALDL_FLOAT;
