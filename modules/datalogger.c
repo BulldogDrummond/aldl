@@ -136,7 +136,7 @@ void datalogger_make_file(datalogger_conf_t *conf,aldl_conf_t *aldl) {
   char *fnappend = filename;
   while(fnappend[0] != 0) fnappend++; /* find end of string */
   do {
-    sprintf(fnappend,"%i.csv",suffix);
+    sprintf(fnappend,"%05d.csv",suffix);
     suffix++;
   } while(access(filename,F_OK) == 0);
 
