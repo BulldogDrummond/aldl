@@ -22,7 +22,8 @@ enum {
 
 typedef enum _gaugetype {
   GAUGE_HBAR,
-  GAUGE_TEXT
+  GAUGE_TEXT,
+  GAUGE_BIN
 } gaugetype_t;
 
 typedef struct _gauge {
@@ -83,6 +84,7 @@ int alarm_range(gauge_t *g);
 /* gauges -------------------*/
 void draw_h_progressbar(gauge_t *g);
 void draw_simpletext_a(gauge_t *g);
+void draw_bin(gauge_t *g);
 void gauge_blank(gauge_t *g);
 void draw_statusbar();
 
@@ -135,6 +137,9 @@ void *consoleif_init(void *aldl_in) {
           break;
         case GAUGE_TEXT:
           draw_simpletext_a(gauge);
+          break;
+        case GAUGE_BIN:
+          draw_bin(gauge);
           break;
         default:
           break;
@@ -204,6 +209,16 @@ void cons_wait_for_connection() {
 }
 
 /* --- GAUGES ---------------------------------- */
+
+void draw_bin(gauge_t *g) {
+  aldl_define_t *def = &aldl->def[g->data_a];
+  gauge_blank(g);
+  aldl_data_t *data = &rec->data[g->data_a];
+  if(data->i == 0) return;
+  attron(COLOR_PAIR(GREEN_ON_BLACK));
+  mvprintw(g->y,g->x,"%s",def->name);
+  attroff(COLOR_PAIR(GREEN_ON_BLACK));
+};
 
 void draw_simpletext_a(gauge_t *g) {
   aldl_define_t *def = &aldl->def[g->data_a];
@@ -336,6 +351,8 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
       gauge->gaugetype = GAUGE_HBAR;
     } else if(faststrcmp(gtypestr,"TEXT") == 1) {
       gauge->gaugetype = GAUGE_TEXT;
+    } else if(faststrcmp(gtypestr,"BIN") == 1) {
+      gauge->gaugetype = GAUGE_BIN;
     } else {
       fatalerror(ERROR_CONFIG,"consoleif: gauge %i bad type %s",n,gtypestr);
     };
