@@ -66,8 +66,11 @@ Bus 001 Device 003: ID 0424:ec00 Some FTDI Device
 there is also a command, 'aldl-ftdi devices' which may give you more detailed
 information about the ftdi devices on your system, or may not.  poorly tested.
 
-then look in aldl.conf. there's a PORT="d:bus/device" line. for this example,
-PORT="D:001/003" would work
+then look in aldl.conf. there's a PORT= line. for this example, use one of the
+following PORT strings:
+
+PORT=i:0x424:0xEC00 (preferred)
+PORT=D:001/003
 
 check out config.h before compile if you're interested in 'tweaking' anything.
 
