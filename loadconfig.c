@@ -216,11 +216,12 @@ void load_config_c(dfile_t *config) {
   for(x=0;x<aldl->n_defs;x++) {
     d = &aldl->def[x]; /* shortcut to def */
     tmp=configopt(config,dconfig(configstr,"TYPE",x),"FLOAT");
-    if(faststrcmp(tmp,"BINARY") == 1) {
+    if(faststrcmp(tmp,"BINARY") == 1 || faststrcmp(tmp,"ERROR") == 1) {
       d->type=ALDL_BOOL;
       d->binary=configopt_int_fatal(config,dconfig(configstr,"BINARY",x),0,7);
       d->invert=configopt_int(config,dconfig(configstr,"INVERT",x),0,1,0);
       d->uom=NULL;
+      if(faststrcmp(tmp,"ERROR") == 1) d->err = 1;
     } else {
       if(faststrcmp(tmp,"FLOAT") == 1) {
         d->type=ALDL_FLOAT;
