@@ -126,6 +126,7 @@ char *load_config_root(dfile_t *config) {
   /* plugins */
   aldl->consoleif_enable = configopt_int(config,"CONSOLEIF_ENABLE",0,1,0);
   aldl->datalogger_enable = configopt_int(config,"DATALOGGER_ENABLE",0,1,0);
+  aldl->remote_enable = configopt_int(config,"REMOTE_ENABLE",0,1,0);
   aldl->dataserver_enable = configopt_int(config,"DATASERVER_ENABLE",0,1,0);
   aldl->datalogger_config = configopt(config,"DATALOGGER_CONFIG",NULL);
   aldl->consoleif_config = configopt(config,"CONSOLEIF_CONFIG",NULL);

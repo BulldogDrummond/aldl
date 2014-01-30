@@ -24,6 +24,7 @@ typedef struct _aldl_threads_t {
   pthread_t consoleif;
   pthread_t datalogger;
   pthread_t dataserver;
+  pthread_t remote;
 } aldl_threads_t;
 
 /* ------ local functions ------------- */
@@ -85,6 +86,8 @@ void parse_cmdline(int argc, char **argv, aldl_conf_t *aldl) {
       aldl->datalogger_enable = 1;
     } else if(faststrcmp(argv[n_arg],"dataserver") == 1) {
       aldl->dataserver_enable = 1;
+    } else if(faststrcmp(argv[n_arg],"remote") == 1) {
+      aldl->remote_enable = 1;
     } else {
       fatalerror(ERROR_NULL,"Option %s not recognized",argv[n_arg]);
     };
@@ -93,6 +96,7 @@ void parse_cmdline(int argc, char **argv, aldl_conf_t *aldl) {
 
 void modules_verify(aldl_conf_t *aldl) {
   /* compatibility checking */
+  /* dont specify remote here, as remote by itself isn't enough ... */
   if(aldl->consoleif_enable == 0 &&
      aldl->datalogger_enable == 0 &&
      aldl->dataserver_enable == 0) {
@@ -114,6 +118,11 @@ void modules_start(aldl_threads_t *thread, aldl_conf_t *aldl) {
   if(aldl->dataserver_enable == 1) {
     pthread_create(&thread->dataserver,NULL,
                     dataserver_init,(void *) aldl);
+  };
+
+  if(aldl->remote_enable == 1) {
+    pthread_create(&thread->remote,NULL,
+                    remote_init,(void *) aldl);
   };
 }
 

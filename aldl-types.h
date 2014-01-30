@@ -135,7 +135,7 @@ typedef struct aldl_conf {
                   connection is no longer synchronized */
   int minmax;  /* enforce min/max values during conversion */
   /* plugin enables -------*/
-  int consoleif_enable, datalogger_enable, dataserver_enable;
+  int consoleif_enable, datalogger_enable, dataserver_enable, remote_enable;
   char *datalogger_config; /* path to datalogger config file */
   char *consoleif_config;  /* path to consoleif config file */
   char *dataserver_config; /* path to dataserver conf file */
