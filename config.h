@@ -108,6 +108,12 @@
    than this number of devices is found ... */
 #define FTDI_AUTO_MAXDEVS 100
 
+/* if the device isn't connected, try again.  this is mostly for systems with
+   no keyboard or input device, so you can go 'oh shit, it's unpluged' without
+   rebooting. */
+#define FTDI_RETRY_USB
+#define FTDI_RETRY_DELAY 3
+
 /* ------- MISC CONSTANTS ---------------------------*/
 
 /* bad chars that can't be used in things such as unit of measure strings or

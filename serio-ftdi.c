@@ -32,8 +32,9 @@ byte ftdistatus;
    s:vendor:product:serial
 */
 
-/* special ftdi error handler, bails if errno<0.  could be macro. */
-void ftdierror(int loc,int errno);
+/* special ftdi error handlers, bails if errno<0. */
+int ftdierror(int loc,int errno);
+void ftdifatal(int loc,int errno);
 
 /****************FUNCTIONS**************************************/
 
@@ -56,10 +57,19 @@ int serial_init(char *port) {
   if((ftdi = ftdi_new()) == NULL) {
     fatalerror(ERROR_FTDI,"ftdi_new failed");
   };
-
+  
   res = ftdi_usb_open_string(ftdi,port);
-  ftdierror(2,res); /* trap error */
-  if(res < 0) return 0;
+  #ifdef FTDI_RETRY_USB
+  if(res<-5) ftdifatal(2,res); /* fatal open errors */
+  while(res<0) { /* device is probably just disconnected */
+    ftdierror(2,res); /* print non-fatal error */
+    fprintf(stderr,"FTDI Device @ %s isn't connected.  Retrying...\n",port);
+    sleep(FTDI_RETRY_DELAY);
+    res = ftdi_usb_open_string(ftdi,port);
+  };
+  #else
+  ftdifatal(2,res);
+  #endif
 
   #ifdef SERIAL_VERBOSE
   printf("init ftdi userland driver appears sucessful...\n");
@@ -136,10 +146,19 @@ inline int serial_read(byte *str, int len) {
   return resp; /* return number of bytes read, or zero */
 }
 
-void ftdierror(int loc,int errno) {
-  if(errno>=0) return;
-  fprintf(stderr,"FTDI DRIVER: %i, %s\n",errno,ftdi_get_error_string(ftdi)); 
-  fatalerror(ERROR_FTDI,"*** See above FTDI DRIVER error message @ stderr");
+void ftdifatal(int loc,int errno) {
+  if(ftdierror(loc,errno) > 0) {
+    fatalerror(ERROR_FTDI,"*** See above FTDI DRIVER error message @ stderr");
+  };
+};
+
+int ftdierror(int loc,int errno) {
+  if(errno>=0) { /* no error */
+    return 0;
+  } else {
+    fprintf(stderr,"FTDI DRIVER: %i, %s\n",errno,ftdi_get_error_string(ftdi));
+    return 1;
+  };
 };
 
 void serial_help_devs() {
@@ -150,13 +169,13 @@ void serial_help_devs() {
   if((ftdi = ftdi_new()) == NULL) fatalerror(ERROR_FTDI,"ftdi_new failed");
 
   ret = ftdi_usb_find_all(ftdi, &devlist, 0x0403, 0x6001);
-  ftdierror(99,ret);
+  ftdifatal(99,ret);
   printf("Number of FTDI devices found: %d\n", ret);
 
   i=0;
   for (curdev = devlist; curdev != NULL; i++) {
     printf("Checking device: %d\n", i);
-    ftdierror(101,ftdi_usb_get_strings(ftdi, curdev->dev, mfr, 128,
+    ftdifatal(101,ftdi_usb_get_strings(ftdi, curdev->dev, mfr, 128,
                   desc,128,NULL,0));
     printf("Manufacturer: %s, Description: %s\n\n", mfr, desc);
     curdev = curdev->next;
