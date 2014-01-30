@@ -212,12 +212,15 @@ void draw_simpletext_a(gauge_t *g) {
   if(alarm_range(g) == 1) attron(COLOR_PAIR(RED_ON_BLACK));
   switch(def->type) {
     case ALDL_FLOAT:
-      mvprintw(g->y,g->x,"%s: %.1f %s",
-            def->name,smooth_float(g),def->uom);
+      mvprintw(g->y,g->x,"%s: %.1f",
+            def->name,smooth_float(g));
+      if(def->uom != NULL) printw(" %s",def->uom);
       break;
     case ALDL_INT:
-      mvprintw(g->y,g->x,"%s: %i %s",
-          def->name,data->i,def->uom);
+    case ALDL_BOOL:
+      mvprintw(g->y,g->x,"%s: %i",
+          def->name,data->i);
+      if(def->uom != NULL) printw(" %s",def->uom);
       break;
     default:
       return;

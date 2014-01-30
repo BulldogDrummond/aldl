@@ -247,10 +247,12 @@ void load_config_c(dfile_t *config) {
       };
       d->uom=configopt(config,dconfig(configstr,"UOM",x),NULL);
       /* check for illegal chars in uom */
-      f = faststrcmp_list(d->uom, CONFIG_BAD_CHARS);
-      if(f != 0) {
-        fatalerror(ERROR_CONFIG,"bad char %c in UOM of def %i",f,x);
-      }
+      if(d->uom != NULL) {
+        f = faststrcmp_list(d->uom, CONFIG_BAD_CHARS);
+        if(f != 0) {
+          fatalerror(ERROR_CONFIG,"bad char %c in UOM of def %i",f,x);
+        }
+      };
       d->size=configopt_int(config,dconfig(configstr,"SIZE",x),1,32,8);     
       /* FIXME no support for signed input type */
     };
