@@ -189,7 +189,7 @@ void statusmessage(char *str) {
   mvaddstr(1,1,VERSION);
   attroff(COLOR_PAIR(COLOR_STATUSSCREEN));
   refresh();
-  usleep(400);
+  usleep(5000);
 };
 
 void cons_wait_for_connection() {
@@ -199,7 +199,7 @@ void cons_wait_for_connection() {
     s = get_connstate(aldl);
     if(s != s_cache) statusmessage(get_state_string(s));
     s_cache = s;
-    usleep(2000);
+    usleep(100000);
   };
 
   statusmessage("Buffering...");
