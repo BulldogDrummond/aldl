@@ -23,7 +23,8 @@ enum {
 typedef enum _gaugetype {
   GAUGE_HBAR,
   GAUGE_TEXT,
-  GAUGE_BIN
+  GAUGE_BIN,
+  GAUGE_ERRSTR
 } gaugetype_t;
 
 typedef struct _gauge {
@@ -85,6 +86,7 @@ int alarm_range(gauge_t *g);
 void draw_h_progressbar(gauge_t *g);
 void draw_simpletext_a(gauge_t *g);
 void draw_bin(gauge_t *g);
+void draw_errstr(gauge_t *g);
 void gauge_blank(gauge_t *g);
 void draw_statusbar();
 
@@ -140,6 +142,9 @@ void *consoleif_init(void *aldl_in) {
           break;
         case GAUGE_BIN:
           draw_bin(gauge);
+          break;
+        case GAUGE_ERRSTR:
+          draw_errstr(gauge);
           break;
         default:
           break;
@@ -218,6 +223,25 @@ void draw_bin(gauge_t *g) {
   attron(COLOR_PAIR(GREEN_ON_BLACK));
   mvprintw(g->y,g->x,"%s",def->name);
   attroff(COLOR_PAIR(GREEN_ON_BLACK));
+};
+
+void draw_errstr(gauge_t *g) {
+  int errfound = 0; 
+  int x = 0;
+  gauge_blank(g);
+  for(x=0;x<=aldl->n_defs - 1;x++) {
+    if(aldl->def[x].err == 1) { /* is an err flag */
+      if(rec->data[x].i == 1) { /* err flag is set */
+        if(errfound > 4) return; /* display max 4 codes */
+        attron(COLOR_PAIR(RED_ON_BLACK));
+        errfound++;
+        if(errfound == 1) mvprintw(g->y,g->x,"ERROR:");
+        printw(" %s",aldl->def[x].name);
+        attroff(COLOR_PAIR(RED_ON_BLACK));
+      };
+    };
+  };
+  if(errfound == 0) mvprintw(g->y,g->x,"NO ERRORS");
 };
 
 void draw_simpletext_a(gauge_t *g) {
@@ -353,6 +377,8 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
       gauge->gaugetype = GAUGE_TEXT;
     } else if(faststrcmp(gtypestr,"BIN") == 1) {
       gauge->gaugetype = GAUGE_BIN;
+    } else if(faststrcmp(gtypestr,"ERRSTR") == 1) {
+      gauge->gaugetype = GAUGE_ERRSTR;
     } else {
       fatalerror(ERROR_CONFIG,"consoleif: gauge %i bad type %s",n,gtypestr);
     };
