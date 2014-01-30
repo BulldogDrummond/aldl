@@ -97,6 +97,7 @@ void *datalogger_init(void *aldl_in) {
           cursor += sprintf(cursor,",%.2f",rec->data[x].f);
           break;
         case ALDL_INT:
+        case ALDL_BOOL:
           cursor += sprintf(cursor,",%i",rec->data[x].i);
           break;
         default:
