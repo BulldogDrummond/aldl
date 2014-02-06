@@ -112,6 +112,7 @@ typedef struct aldl_commdef {
   /* ------- data packet requests -------- */
   int n_packets;             /* the number of packets of data */
   aldl_packetdef_t *packet;  /* the actual packet definitions */
+  int byteorder;             /* 1 = LSB, for binary flags only */
 } aldl_commdef_t;
 
 typedef struct aldl_stats {

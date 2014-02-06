@@ -204,7 +204,11 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
       };
       break;
     case ALDL_BOOL:
-      out->i = getbit(x,def->binary,def->invert);
+      if(aldl->comm->byteorder == 1) {
+        out->i = getbit(x,7 - def->binary,def->invert);
+      } else {
+        out->i = getbit(x,def->binary,def->invert);
+      };
       break;
     default:
       fatalerror(ERROR_RANGE,"invalid type spec: %i",def->type);

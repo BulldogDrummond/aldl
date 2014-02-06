@@ -73,7 +73,7 @@ byte hextobyte(char *str) {
 };
 
 int getbit(byte p, int bpos, int flip) {
-  return flip ^ ( p >> ( bpos + 1 ) & 0x01 );
+  return flip ^ ( p >> bpos & 0x01 );
 };
 
 unsigned int sixteenbit(byte *p) {
