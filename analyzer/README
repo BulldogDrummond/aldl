@@ -1,0 +1,6 @@
+This is a utility to read log entries and make some sense out of them.
+
+It is non-interactive, and simply performs logical analysis of the logs based
+on various parameters.
+
+It'll become more capable as time goes by...
