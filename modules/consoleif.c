@@ -183,8 +183,13 @@ void draw_statusbar() {
   float pps = aldl->stats->packetspersecond;
   unsigned int failcounter = aldl->stats->failcounter;
   unlock_stats();
-  mvprintw(w_height - 1,1,"%s  TIMESTAMP: %i  PKT/S: %.1f  FAILED: %u  ",
-           VERSION, rec->t, pps, failcounter);
+  if(w_width < 40) { /* small statusbar */
+    mvprintw(w_height - 1,0,"%u R=%.1f ERR=%u  ",
+             rec->t / 1000, pps, failcounter);
+  } else { /* lg statusbar */
+    mvprintw(w_height - 1,1,"%s  TIMESTAMP: %i  PKT/S: %.1f  FAILED: %u  ",
+             VERSION, rec->t, pps, failcounter);
+  };
 };
 
 void statusmessage(char *str) {
