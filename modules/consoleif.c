@@ -253,13 +253,17 @@ void draw_simpletext_a(gauge_t *g) {
     case ALDL_FLOAT:
       mvprintw(g->y,g->x,"%s: %.1f",
             def->name,smooth_float(g));
+      #ifdef CONSOLEIF_UOM
       if(def->uom != NULL) printw(" %s",def->uom);
+      #endif
       break;
     case ALDL_INT:
     case ALDL_BOOL:
       mvprintw(g->y,g->x,"%s: %i",
           def->name,data->i);
+      #ifdef CONSOLEIF_UOM
       if(def->uom != NULL) printw(" %s",def->uom);
+      #endif
       break;
     default:
       return;
@@ -287,12 +291,27 @@ int alarm_range(gauge_t *g) {
 
 void draw_h_progressbar(gauge_t *g) {
   aldl_define_t *def = &aldl->def[g->data_a];
-  float data = smooth_float(g);
+  float data = 0;
+  switch(def->type) {
+    case ALDL_INT:
+    case ALDL_BOOL:
+      data = rec->data[g->data_a].i;
+      break;
+    case ALDL_FLOAT:
+      data = smooth_float(g);
+      break;
+    default:
+      break;
+  };
+
   int x;
   char *curs;
 
   /* get rh text width */
-  int width_rhtext = sprintf(bigbuf,"] %.0f%s",g->top,def->uom);
+  int width_rhtext = sprintf(bigbuf,"] %.0f",g->top);
+  #ifdef CONSOLEIF_UOM
+  width_rhtext += sprintf(bigbuf,"%s",def->uom);
+  #endif
 
   /* print LH text */
   int width_lhtext = sprintf(bigbuf,"%s [",def->name);
@@ -311,7 +330,11 @@ void draw_h_progressbar(gauge_t *g) {
     curs[0] = ' ';
     curs++;
   };
+  #ifdef CONSOLEIF_UOM
   sprintf(curs,"] %.0f%s",data,def->uom);
+  #else
+  sprintf(curs,"] %.0f",data);
+  #endif
   move(g->y,g->x); 
   gauge_blank(g);
 

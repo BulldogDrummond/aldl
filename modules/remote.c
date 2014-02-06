@@ -12,6 +12,13 @@
 #include "../useful.h"
 
 void *remote_init(void *aldl_in) {
+  aldl_conf_t *aldl = aldl_in;
+  while(1) {
+    sleep(1);
+    if(access("/etc/aldl/aldl-stop",F_OK) != -1) {
+      exit(1);
+    };
+  };
   return NULL;  
 };
 

@@ -120,3 +120,4 @@
    unique identifier names. */
 #define CONFIG_BAD_CHARS "(),\"'"
 
+#undef CONSOLEIF_UOM
