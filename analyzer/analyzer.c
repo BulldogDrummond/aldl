@@ -10,19 +10,22 @@
 #include "loadconfig.h"
 #include "error.h"
 
+typedef struct _anl_fcell_t {
+  float low,high;
+  float avg;
+} anl_fcell_t;
+
+typedef struct anl_icell_t {
+  int low,high;
+  float avg;
+} anl_icell_t;
+
 typedef struct _anl_t {
-  float low_rpm,high_rpm,avg_rpm;
-  float low_map,high_map,avg_map;
-  float low_maf,high_maf,avg_maf;
-  int low_blm,high_blm;
-  float avg_blm;
+  anl_fcell_t rpm,map,maf;
+  anl_icell_t blm; 
   int counts;
 } anl_t;
 anl_t *anl_blm;
-
-typedef struct _anl_cell_t {
-  float low,high,avg;
-} anl_cell_t;
 
 typedef struct _anl_conf_t {
   int n_cols; /* number of columns in a log file */
@@ -64,7 +67,7 @@ void print_results();
 void print_results_blm();
 
 int main(int argc, char **argv) {
-  printf("**** aldlio offline log analyzer %s ****\n",ANL_VERSION);
+  printf("**** aldlio offline log analyzer %s ****\n\n",ANL_VERSION);
   printf("(c)2014 Steve Haslin\n");
   /* load config */
   anl_load_conf(ANL_CONFIGFILE);
@@ -103,10 +106,10 @@ void prep_anl() {
     anl_t *cdata;
     for(cell=0;cell<anl_conf->blm_n_cells;cell++) {
       cdata = &anl_blm[cell];    
-      cdata->low_map = 999999;
-      cdata->low_rpm = 999999;
-      cdata->low_blm = 999999;
-      cdata->low_maf = 999999;
+      cdata->map.low = 999999;
+      cdata->rpm.low = 999999;
+      cdata->blm.low = 999999;
+      cdata->maf.low = 999999;
     };
   };
 
@@ -155,9 +158,12 @@ void log_blm(char *line) {
   };
 
   /* check CL/PE op */
-  if(csvint(line,anl_conf->col_cl) != anl_conf->valid_cl) return;
-  if(csvint(line,anl_conf->col_blm) != anl_conf->valid_blm) return;
-  if(csvint(line,anl_conf->col_wot) != anl_conf->valid_wot) return;
+  if(anl_conf->valid_cl != -1 &&
+     csvint(line,anl_conf->col_cl) != anl_conf->valid_cl) return;
+  if(anl_conf->valid_blm != -1 && 
+     csvint(line,anl_conf->col_blm) != anl_conf->valid_blm) return;
+  if(anl_conf->valid_wot != -1 &&
+     csvint(line,anl_conf->col_wot) != anl_conf->valid_wot) return;
 
   /* point to cell index */
   anl_t *cdata = &anl_blm[cell];
@@ -168,27 +174,27 @@ void log_blm(char *line) {
   /* update blm */
   float blm = (csvfloat(line,anl_conf->col_lblm) +
              csvfloat(line,anl_conf->col_rblm)) / 2;
-  cdata->avg_blm += blm; /* will div for avg later */
-  if(blm < cdata->low_blm) cdata->low_blm = blm;
-  if(blm > cdata->high_blm) cdata->high_blm = blm;
+  cdata->blm.avg += blm; /* will div for avg later */
+  if(blm < cdata->blm.low) cdata->blm.low = blm;
+  if(blm > cdata->blm.high) cdata->blm.high = blm;
 
   /* update map */
   float map = csvfloat(line,anl_conf->col_map);
-  if(map < cdata->low_map) cdata->low_map = map;
-  if(map > cdata->high_map) cdata->high_map = map;
-  cdata->avg_map += map;
+  if(map < cdata->map.low) cdata->map.low = map;
+  if(map > cdata->map.high) cdata->map.high = map;
+  cdata->map.avg += map;
 
   /* update maf */
   float maf = csvfloat(line,anl_conf->col_maf);
-  if(maf < cdata->low_maf) cdata->low_maf = maf;
-  if(maf > cdata->high_maf) cdata->high_maf = maf;
-  cdata->avg_maf += maf;
+  if(maf < cdata->maf.low) cdata->maf.low = maf;
+  if(maf > cdata->maf.high) cdata->maf.high = maf;
+  cdata->maf.avg += maf;
 
   /* update rpm */
   float rpm = csvfloat(line,anl_conf->col_rpm);
-  if(rpm < cdata->low_rpm) cdata->low_rpm = rpm;
-  if(rpm > cdata->high_rpm) cdata->high_rpm = rpm;
-  cdata->avg_rpm += rpm;
+  if(rpm < cdata->rpm.low) cdata->rpm.low = rpm;
+  if(rpm > cdata->rpm.high) cdata->rpm.high = rpm;
+  cdata->rpm.avg += rpm;
 };
 
 void post_calc() {
@@ -200,10 +206,10 @@ void post_calc_blm() {
   anl_t *cdata;
   for(cell=0;cell<anl_conf->blm_n_cells;cell++) {
     cdata = &anl_blm[cell]; /* ptr to cell */
-    cdata->avg_blm = cdata->avg_blm / (float)cdata->counts;  
-    cdata->avg_maf = cdata->avg_maf / (float)cdata->counts;
-    cdata->avg_map = cdata->avg_map / (float)cdata->counts;
-    cdata->avg_rpm = cdata->avg_rpm / (float)cdata->counts;
+    cdata->blm.avg = cdata->blm.avg / (float)cdata->counts;  
+    cdata->maf.avg = cdata->maf.avg / (float)cdata->counts;
+    cdata->map.avg = cdata->map.avg / (float)cdata->counts;
+    cdata->rpm.avg = cdata->rpm.avg / (float)cdata->counts;
   };
 };
 
@@ -225,16 +231,16 @@ void print_results_blm() {
     cdata = &anl_blm[x];
     if(cdata->counts > anl_conf->blm_min_count) {
       overall_blm_count++;
-      overall_blm_avg += cdata->avg_blm;
+      overall_blm_avg += cdata->blm.avg;
       printf("\n* Cell %i (%i Hits)\n",x,cdata->counts);
       printf("\tBLM: %i - %i (Avg %.1f)\n",
-              cdata->low_blm,cdata->high_blm,cdata->avg_blm);
+              cdata->blm.low,cdata->blm.high,cdata->blm.avg);
       printf("\tRPM: %.1f - %.1f RPM (Avg %.1f)\n",
-              cdata->low_rpm,cdata->high_rpm,cdata->avg_rpm);
+              cdata->rpm.low,cdata->rpm.high,cdata->rpm.avg);
       printf("\tMAP: %.1f - %.1f KPA, (Avg %.1f)\n",
-              cdata->low_map,cdata->high_map,cdata->avg_map);
+              cdata->map.low,cdata->map.high,cdata->map.avg);
       printf("\tMAF: %.1f - %.1f AFGS, (Avg %.1f)\n",
-              cdata->low_maf,cdata->high_maf,cdata->avg_maf);
+              cdata->maf.low,cdata->maf.high,cdata->maf.avg);
     };
   };
   printf("\nOverall useful BLM Average: %.2f (%.3f percent)\n",
@@ -277,18 +283,21 @@ void anl_load_conf(char *filename) {
   anl_conf->n_cols = configopt_int_fatal(dconf,"N_COLS",1,500);
   anl_conf->valid_min_time = configopt_int_fatal(dconf,"MIN_TIME",0,999999);
   anl_conf->valid_min_temp  = configopt_int_fatal(dconf,"MIN_TEMP",-20,99999);
-  anl_conf->valid_cl  = configopt_int_fatal(dconf,"VALID_CL",0,1);
-  anl_conf->valid_blm  = configopt_int_fatal(dconf,"VALID_BLM",0,1);
-  anl_conf->valid_wot = configopt_int_fatal(dconf,"VALID_WOT",0,1);
+  anl_conf->valid_cl  = configopt_int_fatal(dconf,"VALID_CL",-1,1);
+  anl_conf->valid_blm  = configopt_int_fatal(dconf,"VALID_BLM",-1,1);
+  anl_conf->valid_wot = configopt_int_fatal(dconf,"VALID_WOT",-1,1);
   anl_conf->blm_on = configopt_int_fatal(dconf,"BLM_ON",0,1);
-  anl_conf->blm_n_cells = configopt_int_fatal(dconf,"N_CELLS",1,255);
-  anl_conf->blm_min_count = configopt_int_fatal(dconf,"BLM_MIN_COUNTS",0,10000);
+  if(anl_conf->blm_on == 1) {
+    anl_conf->blm_n_cells = configopt_int_fatal(dconf,"N_CELLS",1,255);
+    anl_conf->blm_min_count = configopt_int_fatal(dconf,"BLM_MIN_COUNTS",
+                                  0,10000);
+    anl_conf->col_lblm = configopt_int_fatal(dconf,"COL_LBLM",0,500);
+    anl_conf->col_cell = configopt_int_fatal(dconf,"COL_CELL",0,500);
+    anl_conf->col_rblm = configopt_int_fatal(dconf,"COL_RBLM",0,500);
+  };
   anl_conf->col_timestamp = configopt_int_fatal(dconf,"COL_TIMESTAMP",0,500);
   anl_conf->col_rpm = configopt_int_fatal(dconf,"COL_RPM",0,500);
   anl_conf->col_temp = configopt_int_fatal(dconf,"COL_TEMP",0,500);
-  anl_conf->col_lblm = configopt_int_fatal(dconf,"COL_LBLM",0,500);
-  anl_conf->col_cell = configopt_int_fatal(dconf,"COL_CELL",0,500);
-  anl_conf->col_rblm = configopt_int_fatal(dconf,"COL_RBLM",0,500);
   anl_conf->col_map = configopt_int_fatal(dconf,"COL_MAP",0,500);
   anl_conf->col_maf = configopt_int_fatal(dconf,"COL_MAF",0,500);
   anl_conf->col_cl = configopt_int_fatal(dconf,"COL_CL",0,500);
