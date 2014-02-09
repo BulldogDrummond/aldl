@@ -148,10 +148,9 @@ void log_blm(char *line) {
   };
 
   /* check CL/PE op */
-  /* FIXME this doesnt follow config spec */
-  if(csvint(line,anl_conf->col_cl) != 1) return;
-  if(csvint(line,anl_conf->col_blm) != 1) return;
-  if(csvint(line,anl_conf->col_wot) == 1) return;
+  if(csvint(line,anl_conf->col_cl) != anl_conf->valid_cl) return;
+  if(csvint(line,anl_conf->col_blm) != anl_conf->valid_blm) return;
+  if(csvint(line,anl_conf->col_wot) != anl_conf->valid_wot) return;
 
   /* point to cell index */
   anl_t *cdata = &anl[cell];
