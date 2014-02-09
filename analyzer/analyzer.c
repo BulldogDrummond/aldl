@@ -20,6 +20,10 @@ typedef struct _anl_t {
 } anl_t;
 anl_t *anl_blm;
 
+typedef struct _anl_cell_t {
+  float low,high,avg;
+} anl_cell_t;
+
 typedef struct _anl_conf_t {
   int n_cols; /* number of columns in a log file */
   /* valid row specifier */
