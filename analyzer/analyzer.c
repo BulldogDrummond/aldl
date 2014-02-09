@@ -94,15 +94,18 @@ void prep_anl() {
   anl = malloc(sizeof(anl_t) * anl_conf->blm_n_cells);
   memset(anl,0,sizeof(anl_t) * anl_conf->blm_n_cells);
 
-  int cell;
-  anl_t *cdata;
-  for(cell=0;cell<anl_conf->blm_n_cells;cell++) {
-    cdata = &anl[cell];    
-    cdata->low_map = 999999;
-    cdata->low_rpm = 999999;
-    cdata->low_blm = 999999;
-    cdata->low_maf = 999999;
+  if(anl_conf->blm_on) {
+    int cell;
+    anl_t *cdata;
+    for(cell=0;cell<anl_conf->blm_n_cells;cell++) {
+      cdata = &anl[cell];    
+      cdata->low_map = 999999;
+      cdata->low_rpm = 999999;
+      cdata->low_blm = 999999;
+      cdata->low_maf = 999999;
+    };
   };
+
   goodlines = 0;
   badlines = 0;
   skiplines = 0;
