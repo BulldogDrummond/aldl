@@ -18,7 +18,7 @@ typedef struct _anl_t {
   float avg_blm;
   int counts;
 } anl_t;
-anl_t *anl;
+anl_t *anl_blm;
 
 typedef struct _anl_conf_t {
   int n_cols; /* number of columns in a log file */
@@ -91,14 +91,14 @@ int main(int argc, char **argv) {
 
 void prep_anl() {
   /* alloc anl struct */
-  anl = malloc(sizeof(anl_t) * anl_conf->blm_n_cells);
-  memset(anl,0,sizeof(anl_t) * anl_conf->blm_n_cells);
+  anl_blm = malloc(sizeof(anl_t) * anl_conf->blm_n_cells);
+  memset(anl_blm,0,sizeof(anl_t) * anl_conf->blm_n_cells);
 
   if(anl_conf->blm_on) {
     int cell;
     anl_t *cdata;
     for(cell=0;cell<anl_conf->blm_n_cells;cell++) {
-      cdata = &anl[cell];    
+      cdata = &anl_blm[cell];    
       cdata->low_map = 999999;
       cdata->low_rpm = 999999;
       cdata->low_blm = 999999;
@@ -156,7 +156,7 @@ void log_blm(char *line) {
   if(csvint(line,anl_conf->col_wot) != anl_conf->valid_wot) return;
 
   /* point to cell index */
-  anl_t *cdata = &anl[cell];
+  anl_t *cdata = &anl_blm[cell];
 
   /* update counts */
   cdata->counts++;
@@ -195,7 +195,7 @@ void post_calc_blm() {
   int cell;
   anl_t *cdata;
   for(cell=0;cell<anl_conf->blm_n_cells;cell++) {
-    cdata = &anl[cell]; /* ptr to cell */
+    cdata = &anl_blm[cell]; /* ptr to cell */
     cdata->avg_blm = cdata->avg_blm / (float)cdata->counts;  
     cdata->avg_maf = cdata->avg_maf / (float)cdata->counts;
     cdata->avg_map = cdata->avg_map / (float)cdata->counts;
@@ -218,7 +218,7 @@ void print_results_blm() {
   printf("\n**** BLM Analysis ****\n");
 
   for(x=0;x<anl_conf->blm_n_cells;x++) {
-    cdata = &anl[x];
+    cdata = &anl_blm[x];
     if(cdata->counts > anl_conf->blm_min_count) {
       overall_blm_count++;
       overall_blm_avg += cdata->avg_blm;
