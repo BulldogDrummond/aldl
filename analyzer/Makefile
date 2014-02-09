@@ -15,6 +15,10 @@ error.o: error.c error.h config.h
 loadconfig.o: loadconfig.c loadconfig.h config.h
 	gcc $(CFLAGS) -c loadconfig.c
 
+install: aldl-analyzer analyzer.conf
+	cp -nv analyzer.conf /etc/aldl/analyzer.conf
+	cp -v aldl-analyzer /usr/local/etc/aldl-analyzer
+
 clean:
 	rm -f aldl-analyzer *.o
 
