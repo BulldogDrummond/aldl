@@ -43,9 +43,10 @@ typedef struct _anl_conf_t {
 } anl_conf_t;
 anl_conf_t *anl_conf;
 
-int badlines;
-int goodlines;
-int skiplines;
+typedef struct _anl_stats_t {
+  int badlines,goodlines,skiplines;
+} anl_stats_t;
+anl_stats_t *stats;
 
 void parse_file(char *data);
 void parse_line(char *line);
@@ -69,8 +70,10 @@ void print_results_blm();
 int main(int argc, char **argv) {
   printf("**** aldlio offline log analyzer %s ****\n\n",ANL_VERSION);
   printf("(c)2014 Steve Haslin\n");
+
   /* load config */
   anl_load_conf(ANL_CONFIGFILE);
+
   /* load files ... */
   if(argc < 2) err("no files specified...");
   int x;
@@ -82,14 +85,14 @@ int main(int argc, char **argv) {
     if(log[x-1] == NULL) err("File %s could not be loaded!",argv[x]);
   };
 
-  prep_anl();
+  prep_anl(); /* prepare data structures */
 
   /* parse */
   for(x=0;x<argc-1;x++) {
     parse_file(log[x]);
   };
 
-  post_calc();
+  post_calc(); /* post-calculations (averaging mostly) */
 
   print_results();
 
@@ -97,7 +100,7 @@ int main(int argc, char **argv) {
 };
 
 void prep_anl() {
-  /* alloc anl struct */
+  /* alloc blm anl struct */
   anl_blm = malloc(sizeof(anl_t) * anl_conf->blm_n_cells);
   memset(anl_blm,0,sizeof(anl_t) * anl_conf->blm_n_cells);
 
@@ -113,19 +116,19 @@ void prep_anl() {
     };
   };
 
-  goodlines = 0;
-  badlines = 0;
-  skiplines = 0;
+  /* alloc and config stats struct */
+  stats = malloc(sizeof(anl_stats_t));
+  stats->goodlines = 0;
+  stats->badlines = 0;
+  stats->skiplines = 0;
 };
 
 void parse_file(char *data) {
   printf("Parsing data...\n");
-  int ln = 1; /* line number (skip header) */
-  char *line = line_start(data,ln); /* initial line pointer */
+  char *line = line_start(data,1); /* initial line pointer */
   while(line != NULL) { /* loop for all lines */
     parse_line(line);
-    ln++;
-    line = line_start(data,ln);
+    line = line_start(line,1);
   };
 };
 
@@ -135,7 +138,7 @@ void parse_line(char *line) {
 
   /* check timestamp minimum */
   if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
-    skiplines++;
+    stats->skiplines++;
     return;
   };
 
@@ -147,13 +150,13 @@ void log_blm(char *line) {
   /* get cell number and confirm it's in range */
   int cell = csvint(line,anl_conf->col_cell);
   if(cell < 0 || cell >= anl_conf->blm_n_cells) {
-    skiplines++;
+    stats->skiplines++;
     return;
   };
 
   /* check temperature minimum */
   if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) {
-    skiplines++;
+    stats->skiplines++;
     return;
   };
 
@@ -214,8 +217,11 @@ void post_calc_blm() {
 };
 
 void print_results() {
-  printf("Parsed %i/%i lines.\n",goodlines-badlines,goodlines+badlines);
-  printf("Skipped %i/%i unreliable records.\n",skiplines,goodlines);
+  printf("Parsed %i/%i lines.\n",
+      stats->goodlines - stats->badlines,
+      stats->goodlines + stats->badlines);
+  printf("Skipped %i/%i unreliable records.\n",
+      stats->skiplines,stats->goodlines);
   if(anl_conf->blm_on == 1) print_results_blm();
 };
 
@@ -241,11 +247,25 @@ void print_results_blm() {
               cdata->map.low,cdata->map.high,cdata->map.avg);
       printf("\tMAF: %.1f - %.1f AFGS, (Avg %.1f)\n",
               cdata->maf.low,cdata->maf.high,cdata->maf.avg);
+      if(cdata->blm.avg > 138) {
+        printf("\t!!!! This cell is tuned too lean !!!!\n");
+      };
+      if(cdata->blm.avg < 118) {
+        printf("\t!!!! This cell is tuned too rich !!!!\n");
+      };
+    } else {
+      printf("\n* Cell %i (%i Hits) - Not reliable.\n",x,cdata->counts);
     };
   };
   printf("\nOverall useful BLM Average: %.2f (%.3f percent)\n",
         overall_blm_avg / overall_blm_count,
         ( overall_blm_avg / overall_blm_count) / 128);
+  if(overall_blm_avg / overall_blm_count < 118) {
+    printf("!!!! Overall tune too rich !!!!\n");
+  };
+  if(overall_blm_avg / overall_blm_count > 138) {
+    printf("!!!! Overall tune too lean !!!!\n");
+  };
 };
 
 int verify_line(char *line) {
@@ -253,17 +273,17 @@ int verify_line(char *line) {
 
   /* check for too many columns */
   if(field_start(line,anl_conf->n_cols) == NULL) {
-    badlines++;
+    stats->badlines++;
     return 0;
   };
 
   /* check for not enough columns */
   if(field_start(line,anl_conf->n_cols + 1) != NULL) {
-    badlines++;
+    stats->badlines++;
     return 0;
   };
 
-  goodlines++;
+  stats->goodlines++;
   return 1;
 };
 
