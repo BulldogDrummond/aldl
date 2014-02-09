@@ -309,6 +309,10 @@ void draw_h_progressbar(gauge_t *g) {
       break;
   };
 
+  /* enforce boundaries */
+  if(data < g->bottom) g = bottom;
+  if(data > g->top) g = top;
+
   int x;
   char *curs;
 
