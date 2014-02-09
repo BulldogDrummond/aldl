@@ -1,3 +1,5 @@
+/* THIS FILE WILL BE DEPRECIATED IN THE NEXT RELEASE */
+
 /* number of the last column to determine if line is valid */
 #define LAST_COL 26
 
