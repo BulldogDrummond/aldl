@@ -45,10 +45,7 @@ anl_knock_t *anl_knock;
 
 /* wideband analysis table */
 typedef struct _anl_wb_t {
-  float t[RPM_GRIDSIZE][MAP_GRIDSIZE];
-  int c[RPM_GRIDSIZE][MAP_GRIDSIZE];
-  int ttl;
-  int prev;
+  anl_fcell_t t[RPM_GRIDSIZE][MAP_GRIDSIZE];
 } anl_wb_t;
 anl_wb_t *anl_wb;
 
@@ -162,12 +159,16 @@ void prep_anl() {
   stats->skiplines = 0;
 
   /* config knock struct */
-  anl_knock = malloc(sizeof(anl_knock_t));
-  memset(anl_knock,0,sizeof(anl_knock_t));
+  if(anl_conf->knock_on == 1) {
+    anl_knock = malloc(sizeof(anl_knock_t));
+    memset(anl_knock,0,sizeof(anl_knock_t));
+  };
 
   /* config wb struct */
-  anl_wb = malloc(sizeof(anl_wb_t));
-  memset(anl_wb,0,sizeof(anl_wb_t));
+  if(anl_conf->wb_on == 1) {
+    anl_wb = malloc(sizeof(anl_wb_t));
+    memset(anl_wb,0,sizeof(anl_wb_t));
+  };
 };
 
 void parse_file(char *data) {
@@ -207,8 +208,8 @@ void log_wb(char *line) {
   };
   int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
   int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
-  anl_wb->t[rpmcell][mapcell] += (csvfloat(line,anl_conf->col_wb));
-  anl_wb->c[rpmcell][mapcell] ++;
+  anl_wb->t[rpmcell][mapcell].avg += (csvfloat(line,anl_conf->col_wb));
+  anl_wb->t[rpmcell][mapcell].count++;
 };
 
 void log_knock(char *line) {
@@ -305,8 +306,8 @@ void post_calc_wb() {
   int rpmrow = 0;
   for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
-      anl_wb->t[rpmrow][maprow] = anl_wb->t[rpmrow][maprow] /
-                        anl_wb->c[rpmrow][maprow];
+      anl_wb->t[rpmrow][maprow].avg = anl_wb->t[rpmrow][maprow].avg /
+                        anl_wb->t[rpmrow][maprow].count;
     };
   };
 };
@@ -317,11 +318,11 @@ void print_results_wb() {
   printf("\n**** WB Analysis ****\n");
   for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
-      if(anl_wb->c[rpmrow][maprow] > 50) {
+      if(anl_wb->t[rpmrow][maprow].count > 50) {
         printf("RPM %i-%i @ MAP%i-%i: %.2f   (%i Counts)\n",
         rpmrow * GRID_RPM_INTERVAL, ( rpmrow + 1) * GRID_RPM_INTERVAL,
         maprow * GRID_MAP_INTERVAL, ( maprow + 1) * GRID_MAP_INTERVAL,
-        anl_wb->t[rpmrow][maprow], anl_wb->c[rpmrow][maprow]);
+        anl_wb->t[rpmrow][maprow].avg, anl_wb->t[rpmrow][maprow].count);
       };
     };
   };
