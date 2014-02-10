@@ -184,35 +184,39 @@ void parse_line(char *line) {
   /* verify line integrity */
   if(verify_line(line) == 0) return;
 
+  /* BRANCHING TO PER-LINE ANALYZERS HERE --------- */
+  if(anl_conf->blm_on == 1) log_blm(line);
+  if(anl_conf->knock_on == 1) log_knock(line);
+  if(anl_conf->wb_on == 1) log_wb(line);
+};
+
+void print_results() {
+  printf("Parsed %i/%i lines.\n",
+      stats->goodlines - stats->badlines,
+      stats->goodlines + stats->badlines);
+  printf("Skipped %i/%i unreliable records.\n",
+      stats->skiplines,stats->goodlines);
+
+  /* BRANCHING TO RESULT PARSERS HERE ----------*/
+  if(anl_conf->blm_on == 1) print_results_blm();
+  if(anl_conf->knock_on == 1) print_results_knock();
+  if(anl_conf->wb_on == 1) print_results_wb();
+};
+
+void post_calc() {
+  /* BRANCHING TO POST_CALCS HERE ---------------*/
+  if(anl_conf->blm_on == 1) post_calc_blm();
+  if(anl_conf->wb_on == 1) post_calc_wb();
+};
+
+/******** KNOCK COUNT GRID ANALYZER **************************/
+
+void log_knock(char *line) {
   /* check timestamp minimum */
   if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
     stats->skiplines++;
     return;
   };
-
-  /* bring in blm stuff */
-  if(anl_conf->blm_on == 1) log_blm(line);
-
-  /* bring in knock stuff */
-  if(anl_conf->knock_on == 1) log_knock(line);
-
-  /* wb */
-  if(anl_conf->wb_on == 1) log_wb(line);
-};
-
-void log_wb(char *line) {
-  /* check temperature minimum */
-  if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) {
-    stats->skiplines++;
-    return;
-  };
-  int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
-  int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
-  anl_wb->t[rpmcell][mapcell].avg += (csvfloat(line,anl_conf->col_wb));
-  anl_wb->t[rpmcell][mapcell].count++;
-};
-
-void log_knock(char *line) {
   int kcount = csvint(line,anl_conf->col_knock);
   if(kcount == anl_knock->prev) return; /* no new knock */
   if(kcount < anl_knock->prev) {
@@ -246,7 +250,15 @@ void print_results_knock() {
   printf("Total knock events: %.0f k\n",(float)anl_knock->ttl / 1000);
 };
 
+/********* BLM CELL ANALYZER ****************************/
+
 void log_blm(char *line) {
+  /* check timestamp minimum */
+  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
+    stats->skiplines++;
+    return;
+  };
+
   /* get cell number and confirm it's in range */
   int cell = csvint(line,anl_conf->col_cell);
   if(cell < 0 || cell >= anl_conf->blm_n_cells) {
@@ -296,59 +308,16 @@ void log_blm(char *line) {
   cdata->rpm.avg += rpm;
 };
 
-void post_calc() {
-  if(anl_conf->blm_on == 1) post_calc_blm();
-  if(anl_conf->wb_on == 1) post_calc_wb();
-};
-
-void post_calc_wb() {
-  int maprow = 0;
-  int rpmrow = 0;
-  for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
-    for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
-      anl_wb->t[rpmrow][maprow].avg = anl_wb->t[rpmrow][maprow].avg /
-                        anl_wb->t[rpmrow][maprow].count;
-    };
-  };
-};
-
-void print_results_wb() {
-  int maprow = 0;
-  int rpmrow = 0;
-  printf("\n**** WB Analysis ****\n");
-  for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
-    for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
-      if(anl_wb->t[rpmrow][maprow].count > 50) {
-        printf("RPM %i-%i @ MAP%i-%i: %.2f   (%i Counts)\n",
-        rpmrow * GRID_RPM_INTERVAL, ( rpmrow + 1) * GRID_RPM_INTERVAL,
-        maprow * GRID_MAP_INTERVAL, ( maprow + 1) * GRID_MAP_INTERVAL,
-        anl_wb->t[rpmrow][maprow].avg, anl_wb->t[rpmrow][maprow].count);
-      };
-    };
-  };
-};
-
 void post_calc_blm() {
   int cell;
   anl_t *cdata;
   for(cell=0;cell<anl_conf->blm_n_cells;cell++) {
     cdata = &anl_blm[cell]; /* ptr to cell */
-    cdata->blm.avg = cdata->blm.avg / (float)cdata->counts;  
+    cdata->blm.avg = cdata->blm.avg / (float)cdata->counts;
     cdata->maf.avg = cdata->maf.avg / (float)cdata->counts;
     cdata->map.avg = cdata->map.avg / (float)cdata->counts;
     cdata->rpm.avg = cdata->rpm.avg / (float)cdata->counts;
   };
-};
-
-void print_results() {
-  printf("Parsed %i/%i lines.\n",
-      stats->goodlines - stats->badlines,
-      stats->goodlines + stats->badlines);
-  printf("Skipped %i/%i unreliable records.\n",
-      stats->skiplines,stats->goodlines);
-  if(anl_conf->blm_on == 1) print_results_blm();
-  if(anl_conf->knock_on == 1) print_results_knock();
-  if(anl_conf->wb_on == 1) print_results_wb();
 };
 
 void print_results_blm() {
@@ -393,6 +362,54 @@ void print_results_blm() {
     printf("!!!! Overall tune too lean !!!!\n");
   };
 };
+
+/************* WIDEBAND ANALYZER ******************************/
+
+void log_wb(char *line) {
+  /* check timestamp minimum */
+  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
+    stats->skiplines++;
+    return;
+  };
+  /* check temperature minimum */
+  if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) {
+    stats->skiplines++;
+    return;
+  };
+  int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
+  int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
+  anl_wb->t[rpmcell][mapcell].avg += (csvfloat(line,anl_conf->col_wb));
+  anl_wb->t[rpmcell][mapcell].count++;
+};
+
+void post_calc_wb() {
+  int maprow = 0;
+  int rpmrow = 0;
+  for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
+    for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
+      anl_wb->t[rpmrow][maprow].avg = anl_wb->t[rpmrow][maprow].avg /
+                        anl_wb->t[rpmrow][maprow].count;
+    };
+  };
+};
+
+void print_results_wb() {
+  int maprow = 0;
+  int rpmrow = 0;
+  printf("\n**** WB Analysis ****\n");
+  for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
+    for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
+      if(anl_wb->t[rpmrow][maprow].count > 50) {
+        printf("RPM %i-%i @ MAP%i-%i: %.2f   (%i Counts)\n",
+        rpmrow * GRID_RPM_INTERVAL, ( rpmrow + 1) * GRID_RPM_INTERVAL,
+        maprow * GRID_MAP_INTERVAL, ( maprow + 1) * GRID_MAP_INTERVAL,
+        anl_wb->t[rpmrow][maprow].avg, anl_wb->t[rpmrow][maprow].count);
+      };
+    };
+  };
+};
+
+/*--------------------------------------------------------------*/
 
 int verify_line(char *line) {
   if(line == NULL) return 0;
