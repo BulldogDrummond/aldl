@@ -300,18 +300,14 @@ void draw_h_progressbar(gauge_t *g) {
   switch(def->type) {
     case ALDL_INT:
     case ALDL_BOOL:
-      data = rec->data[g->data_a].i;
+      data = clamp_int(g->bottom,g->top,rec->data[g->data_a].i);
       break;
     case ALDL_FLOAT:
-      data = smooth_float(g);
+      data = clamp_float(g->bottom,g->top,smooth_float(g));
       break;
     default:
       break;
   };
-
-  /* enforce boundaries */
-  if(data < g->bottom) g = bottom;
-  if(data > g->top) g = top;
 
   int x;
   char *curs;
