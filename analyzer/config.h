@@ -4,5 +4,6 @@
 /* configure analysis grids */
 #define GRID_RPM_RANGE 7000
 #define GRID_RPM_INTERVAL 250
-#define GRIP_MAP_RANGE 100
+#define GRID_MAP_RANGE 100
 #define GRID_MAP_INTERVAL 5
+
