@@ -37,6 +37,14 @@ typedef struct _anl_knock_t {
 } anl_knock_t;
 anl_knock_t *anl_knock;
 
+typedef struct _anl_wb_t {
+  float t[RPM_GRIDSIZE][MAP_GRIDSIZE];
+  int c[RPM_GRIDSIZE][MAP_GRIDSIZE];
+  int ttl;
+  int prev;
+} anl_wb_t;
+anl_wb_t *anl_wb;
+
 typedef struct _anl_conf_t {
   int n_cols; /* number of columns in a log file */
   /* valid row specifier */
@@ -49,9 +57,11 @@ typedef struct _anl_conf_t {
   int blm_min_count; /* minimum number of counts for a valid cell */
   /* knock analyzer */
   int knock_on; /* activate knock counter */
+  /* wb analyzer */
+  int wb_on,wb_wot,wb_counts;
   /* column identifiers */ 
   int col_timestamp, col_rpm, col_temp, col_lblm, col_rblm, col_cell;
-  int col_map, col_maf, col_cl, col_blm, col_wot, col_knock;
+  int col_map, col_maf, col_cl, col_blm, col_wot, col_knock, col_wb;
 } anl_conf_t;
 anl_conf_t *anl_conf;
 
@@ -66,6 +76,7 @@ int verify_line(char *line);
 
 void log_blm(char *line);
 void log_knock(char *line);
+void log_wb(char *line);
 
 int csvint(char *line, int f);
 float csvfloat(char *line, int f);
@@ -75,11 +86,13 @@ void prep_anl();
 void anl_load_conf(char *filename);
 
 void post_calc_blm();
+void post_calc_wb();
 void post_calc();
 
 void print_results();
 void print_results_blm();
 void print_results_knock();
+void print_results_wb();
 
 int rpm_cell_offset(int value);
 int map_cell_offset(int value);
@@ -143,6 +156,10 @@ void prep_anl() {
   /* config knock struct */
   anl_knock = malloc(sizeof(anl_knock_t));
   memset(anl_knock,0,sizeof(anl_knock_t));
+
+  /* config wb struct */
+  anl_wb = malloc(sizeof(anl_wb_t));
+  memset(anl_wb,0,sizeof(anl_wb_t));
 };
 
 void parse_file(char *data) {
@@ -169,6 +186,21 @@ void parse_line(char *line) {
 
   /* bring in knock stuff */
   if(anl_conf->knock_on == 1) log_knock(line);
+
+  /* wb */
+  if(anl_conf->wb_on == 1) log_wb(line);
+};
+
+void log_wb(char *line) {
+  /* check temperature minimum */
+  if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) {
+    stats->skiplines++;
+    return;
+  };
+  int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
+  int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
+  anl_wb->t[rpmcell][mapcell] += (csvfloat(line,anl_conf->col_wb));
+  anl_wb->c[rpmcell][mapcell] ++;
 };
 
 void log_knock(char *line) {
@@ -257,6 +289,34 @@ void log_blm(char *line) {
 
 void post_calc() {
   if(anl_conf->blm_on == 1) post_calc_blm();
+  if(anl_conf->wb_on == 1) post_calc_wb();
+};
+
+void post_calc_wb() {
+  int maprow = 0;
+  int rpmrow = 0;
+  for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
+    for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
+      anl_wb->t[rpmrow][maprow] = anl_wb->t[rpmrow][maprow] /
+                        anl_wb->c[rpmrow][maprow];
+    };
+  };
+};
+
+void print_results_wb() {
+  int maprow = 0;
+  int rpmrow = 0;
+  printf("\n**** WB Analysis ****\n");
+  for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
+    for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
+      if(anl_wb->c[rpmrow][maprow] > 50) {
+        printf("RPM %i-%i @ MAP%i-%i: %.2f   (%i Counts)\n",
+        rpmrow * GRID_RPM_INTERVAL, ( rpmrow + 1) * GRID_RPM_INTERVAL,
+        maprow * GRID_MAP_INTERVAL, ( maprow + 1) * GRID_MAP_INTERVAL,
+        anl_wb->t[rpmrow][maprow], anl_wb->c[rpmrow][maprow]);
+      };
+    };
+  };
 };
 
 void post_calc_blm() {
@@ -279,6 +339,7 @@ void print_results() {
       stats->skiplines,stats->goodlines);
   if(anl_conf->blm_on == 1) print_results_blm();
   if(anl_conf->knock_on == 1) print_results_knock();
+  if(anl_conf->wb_on == 1) print_results_wb();
 };
 
 void print_results_blm() {
@@ -364,13 +425,19 @@ void anl_load_conf(char *filename) {
   if(anl_conf->blm_on == 1) {
     anl_conf->blm_n_cells = configopt_int_fatal(dconf,"N_CELLS",1,255);
     anl_conf->blm_min_count = configopt_int_fatal(dconf,"BLM_MIN_COUNTS",
-                                  0,10000);
+                                  1,10000);
     anl_conf->col_lblm = configopt_int_fatal(dconf,"COL_LBLM",0,500);
     anl_conf->col_cell = configopt_int_fatal(dconf,"COL_CELL",0,500);
     anl_conf->col_rblm = configopt_int_fatal(dconf,"COL_RBLM",0,500);
   };
   if(anl_conf->knock_on == 1) {
     anl_conf->col_knock = configopt_int_fatal(dconf,"COL_KNOCK",0,500);
+  };
+  anl_conf->wb_on = configopt_int_fatal(dconf,"WB_ON",0,1);
+  if(anl_conf->wb_on == 1) {
+    anl_conf->col_wb = configopt_int_fatal(dconf,"COL_WB",0,500);
+    anl_conf->wb_wot = configopt_int_fatal(dconf,"WB_WOT",0,1);
+    anl_conf->wb_counts = configopt_int_fatal(dconf,"WB_MIN_COUNTS",1,65535);
   };
   anl_conf->col_timestamp = configopt_int_fatal(dconf,"COL_TIMESTAMP",0,500);
   anl_conf->col_rpm = configopt_int_fatal(dconf,"COL_RPM",0,500);
