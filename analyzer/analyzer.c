@@ -387,7 +387,6 @@ int rpm_cell_offset(int value) {
   if(value < 0) return 0;
   if(value < GRID_RPM_INTERVAL) return 0;
   int cell = ((float)value/GRID_RPM_RANGE)*(GRID_RPM_RANGE/GRID_RPM_INTERVAL);
-  printf("RPM CELL %i\n",cell);
   return cell;
 };
 
@@ -396,7 +395,6 @@ int map_cell_offset(int value) {
   if(value < 0) return value;
   if(value < GRID_MAP_INTERVAL) return 0;
   int cell = ((float)value/GRID_MAP_RANGE)*(GRID_MAP_RANGE/GRID_MAP_INTERVAL);
-  printf("MAP CELL %i\n",cell);
   return cell;
 };
 
