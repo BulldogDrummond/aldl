@@ -59,4 +59,8 @@ void printhexstring(byte *str, int length);
 /* sleep for ms milliseconds */
 void msleep(int ms);
 
+/* ensure number remains within a boundary */
+int clamp_int(int min, int max, int in);
+float clamp_float(float min, float max, float in);
+
 #endif

@@ -133,3 +133,15 @@ void *smalloc(size_t size) {
   };
   return m;
 };
+
+int clamp_int(int min, int max, int in) {
+  if(in > max) return max;
+  if(in < min) return min;
+  return in;
+};
+
+float clamp_float(float min, float max, float in) {
+  if(in > max) return max;
+  if(in < min) return min;
+  return in;
+};
