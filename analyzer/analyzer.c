@@ -13,16 +13,21 @@
 #define RPM_GRIDSIZE ( GRID_RPM_RANGE / GRID_RPM_INTERVAL )
 #define MAP_GRIDSIZE ( GRID_MAP_RANGE / GRID_MAP_INTERVAL )
 
+/* grid cell, float */
 typedef struct _anl_fcell_t {
   float low,high;
   float avg;
+  int count;
 } anl_fcell_t;
 
+/* grid cell, int */
 typedef struct anl_icell_t {
   int low,high;
   float avg;
+  int count;
 } anl_icell_t;
 
+/* blm analysis storage */
 typedef struct _anl_t {
   anl_fcell_t rpm,map,maf;
   anl_icell_t blm; 
@@ -30,6 +35,7 @@ typedef struct _anl_t {
 } anl_t;
 anl_t *anl_blm;
 
+/* knock table */
 typedef struct _anl_knock_t {
   int t[RPM_GRIDSIZE][MAP_GRIDSIZE];
   int ttl;
@@ -37,6 +43,7 @@ typedef struct _anl_knock_t {
 } anl_knock_t;
 anl_knock_t *anl_knock;
 
+/* wideband analysis table */
 typedef struct _anl_wb_t {
   float t[RPM_GRIDSIZE][MAP_GRIDSIZE];
   int c[RPM_GRIDSIZE][MAP_GRIDSIZE];
@@ -45,6 +52,7 @@ typedef struct _anl_wb_t {
 } anl_wb_t;
 anl_wb_t *anl_wb;
 
+/* configuration storage */
 typedef struct _anl_conf_t {
   int n_cols; /* number of columns in a log file */
   /* valid row specifier */
@@ -74,16 +82,16 @@ void parse_file(char *data);
 void parse_line(char *line);
 int verify_line(char *line);
 
-void log_blm(char *line);
-void log_knock(char *line);
-void log_wb(char *line);
-
 int csvint(char *line, int f);
 float csvfloat(char *line, int f);
 
 void prep_anl();
 
 void anl_load_conf(char *filename);
+
+void log_blm(char *line);
+void log_knock(char *line);
+void log_wb(char *line);
 
 void post_calc_blm();
 void post_calc_wb();
