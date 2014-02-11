@@ -190,17 +190,15 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* get value, this does need more work ... */
   switch(def->type) {
     case ALDL_INT:
-      out->i = ( (int)x + def->adder.i ) * def->multiplier.i;
+      out->i = ( (int)x * def->multiplier.i ) + def->adder.i;
       if(aldl->minmax == 1) {
-        if(out->i < def->min.i) out->i = def->min.i;
-        if(out->i > def->max.i) out->i = def->max.i;
+        out->i = clamp_int(def->min.i,def->max.i,out->i);
       };
       break;
     case ALDL_FLOAT:
-      out->f = ( (float)x + def->adder.f ) * def->multiplier.f;
+      out->f = ( (float)x * def->multiplier.f ) + def->adder.f;
       if(aldl->minmax == 1) {
-        if(out->f < def->min.f) out->f = def->min.f;
-        if(out->f > def->max.f) out->f = def->max.f;
+        out->f = clamp_float(def->min.f,def->max.f,out->f); 
       };
       break;
     case ALDL_BOOL:
