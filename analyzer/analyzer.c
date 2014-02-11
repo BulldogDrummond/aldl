@@ -396,7 +396,7 @@ void post_calc_wb() {
 void print_results_wb() {
   int maprow = 0;
   int rpmrow = 0;
-  printf("\n**** WB Analysis ****\n");
+  printf("\n**** WB Analysis ****\n\n");
   for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
       if(anl_wb->t[rpmrow][maprow].count > 50) {
