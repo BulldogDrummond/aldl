@@ -17,7 +17,7 @@ loadconfig.o: loadconfig.c loadconfig.h config.h
 
 install: aldl-analyzer analyzer.conf
 	cp -nv analyzer.conf /etc/aldl/analyzer.conf
-	cp -v aldl-analyzer /usr/local/etc/aldl-analyzer
+	cp -v aldl-analyzer /usr/local/bin/aldl-analyzer
 
 clean:
 	rm -f aldl-analyzer *.o
