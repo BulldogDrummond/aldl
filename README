@@ -115,11 +115,7 @@ serio-dummy.c: a really stupid fake serial driver for debugging, that pretends
 modules/*: various output modules which can be executed by main.c to actually
            do stuff with the data, incl. display and logging.
 
-#notes
-
-string to identify your ftdi interface (pick one):
-   d:devicenode (usually at /proc/bus/usb)
-   i:vendor:product
-   i:vendor:product:index
-   s:vendor:product:serial
+analyzer/*: a c-based offline log analyzer that parses groups of logs for blm
+            cell trims, knock counts, wideband afr, etc. using thresholds to
+            try to avoid bad data.
 
