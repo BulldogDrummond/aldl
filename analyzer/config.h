@@ -3,7 +3,10 @@
 
 /* configure analysis grids */
 #define GRID_RPM_RANGE 7000
-#define GRID_RPM_INTERVAL 500
+#define GRID_RPM_INTERVAL 400
 #define GRID_MAP_RANGE 100
-#define GRID_MAP_INTERVAL 15
+#define GRID_MAP_INTERVAL 10
+#define GRID_MAF_RANGE 260
+#define GRID_MAF_INTERVAL 10
 
+#define REJECTDECEL

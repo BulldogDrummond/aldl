@@ -12,6 +12,7 @@
 
 #define RPM_GRIDSIZE ( GRID_RPM_RANGE / GRID_RPM_INTERVAL )
 #define MAP_GRIDSIZE ( GRID_MAP_RANGE / GRID_MAP_INTERVAL )
+#define MAF_GRIDSIZE ( GRID_MAF_RANGE / GRID_MAF_INTERVAL )
 
 /* grid cell, float */
 typedef struct _anl_fcell_t {
@@ -49,6 +50,11 @@ typedef struct _anl_wb_t {
 } anl_wb_t;
 anl_wb_t *anl_wb;
 
+typedef struct _anl_wbmaf_t {
+  anl_fcell_t t[MAF_GRIDSIZE];
+} anl_wbmaf_t;
+anl_wbmaf_t *anl_wbmaf;
+
 /* configuration storage */
 typedef struct _anl_conf_t {
   int n_cols; /* number of columns in a log file */
@@ -63,7 +69,7 @@ typedef struct _anl_conf_t {
   /* knock analyzer */
   int knock_on; /* activate knock counter */
   /* wb analyzer */
-  int wb_on,wb_wot,wb_counts;
+  int wb_on,wb_wot,wb_counts,wb_min,wb_max;
   /* column identifiers */ 
   int col_timestamp, col_rpm, col_temp, col_lblm, col_rblm, col_cell;
   int col_map, col_maf, col_cl, col_blm, col_wot, col_knock, col_wb;
@@ -71,7 +77,7 @@ typedef struct _anl_conf_t {
 anl_conf_t *anl_conf;
 
 typedef struct _anl_stats_t {
-  int badlines,goodlines,skiplines;
+  int badlines,goodlines;
 } anl_stats_t;
 anl_stats_t *stats;
 
@@ -101,6 +107,7 @@ void print_results_wb();
 
 int rpm_cell_offset(int value);
 int map_cell_offset(int value);
+int maf_cell_offset(int value);
 
 int main(int argc, char **argv) {
   printf("**** aldlio offline log analyzer %s ****\n\n",ANL_VERSION);
@@ -156,7 +163,6 @@ void prep_anl() {
   stats = malloc(sizeof(anl_stats_t));
   stats->goodlines = 0;
   stats->badlines = 0;
-  stats->skiplines = 0;
 
   /* config knock struct */
   if(anl_conf->knock_on == 1) {
@@ -169,6 +175,7 @@ void prep_anl() {
     anl_wb = malloc(sizeof(anl_wb_t));
     memset(anl_wb,0,sizeof(anl_wb_t));
   };
+  anl_wbmaf = malloc(sizeof(anl_wbmaf_t));
 };
 
 void parse_file(char *data) {
@@ -191,11 +198,9 @@ void parse_line(char *line) {
 };
 
 void print_results() {
-  printf("Parsed %i/%i lines.\n",
+  printf("Accepted %i/%i lines.\n",
       stats->goodlines - stats->badlines,
       stats->goodlines + stats->badlines);
-  printf("Skipped %i/%i unreliable records.\n",
-      stats->skiplines,stats->goodlines);
 
   /* BRANCHING TO RESULT PARSERS HERE ----------*/
   if(anl_conf->blm_on == 1) print_results_blm();
@@ -213,10 +218,7 @@ void post_calc() {
 
 void log_knock(char *line) {
   /* check timestamp minimum */
-  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
-    stats->skiplines++;
-    return;
-  };
+  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) return;
   int kcount = csvint(line,anl_conf->col_knock);
   if(kcount == anl_knock->prev) return; /* no new knock */
   if(kcount < anl_knock->prev) {
@@ -237,15 +239,25 @@ void print_results_knock() {
   printf("\n**** KNOCK Analysis ****\n\n");
   int maprow = 0;
   int rpmrow = 0;
+  int knock = 0;
+  for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
+    printf(" %4i ",maprow * GRID_MAP_INTERVAL);
+  };
+  printf("\n");
   for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
+    printf("%4i\n ",rpmrow * GRID_RPM_INTERVAL);
+    printf("   ");
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
-      if(anl_knock->t[rpmrow][maprow] != 0) {
-        printf("RPM %i-%i @ MAP%i-%i: %i Counts\n",
-          rpmrow * GRID_RPM_INTERVAL, ( rpmrow + 1) * GRID_RPM_INTERVAL,
-          maprow * GRID_MAP_INTERVAL, ( maprow + 1) * GRID_MAP_INTERVAL,
-          anl_knock->t[rpmrow][maprow]);
+      knock = anl_knock->t[rpmrow][maprow];
+      if(knock < 50) {
+        printf(" .... ");
+      } else if(knock < 1000) {
+        printf(" %4i ",knock);
+      } else {
+        printf(" %3ik ",knock / 1000);
       };
     };
+    printf("\n");
   };
   printf("Total knock events: %.0f k\n",(float)anl_knock->ttl / 1000);
 };
@@ -254,23 +266,14 @@ void print_results_knock() {
 
 void log_blm(char *line) {
   /* check timestamp minimum */
-  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
-    stats->skiplines++;
-    return;
-  };
+  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) return;
 
   /* get cell number and confirm it's in range */
   int cell = csvint(line,anl_conf->col_cell);
-  if(cell < 0 || cell >= anl_conf->blm_n_cells) {
-    stats->skiplines++;
-    return;
-  };
+  if(cell < 0 || cell >= anl_conf->blm_n_cells) return;
 
   /* check temperature minimum */
-  if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) {
-    stats->skiplines++;
-    return;
-  };
+  if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) return;
 
   /* check CL/PE op */
   if(csvint(line,anl_conf->col_cl) != 1) return;
@@ -366,46 +369,81 @@ void print_results_blm() {
 /************* WIDEBAND ANALYZER ******************************/
 
 void log_wb(char *line) {
-  /* check timestamp minimum */
-  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
-    stats->skiplines++;
-    return;
-  };
-  /* check temperature minimum */
-  if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) {
-    stats->skiplines++;
-    return;
-  };
+  /* get wb value */
+  float wb = csvfloat(line,anl_conf->col_wb);
+
+  /* thresholds */
+  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) return;
+  if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) return;
+  if(csvint(line,anl_conf->col_wot) != anl_conf->wb_wot) return;
+  if(wb < anl_conf->wb_min || wb > anl_conf->wb_max) return;
+
+  /* a routine for the LT1 that rejects anything in blm cell 17, to detect
+     decel (which shouldnt really be factored into ve or maf tables) */
+  #ifdef REJECTDECEL
+  if(csvint(line,anl_conf->col_cell) == 17) return;
+  #endif
+  
+  /* ve analysis */
   int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
   int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
-  anl_wb->t[rpmcell][mapcell].avg += (csvfloat(line,anl_conf->col_wb));
+  anl_wb->t[rpmcell][mapcell].avg += wb;
   anl_wb->t[rpmcell][mapcell].count++;
+
+  /* maf analysis */
+  int mafcell = maf_cell_offset(csvfloat(line,anl_conf->col_maf));
+  anl_wbmaf->t[mafcell].avg += wb;
+  anl_wbmaf->t[mafcell].count++;
 };
 
 void post_calc_wb() {
   int maprow = 0;
   int rpmrow = 0;
+  int mafrow = 0;
   for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
       anl_wb->t[rpmrow][maprow].avg = anl_wb->t[rpmrow][maprow].avg /
                         anl_wb->t[rpmrow][maprow].count;
     };
   };
+  for(mafrow=0;mafrow<MAF_GRIDSIZE;mafrow++) {
+    anl_wbmaf->t[mafrow].avg = anl_wbmaf->t[mafrow].avg /
+                       anl_wbmaf->t[mafrow].count;
+  };
 };
 
 void print_results_wb() {
   int maprow = 0;
   int rpmrow = 0;
-  printf("\n**** WB Analysis ****\n\n");
+  int mafrow = 0;
+
+  printf("\n**** WB Analysis, VE ****\n\n");
+  for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
+    printf(" %4i ",maprow * GRID_MAP_INTERVAL);
+  };
+  printf("\n");
   for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
+    printf("%4i\n ",rpmrow * GRID_RPM_INTERVAL);
+    printf("   ");
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
-      if(anl_wb->t[rpmrow][maprow].count > 50) {
-        printf("RPM %i-%i @ MAP%i-%i: %.2f   (%i Counts)\n",
-        rpmrow * GRID_RPM_INTERVAL, ( rpmrow + 1) * GRID_RPM_INTERVAL,
-        maprow * GRID_MAP_INTERVAL, ( maprow + 1) * GRID_MAP_INTERVAL,
-        anl_wb->t[rpmrow][maprow].avg, anl_wb->t[rpmrow][maprow].count);
+      if(anl_wb->t[rpmrow][maprow].count <= anl_conf->wb_counts) {
+        printf(" .... ");
+      } else {
+        printf(" %4.1f ",anl_wb->t[rpmrow][maprow].avg);
       };
     };
+    printf("\n");
+  };
+
+  printf("\n**** WB Analysis, MAF ****\n\n");
+  for(mafrow=0;mafrow<MAF_GRIDSIZE;mafrow++) {
+    if(anl_wbmaf->t[mafrow].count == 0) {
+       anl_wbmaf->t[mafrow].avg = 0;
+    };
+    printf("MAF %3i - %3i    ",mafrow * GRID_MAF_INTERVAL,
+        GRID_MAF_INTERVAL * (mafrow +1));
+    printf("   %4.1f    %i Counts\n",
+          anl_wbmaf->t[mafrow].avg, anl_wbmaf->t[mafrow].count);
   };
 };
 
@@ -463,6 +501,8 @@ void anl_load_conf(char *filename) {
   if(anl_conf->wb_on == 1) {
     anl_conf->col_wb = configopt_int_fatal(dconf,"COL_WB",0,500);
     anl_conf->wb_wot = configopt_int_fatal(dconf,"WB_WOT",0,1);
+    anl_conf->wb_min = configopt_float_fatal(dconf,"WB_MIN");
+    anl_conf->wb_max = configopt_float_fatal(dconf,"WB_MAX");
     anl_conf->wb_counts = configopt_int_fatal(dconf,"WB_MIN_COUNTS",1,65535);
   };
   anl_conf->col_timestamp = configopt_int_fatal(dconf,"COL_TIMESTAMP",0,500);
@@ -485,9 +525,16 @@ int rpm_cell_offset(int value) {
 
 int map_cell_offset(int value) {
   if(value > GRID_MAP_RANGE) return GRID_MAP_RANGE / GRID_MAP_INTERVAL;
-  if(value < 0) return value;
+  if(value < 0) return 0;
   if(value < GRID_MAP_INTERVAL) return 0;
   int cell = ((float)value/GRID_MAP_RANGE)*(GRID_MAP_RANGE/GRID_MAP_INTERVAL);
   return cell;
 };
 
+int maf_cell_offset(int value) {
+  if(value > GRID_MAF_RANGE) return GRID_MAP_RANGE / GRID_MAP_INTERVAL;
+  if(value < 0) return 0;
+  if(value < GRID_MAP_INTERVAL) return 0;
+  int cell = ((float)value/GRID_MAF_RANGE)*(GRID_MAF_RANGE/GRID_MAF_INTERVAL);
+  return cell;
+};
