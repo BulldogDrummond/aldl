@@ -6,7 +6,10 @@
 #define GRID_RPM_INTERVAL 400
 #define GRID_MAP_RANGE 100
 #define GRID_MAP_INTERVAL 10
-#define GRID_MAF_RANGE 260
-#define GRID_MAF_INTERVAL 10
+#define GRID_MAF_RANGE 250
+#define GRID_MAF_INTERVAL 5
 
+/* reject blm cell 17, so decel events dont fuck up results */
 #define REJECTDECEL
+
+#define MIN_RPM 200
