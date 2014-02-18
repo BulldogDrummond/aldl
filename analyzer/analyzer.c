@@ -17,14 +17,14 @@
 /* grid cell, float */
 typedef struct _anl_fcell_t {
   float low,high;
-  float avg;
+  double avg;
   int count;
 } anl_fcell_t;
 
 /* grid cell, int */
 typedef struct anl_icell_t {
   int low,high;
-  float avg;
+  double avg;
   int count;
 } anl_icell_t;
 
@@ -38,7 +38,7 @@ anl_t *anl_blm;
 
 /* knock table */
 typedef struct _anl_knock_t {
-  int t[RPM_GRIDSIZE][MAP_GRIDSIZE];
+  int t[RPM_GRIDSIZE + 1][MAP_GRIDSIZE + 1];
   int ttl;
   int prev;
 } anl_knock_t;
@@ -46,12 +46,12 @@ anl_knock_t *anl_knock;
 
 /* wideband analysis table */
 typedef struct _anl_wb_t {
-  anl_fcell_t t[RPM_GRIDSIZE][MAP_GRIDSIZE];
+  anl_fcell_t t[RPM_GRIDSIZE + 1][MAP_GRIDSIZE + 1];
 } anl_wb_t;
 anl_wb_t *anl_wb;
 
 typedef struct _anl_wbmaf_t {
-  anl_fcell_t t[MAF_GRIDSIZE];
+  anl_fcell_t t[MAF_GRIDSIZE + 1];
 } anl_wbmaf_t;
 anl_wbmaf_t *anl_wbmaf;
 
@@ -69,7 +69,7 @@ typedef struct _anl_conf_t {
   /* knock analyzer */
   int knock_on; /* activate knock counter */
   /* wb analyzer */
-  int wb_on,wb_wot,wb_counts,wb_min,wb_max;
+  int wb_on,wb_wot,wb_counts,wb_min,wb_max,wb_comp;
   /* column identifiers */ 
   int col_timestamp, col_rpm, col_temp, col_lblm, col_rblm, col_cell;
   int col_map, col_maf, col_cl, col_blm, col_wot, col_knock, col_wb;
@@ -143,8 +143,8 @@ int main(int argc, char **argv) {
 
 void prep_anl() {
   /* alloc blm anl struct */
-  anl_blm = malloc(sizeof(anl_t) * anl_conf->blm_n_cells);
-  memset(anl_blm,0,sizeof(anl_t) * anl_conf->blm_n_cells);
+  anl_blm = malloc(sizeof(anl_t) * ( anl_conf->blm_n_cells +1 ));
+  memset(anl_blm,0,sizeof(anl_t) * ( anl_conf->blm_n_cells +1 ));
 
   /* config blm struct */
   if(anl_conf->blm_on) {
@@ -218,8 +218,17 @@ void post_calc() {
 
 void log_knock(char *line) {
   /* check timestamp minimum */
-  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) return;
   int kcount = csvint(line,anl_conf->col_knock);
+  if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
+    /* always init with under-time knock value */
+    anl_knock->prev = kcount;
+    return;
+  };
+
+  /* minimum rpm */
+  #ifdef MIN_RPM
+  if(csvint(line,anl_conf->col_rpm) < MIN_RPM) return;
+  #endif
   if(kcount == anl_knock->prev) return; /* no new knock */
   if(kcount < anl_knock->prev) {
     /* either knock counter has rolled, or this is the initial value. */
@@ -230,9 +239,9 @@ void log_knock(char *line) {
   /* at this point a knock event HAS been encountered */
   int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
   int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
-  anl_knock->t[rpmcell][mapcell] += kcount; /* incr kcount */
+  anl_knock->t[rpmcell][mapcell] += ( kcount - anl_knock->prev ); /* incr k */
+  anl_knock->ttl += ( kcount - anl_knock->prev ); /* incr. ttl */
   anl_knock->prev = kcount; /* reset prev */
-  anl_knock->ttl += kcount; /* incr. ttl */
 };
 
 void print_results_knock() {
@@ -267,6 +276,11 @@ void print_results_knock() {
 void log_blm(char *line) {
   /* check timestamp minimum */
   if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) return;
+
+  /* minimum rpm */
+  #ifdef MIN_RPM
+  if(csvint(line,anl_conf->col_rpm) < MIN_RPM) return;
+  #endif
 
   /* get cell number and confirm it's in range */
   int cell = csvint(line,anl_conf->col_cell);
@@ -370,7 +384,7 @@ void print_results_blm() {
 
 void log_wb(char *line) {
   /* get wb value */
-  float wb = csvfloat(line,anl_conf->col_wb);
+  float wb = csvfloat(line,anl_conf->col_wb) - anl_conf->wb_comp;
 
   /* thresholds */
   if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) return;
@@ -378,22 +392,28 @@ void log_wb(char *line) {
   if(csvint(line,anl_conf->col_wot) != anl_conf->wb_wot) return;
   if(wb < anl_conf->wb_min || wb > anl_conf->wb_max) return;
 
+  /* minimum rpm */
+  #ifdef MIN_RPM
+  if(csvint(line,anl_conf->col_rpm) < MIN_RPM) return;
+  #endif
+
   /* a routine for the LT1 that rejects anything in blm cell 17, to detect
      decel (which shouldnt really be factored into ve or maf tables) */
   #ifdef REJECTDECEL
   if(csvint(line,anl_conf->col_cell) == 17) return;
   #endif
-  
-  /* ve analysis */
-  int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
-  int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
-  anl_wb->t[rpmcell][mapcell].avg += wb;
-  anl_wb->t[rpmcell][mapcell].count++;
 
-  /* maf analysis */
-  int mafcell = maf_cell_offset(csvfloat(line,anl_conf->col_maf));
-  anl_wbmaf->t[mafcell].avg += wb;
-  anl_wbmaf->t[mafcell].count++;
+  float maf = csvfloat(line,anl_conf->col_maf);
+  
+    /* ve analysis */
+    int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
+    int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
+    anl_wb->t[rpmcell][mapcell].avg += wb;
+    anl_wb->t[rpmcell][mapcell].count++;
+    /* maf analysis */
+    int mafcell = maf_cell_offset(maf);
+    anl_wbmaf->t[mafcell].avg += wb;
+    anl_wbmaf->t[mafcell].count++;
 };
 
 void post_calc_wb() {
@@ -504,6 +524,7 @@ void anl_load_conf(char *filename) {
     anl_conf->wb_min = configopt_float_fatal(dconf,"WB_MIN");
     anl_conf->wb_max = configopt_float_fatal(dconf,"WB_MAX");
     anl_conf->wb_counts = configopt_int_fatal(dconf,"WB_MIN_COUNTS",1,65535);
+    anl_conf->wb_comp = configopt_float(dconf,"WB_COMP",0);
   };
   anl_conf->col_timestamp = configopt_int_fatal(dconf,"COL_TIMESTAMP",0,500);
   anl_conf->col_rpm = configopt_int_fatal(dconf,"COL_RPM",0,500);
