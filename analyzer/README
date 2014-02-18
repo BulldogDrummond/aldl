@@ -4,3 +4,9 @@ It is non-interactive, and simply performs logical analysis of the logs based
 on various parameters.
 
 It'll become more capable as time goes by...
+
+To be completely honest, I've just written this peice of junk to analyze a few
+problems that I've come up with.  It's probably inaccurate and riddled with
+bugs, and I'm not very proud of how it's structured.  I just threw it together.
+
+Use at your own risk...
