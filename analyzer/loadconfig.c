@@ -229,6 +229,7 @@ char *load_file(char *filename) {
   if(flength == -1) return NULL;
   rewind(fdesc);
   char *buf = malloc(sizeof(char) * ( flength + 1));
+  if(buf == NULL) return NULL; /* file too big for memory */
   if(fread(buf,1,flength,fdesc) != flength) return NULL;
   fclose(fdesc);
   buf[flength] = 0;
