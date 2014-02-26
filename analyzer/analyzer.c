@@ -18,28 +18,28 @@
 typedef struct _anl_fcell_t {
   float low,high;
   double avg;
-  int count;
+  unsigned int count;
 } anl_fcell_t;
 
 /* grid cell, int */
 typedef struct anl_icell_t {
   int low,high;
   double avg;
-  int count;
+  unsigned int count;
 } anl_icell_t;
 
 /* blm analysis storage */
 typedef struct _anl_t {
   anl_fcell_t rpm,map,maf;
   anl_icell_t blm; 
-  int counts;
+  unsigned int counts;
 } anl_t;
 anl_t *anl_blm;
 
 /* knock table */
 typedef struct _anl_knock_t {
   int t[RPM_GRIDSIZE + 1][MAP_GRIDSIZE + 1];
-  int ttl;
+  unsigned int ttl;
   int prev;
 } anl_knock_t;
 anl_knock_t *anl_knock;
@@ -116,22 +116,22 @@ int main(int argc, char **argv) {
   /* load config */
   anl_load_conf(ANL_CONFIGFILE);
 
+  prep_anl();
+
   /* load files ... */
   if(argc < 2) err("no files specified...");
   int x;
-  char **log = malloc(sizeof(char) * argc);
+  char *log;
   printf("Loading files...\n");
   for(x=1;x<argc;x++) {
-    printf("Loading file %s\n",argv[x]);
-    log[x-1] = load_file(argv[x]);
-    if(log[x-1] == NULL) err("File %s could not be loaded!",argv[x]);
-  };
-
-  prep_anl(); /* prepare data structures */
-
-  /* parse */
-  for(x=0;x<argc-1;x++) {
-    parse_file(log[x]);
+    printf("Loading file %s: ",argv[x]);
+    log = load_file(argv[x]);
+    if(log == NULL) {
+      printf("Couldn't load file, skipping.\n");
+    } else {
+      parse_file(log);
+      free(log);
+    };
   };
 
   post_calc(); /* post-calculations (averaging mostly) */
@@ -175,16 +175,19 @@ void prep_anl() {
     anl_wb = malloc(sizeof(anl_wb_t));
     memset(anl_wb,0,sizeof(anl_wb_t));
   };
+
   anl_wbmaf = malloc(sizeof(anl_wbmaf_t));
+  memset(anl_wbmaf,0,sizeof(anl_wbmaf_t));
 };
 
 void parse_file(char *data) {
-  printf("Parsing data...\n");
+  printf("Parsing data... ");
   char *line = line_start(data,1); /* initial line pointer */
   while(line != NULL) { /* loop for all lines */
     parse_line(line);
     line = line_start(line,1);
   };
+  printf("Done.\n");
 };
 
 void parse_line(char *line) {
