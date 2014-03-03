@@ -1,5 +1,5 @@
 # compiler flags
-CFLAGS= -O2 -Wall
+CFLAGS= -g -Wall
 
 all: aldl-analyzer
 

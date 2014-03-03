@@ -38,9 +38,7 @@ anl_t *anl_blm;
 
 /* knock table */
 typedef struct _anl_knock_t {
-  int t[RPM_GRIDSIZE + 1][MAP_GRIDSIZE + 1];
-  unsigned int ttl;
-  int prev;
+  float t[RPM_GRIDSIZE + 1][MAP_GRIDSIZE + 1];
 } anl_knock_t;
 anl_knock_t *anl_knock;
 
@@ -54,6 +52,11 @@ typedef struct _anl_wbmaf_t {
   anl_fcell_t t[MAF_GRIDSIZE + 1];
 } anl_wbmaf_t;
 anl_wbmaf_t *anl_wbmaf;
+
+typedef struct _anl_wbwot_t {
+  anl_fcell_t t[RPM_GRIDSIZE + 1];
+} anl_wbwot_t;
+anl_wbwot_t *anl_wbwot;
 
 /* configuration storage */
 typedef struct _anl_conf_t {
@@ -69,7 +72,7 @@ typedef struct _anl_conf_t {
   /* knock analyzer */
   int knock_on; /* activate knock counter */
   /* wb analyzer */
-  int wb_on,wb_wot,wb_counts,wb_min,wb_max,wb_comp;
+  int wb_on,wb_counts,wb_min,wb_max,wb_comp;
   /* column identifiers */ 
   int col_timestamp, col_rpm, col_temp, col_lblm, col_rblm, col_cell;
   int col_map, col_maf, col_cl, col_blm, col_wot, col_knock, col_wb;
@@ -178,6 +181,8 @@ void prep_anl() {
 
   anl_wbmaf = malloc(sizeof(anl_wbmaf_t));
   memset(anl_wbmaf,0,sizeof(anl_wbmaf_t));
+  anl_wbwot = malloc(sizeof(anl_wbwot_t));
+  memset(anl_wbwot,0,sizeof(anl_wbwot_t));
 };
 
 void parse_file(char *data) {
@@ -221,37 +226,28 @@ void post_calc() {
 
 void log_knock(char *line) {
   /* check timestamp minimum */
-  int kcount = csvint(line,anl_conf->col_knock);
   if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
-    /* always init with under-time knock value */
-    anl_knock->prev = kcount;
     return;
   };
 
-  /* minimum rpm */
-  #ifdef MIN_RPM
-  if(csvint(line,anl_conf->col_rpm) < MIN_RPM) return;
-  #endif
-  if(kcount == anl_knock->prev) return; /* no new knock */
-  if(kcount < anl_knock->prev) {
-    /* either knock counter has rolled, or this is the initial value. */
-    /* FIXME we are discarding knock events during rollover ... */
-    anl_knock->prev = kcount; 
-    return;
-  };
-  /* at this point a knock event HAS been encountered */
+  /* get knock retard */
+  float kr = csvfloat(line,anl_conf->col_knock);
+  if(kr == 0) return; /* no knock retard */
+
+  /* find correct cell */
   int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
   int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
-  anl_knock->t[rpmcell][mapcell] += ( kcount - anl_knock->prev ); /* incr k */
-  anl_knock->ttl += ( kcount - anl_knock->prev ); /* incr. ttl */
-  anl_knock->prev = kcount; /* reset prev */
+  float ckr = anl_knock->t[rpmcell][mapcell];
+
+  if(kr < ckr) return; /* lower than existing count */
+  anl_knock->t[rpmcell][mapcell] = kr;
 };
 
 void print_results_knock() {
   printf("\n**** KNOCK Analysis ****\n\n");
   int maprow = 0;
   int rpmrow = 0;
-  int knock = 0;
+  float knock = 0;
   for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
     printf(" %4i ",maprow * GRID_MAP_INTERVAL);
   };
@@ -261,17 +257,14 @@ void print_results_knock() {
     printf("   ");
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
       knock = anl_knock->t[rpmrow][maprow];
-      if(knock < 50) {
+      if(knock <= 0) {
         printf(" .... ");
-      } else if(knock < 1000) {
-        printf(" %4i ",knock);
       } else {
-        printf(" %3ik ",knock / 1000);
+        printf(" %4.1f ",knock);
       };
     };
     printf("\n");
   };
-  printf("Total knock events: %.0f k\n",(float)anl_knock->ttl / 1000);
 };
 
 /********* BLM CELL ANALYZER ****************************/
@@ -295,6 +288,7 @@ void log_blm(char *line) {
   /* check CL/PE op */
   if(csvint(line,anl_conf->col_cl) != 1) return;
   if(csvint(line,anl_conf->col_blm) != 1) return;
+  if(csvint(line,anl_conf->col_wot) == 1) return;
 
   /* point to cell index */
   anl_t *cdata = &anl_blm[cell];
@@ -392,21 +386,22 @@ void log_wb(char *line) {
   /* thresholds */
   if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) return;
   if(csvfloat(line,anl_conf->col_temp) < anl_conf->valid_min_temp) return;
-  if(csvint(line,anl_conf->col_wot) != anl_conf->wb_wot) return;
   if(wb < anl_conf->wb_min || wb > anl_conf->wb_max) return;
 
-  /* minimum rpm */
-  #ifdef MIN_RPM
-  if(csvint(line,anl_conf->col_rpm) < MIN_RPM) return;
-  #endif
+  if(csvint(line,anl_conf->col_wot) == 0) { /* analyze non-pe records */
 
-  /* a routine for the LT1 that rejects anything in blm cell 17, to detect
-     decel (which shouldnt really be factored into ve or maf tables) */
-  #ifdef REJECTDECEL
-  if(csvint(line,anl_conf->col_cell) == 17) return;
-  #endif
+    /* minimum rpm */
+    #ifdef MIN_RPM
+    if(csvint(line,anl_conf->col_rpm) < MIN_RPM) return;
+    #endif
 
-  float maf = csvfloat(line,anl_conf->col_maf);
+    /* a routine for the LT1 that rejects anything in blm cell 17, to detect
+       decel (which shouldnt really be factored into ve or maf tables) */
+    #ifdef REJECTDECEL
+    if(csvint(line,anl_conf->col_cell) == 17) return;
+    #endif
+
+    float maf = csvfloat(line,anl_conf->col_maf);
   
     /* ve analysis */
     int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
@@ -417,6 +412,12 @@ void log_wb(char *line) {
     int mafcell = maf_cell_offset(maf);
     anl_wbmaf->t[mafcell].avg += wb;
     anl_wbmaf->t[mafcell].count++;
+
+  } else { /* analyze wot record */
+    int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
+    anl_wbwot->t[rpmcell].avg += wb;
+    anl_wbwot->t[rpmcell].count++;
+  };
 };
 
 void post_calc_wb() {
@@ -428,6 +429,9 @@ void post_calc_wb() {
       anl_wb->t[rpmrow][maprow].avg = anl_wb->t[rpmrow][maprow].avg /
                         anl_wb->t[rpmrow][maprow].count;
     };
+    /* embed wot in this loop */
+    anl_wbwot->t[rpmrow].avg = anl_wbwot->t[rpmrow].avg / 
+                              anl_wbwot->t[rpmrow].count;
   };
   for(mafrow=0;mafrow<MAF_GRIDSIZE;mafrow++) {
     anl_wbmaf->t[mafrow].avg = anl_wbmaf->t[mafrow].avg /
@@ -468,6 +472,18 @@ void print_results_wb() {
     printf("   %4.1f    %i Counts\n",
           anl_wbmaf->t[mafrow].avg, anl_wbmaf->t[mafrow].count);
   };
+
+  printf("\n**** WB Analysis, POWER ENRICH ****\n\n");
+  for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
+    if(anl_wbwot->t[rpmrow].count == 0) {
+       anl_wbwot->t[rpmrow].avg = 0;
+    };
+    printf("RPM %3i - %3i    ",rpmrow * GRID_RPM_INTERVAL,
+        GRID_RPM_INTERVAL * (rpmrow +1));
+    printf("   %4.1f    %i Counts\n",
+          anl_wbwot->t[rpmrow].avg, anl_wbwot->t[rpmrow].count);
+  };
+ 
 };
 
 /*--------------------------------------------------------------*/
@@ -523,7 +539,6 @@ void anl_load_conf(char *filename) {
   anl_conf->wb_on = configopt_int_fatal(dconf,"WB_ON",0,1);
   if(anl_conf->wb_on == 1) {
     anl_conf->col_wb = configopt_int_fatal(dconf,"COL_WB",0,500);
-    anl_conf->wb_wot = configopt_int_fatal(dconf,"WB_WOT",0,1);
     anl_conf->wb_min = configopt_float_fatal(dconf,"WB_MIN");
     anl_conf->wb_max = configopt_float_fatal(dconf,"WB_MAX");
     anl_conf->wb_counts = configopt_int_fatal(dconf,"WB_MIN_COUNTS",1,65535);
