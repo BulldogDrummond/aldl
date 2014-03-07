@@ -38,7 +38,11 @@ anl_t *anl_blm;
 
 /* knock table */
 typedef struct _anl_knock_t {
-  float t[RPM_GRIDSIZE + 1][MAP_GRIDSIZE + 1];
+  int t[RPM_GRIDSIZE + 1][MAP_GRIDSIZE + 1];
+  int last;
+  int total_events;
+  int discarded;
+  unsigned long total_counts;
 } anl_knock_t;
 anl_knock_t *anl_knock;
 
@@ -71,6 +75,7 @@ typedef struct _anl_conf_t {
   int blm_min_count; /* minimum number of counts for a valid cell */
   /* knock analyzer */
   int knock_on; /* activate knock counter */
+  int min_knock;
   /* wb analyzer */
   int wb_on,wb_counts,wb_min,wb_max,wb_comp;
   /* column identifiers */ 
@@ -227,27 +232,50 @@ void post_calc() {
 void log_knock(char *line) {
   /* check timestamp minimum */
   if(csvint(line,anl_conf->col_timestamp) < anl_conf->valid_min_time) {
+    anl_knock->last = csvint(line,anl_conf->col_knock);; /* keep-alive */
     return;
   };
 
-  /* get knock retard */
-  float kr = csvfloat(line,anl_conf->col_knock);
-  if(kr == 0) return; /* no knock retard */
+  /* get knock count */
+  int knock = csvint(line,anl_conf->col_knock);
+  int knock_amount = knock - anl_knock->last;
+
+  /* same knock count as last time */
+  if(knock_amount == 0) return;
+
+  /* if rolled counter, or restarting, we dont care which */
+  /* (this does mean we're throwing away knock counts on rollover) */
+  if(anl_knock->last > knock) {
+    anl_knock->last = knock; /* start with new value */
+    return;
+  };
+
+  /* at this point, there's a knock event. */
+
+  /* discard statistically insignifigant events */
+  if(knock_amount < anl_conf->min_knock) {
+    anl_knock->discarded++;
+    anl_knock->last = knock; /* reset and continue */
+  };
 
   /* find correct cell */
   int rpmcell = rpm_cell_offset(csvfloat(line,anl_conf->col_rpm));
   int mapcell = map_cell_offset(csvfloat(line,anl_conf->col_map));
-  float ckr = anl_knock->t[rpmcell][mapcell];
 
-  if(kr < ckr) return; /* lower than existing count */
-  anl_knock->t[rpmcell][mapcell] = kr;
+  /* incr by 1 */
+  anl_knock->t[rpmcell][mapcell]++;
+
+  anl_knock->total_events++; /* increment total counter */
+  anl_knock->total_counts += knock_amount;
+
+  /* reset counter */
+  anl_knock->last = knock;
 };
 
 void print_results_knock() {
-  printf("\n**** KNOCK Analysis ****\n\n");
+  printf("\n**** KNOCK Analysis PER EVENT ****\n\n");
   int maprow = 0;
   int rpmrow = 0;
-  float knock = 0;
   for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
     printf(" %4i ",maprow * GRID_MAP_INTERVAL);
   };
@@ -256,15 +284,13 @@ void print_results_knock() {
     printf("%4i\n ",rpmrow * GRID_RPM_INTERVAL);
     printf("   ");
     for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
-      knock = anl_knock->t[rpmrow][maprow];
-      if(knock <= 0) {
-        printf(" .... ");
-      } else {
-        printf(" %4.1f ",knock);
-      };
+      printf(" %4i ",anl_knock->t[rpmrow][maprow]);
     };
     printf("\n");
   };
+  printf("total events: %i  total counts: %lu  discarded: %i\n",
+             anl_knock->total_events + anl_knock->discarded,
+            anl_knock->total_counts, anl_knock->discarded);
 };
 
 /********* BLM CELL ANALYZER ****************************/
@@ -535,6 +561,7 @@ void anl_load_conf(char *filename) {
   };
   if(anl_conf->knock_on == 1) {
     anl_conf->col_knock = configopt_int_fatal(dconf,"COL_KNOCK",0,500);
+    anl_conf->min_knock = configopt_int_fatal(dconf,"KNOCK_MIN",1,65535);
   };
   anl_conf->wb_on = configopt_int_fatal(dconf,"WB_ON",0,1);
   if(anl_conf->wb_on == 1) {
