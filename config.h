@@ -114,6 +114,11 @@
 #define FTDI_RETRY_USB
 #define FTDI_RETRY_DELAY 3
 
+/* if this many io operations fail, consider the interface failed and attempt
+   reconnection. */
+#define FTDI_ATTEMPT_RECOVERY
+#define FTDI_MAXFAIL 3
+
 /* ------- MISC CONSTANTS ---------------------------*/
 
 /* bad chars that can't be used in things such as unit of measure strings or
