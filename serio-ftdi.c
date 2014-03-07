@@ -195,7 +195,7 @@ void ftdi_recovery() {
     fprintf(stderr,"FTDI DRIVER: Triggered recovery mode...\n");
     #endif
   serial_close();
-  usleep(10000);
+  msleep(500);
   serial_init(serialstr);
   #endif
 };
