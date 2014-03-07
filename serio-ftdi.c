@@ -23,6 +23,12 @@ struct ftdi_context *ftdi;
 /* simple connection state status bit */
 byte ftdistatus;
 
+/* number of failed io attempts */
+int iofail;
+
+/* storage for serial init string */
+char *serialstr;
+
 /***************FUNCTION DEFS************************************/
 
 /* init the ftdi driver by a special port description:
@@ -32,9 +38,13 @@ byte ftdistatus;
    s:vendor:product:serial
 */
 
-/* special ftdi error handlers, bails if errno<0. */
-int ftdierror(int loc,int errno);
-void ftdifatal(int loc,int errno);
+/* special ftdi error handlers */
+int ftdierror(int loc,int errno); /* prints error but continues */
+void ftdifatal(int loc,int errno); /* bails entirely on error */
+int ftdierror_counter(int loc,int errno); /* counts errors + recovery */
+
+/* enter recovery mode */
+void ftdi_recovery();
 
 /****************FUNCTIONS**************************************/
 
@@ -51,7 +61,9 @@ int serial_init(char *port) {
   #endif
 
   ftdistatus = 0;
+  iofail = 0;
   int res = -1;
+  serialstr = port;
 
   /* new ftdi instance */
   if((ftdi = ftdi_new()) == NULL) {
@@ -86,21 +98,21 @@ int serial_init(char *port) {
 };
 
 void serial_purge() {
-  ftdierror(88,ftdi_usb_purge_buffers(ftdi));
+  ftdierror_counter(88,ftdi_usb_purge_buffers(ftdi));
   #ifdef SERIAL_VERBOSE
   printf("SERIAL PURGE RX/TX\n");
   #endif
 }
 
 void serial_purge_rx() {
-  ftdierror(88,ftdi_usb_purge_rx_buffer(ftdi));
+  ftdierror_counter(88,ftdi_usb_purge_rx_buffer(ftdi));
   #ifdef SERIAL_VERBOSE
   printf("SERIAL PURGE RX\n");
   #endif
 }
 
 void serial_purge_tx() {
-  ftdierror(88,ftdi_usb_purge_tx_buffer(ftdi));
+  ftdierror_counter(88,ftdi_usb_purge_tx_buffer(ftdi));
   #ifdef SERIAL_VERBOSE
   printf("SERIAL PURGE TX\n");
   #endif
@@ -119,7 +131,7 @@ int serial_write(byte *str, int len) {
   printhexstring(str,len);
   #endif
 
-  ftdierror(6,ftdi_write_data(ftdi,(unsigned char *)str,len));
+  ftdierror_counter(6,ftdi_write_data(ftdi,(unsigned char *)str,len));
   return 0;
 }
 
@@ -133,7 +145,7 @@ inline int serial_read(byte *str, int len) {
   };
   int resp = 0; /* to store response from whatever read */
   resp = ftdi_read_data(ftdi,(unsigned char *)str,len);
-  ftdierror(22,resp); /* this will break if resp<0 */
+  ftdierror_counter(22,resp);
   #ifdef SERIAL_SUPERVERBOSE
   if(resp > 0) {
     printf("READ %i of %i bytes: ",resp,len);
@@ -156,9 +168,36 @@ int ftdierror(int loc,int errno) {
   if(errno>=0) { /* no error */
     return 0;
   } else {
+    #ifdef SERIAL_VERBOSE
     fprintf(stderr,"FTDI DRIVER: %i, %s\n",errno,ftdi_get_error_string(ftdi));
+    #endif
     return 1;
   };
+};
+
+int ftdierror_counter(int loc,int errno) {
+  if(errno>=0) { /* no error */
+    iofail = 0;
+    return 0;
+  } else {
+    iofail++;
+    #ifdef SERIAL_VERBOSE
+    fprintf(stderr,"FTDI DRIVER: %i, %s\n",errno,ftdi_get_error_string(ftdi));
+    #endif
+    if(iofail > FTDI_MAXFAIL) ftdi_recovery();
+    return 1;
+  };
+};
+
+void ftdi_recovery() {
+  #ifdef FTDI_ATTEMPT_RECOVERY
+    #ifdef SERIAL_VERBOSE
+    fprintf(stderr,"FTDI DRIVER: Triggered recovery mode...\n");
+    #endif
+  serial_close();
+  usleep(10000);
+  serial_init(serialstr);
+  #endif
 };
 
 void serial_help_devs() {
