@@ -1,4 +1,4 @@
-#define ANL_VERSION "0.5a"
+#define ANL_VERSION "0.7"
 #define ANL_CONFIGFILE "/etc/aldl/analyzer.conf"
 
 /* configure analysis grids */
