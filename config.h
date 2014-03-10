@@ -73,7 +73,7 @@
    times 10 milliseconds of wait time if NICE_RECONNECT isn't set, and becomes
    variable if it is.  undef this to wait forever.  this has no effect if the
    wait for idle chatter routine is disabled. */
-#define GIVEUPWAITING 20000
+#define GIVEUPWAITING 1500
 
 /* this is added to actual message length, incl. header and checksum, to
    determine packet length byte (byte 2 of most aldl messages).  so far, no
@@ -142,4 +142,5 @@
    unique identifier names. */
 #define CONFIG_BAD_CHARS "(),\"'"
 
+/* use units of measure in consoleif */
 #undef CONSOLEIF_UOM
