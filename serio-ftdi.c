@@ -40,12 +40,12 @@ char *serialstr;
 */
 
 /* special ftdi error handlers */
-int ftdierror(int loc,int errno); /* prints error but continues */
-void ftdifatal(int loc,int errno); /* bails entirely on error */
-int ftdierror_counter(int loc,int errno); /* counts errors + recovery */
+inline int ftdierror(int loc,int errno); /* prints error but continues */
+inline void ftdifatal(int loc,int errno); /* bails entirely on error */
+inline int ftdierror_counter(int loc,int errno); /* counts errors + recovery */
 
 /* enter recovery mode */
-void ftdi_recovery();
+inline void ftdi_recovery();
 
 /****************FUNCTIONS**************************************/
 
@@ -122,13 +122,15 @@ void serial_purge_tx() {
 }
 
 int serial_write(byte *str, int len) {
-  /* check for 0 length or null string */
-  if(str == NULL || len == 0) {
-    #ifdef SERIAL_VERBOSE
-      printf("non-fatal, attempted serial write of 0 len or null string\n");
-    #endif
-    return 1;
-  };
+  #ifdef RETARDED
+    /* check for 0 length or null string */
+    if(str == NULL || len == 0) {
+      #ifdef SERIAL_VERBOSE
+        printf("non-fatal, attempted serial write of 0 len or null string\n");
+      #endif
+      return 1;
+    };
+  #endif
   #ifdef SERIAL_SUPERVERBOSE
   printf("WRITE: ");
   printhexstring(str,len);
@@ -139,13 +141,15 @@ int serial_write(byte *str, int len) {
 }
 
 inline int serial_read(byte *str, int len) {
-  /* check for null string or 0 length */
-  if(str == NULL || len == 0) {
-    #ifdef SERIAL_VERBOSE
-      printf("non-fatal, attempted serial read to NULL buffer or 0 len\n");
-    #endif
-    return 0;
-  };
+  #ifdef RETARDED
+    /* check for null string or 0 length */
+    if(str == NULL || len == 0) {
+      #ifdef SERIAL_VERBOSE
+        printf("non-fatal, attempted serial read to NULL buffer or 0 len\n");
+      #endif
+      return 0;
+    };
+  #endif
   int resp = 0; /* to store response from whatever read */
   resp = ftdi_read_data(ftdi,(unsigned char *)str,len);
   ftdierror_counter(22,resp);
@@ -161,13 +165,13 @@ inline int serial_read(byte *str, int len) {
   return resp; /* return number of bytes read, or zero */
 }
 
-void ftdifatal(int loc,int errno) {
+inline void ftdifatal(int loc,int errno) {
   if(ftdierror(loc,errno) > 0) {
     fatalerror(ERROR_FTDI,"*** See above FTDI DRIVER error message @ stderr");
   };
 };
 
-int ftdierror(int loc,int errno) {
+inline int ftdierror(int loc,int errno) {
   if(errno>=0) { /* no error */
     return 0;
   } else {
@@ -178,7 +182,7 @@ int ftdierror(int loc,int errno) {
   };
 };
 
-int ftdierror_counter(int loc,int errno) {
+inline int ftdierror_counter(int loc,int errno) {
   if(errno>=0) { /* no error */
     iofail = 0;
     return 0;
@@ -192,7 +196,7 @@ int ftdierror_counter(int loc,int errno) {
   };
 };
 
-void ftdi_recovery() {
+inline void ftdi_recovery() {
   #ifdef FTDI_ATTEMPT_RECOVERY
     #ifdef SERIAL_VERBOSE
     fprintf(stderr,"FTDI DRIVER: Triggered recovery mode...\n");
