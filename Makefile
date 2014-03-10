@@ -68,7 +68,7 @@ serio-ftdi.o: serio-ftdi.c aldl-io.h aldl-types.h config.h
 serio-dummy.o: serio-dummy.c aldl-io.h aldl-types.h config.h
 	gcc $(CFLAGS) -c serio-dummy.c -o serio-dummy.o
 
-aldlcomm.o: aldl-io.h aldl-types.h serio-ftdi.o config.h
+aldlcomm.o: aldl-io.h aldlcomm.c aldl-types.h serio-ftdi.o config.h
 	gcc $(CFLAGS) -c aldlcomm.c -o aldlcomm.o
 
 aldldata.o: aldl-io.h aldl-types.h aldldata.c aldlcomm.o config.h
