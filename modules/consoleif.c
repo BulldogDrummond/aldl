@@ -24,7 +24,8 @@ typedef enum _gaugetype {
   GAUGE_HBAR,
   GAUGE_TEXT,
   GAUGE_BIN,
-  GAUGE_ERRSTR
+  GAUGE_ERRSTR,
+  GAUGE_SHIFT
 } gaugetype_t;
 
 typedef struct _gauge {
@@ -37,6 +38,9 @@ typedef struct _gauge {
   int weight;  /* smoothing weight */
   gaugetype_t gaugetype;
 } gauge_t;
+
+/* some global cached indexes */
+int index_rpm, index_map, index_speed;
 
 typedef struct _consoleif_conf {
   int n_gauges;
@@ -57,6 +61,9 @@ aldl_conf_t *aldl; /* global pointer to aldl conf struct */
 char *bigbuf; /* a large temporary string construction buffer */
 
 aldl_record_t *rec; /* current record */
+
+#define N_GEARS 6
+float geartable[N_GEARS];
 
 /* --- local functions ------------------------*/
 
@@ -87,6 +94,7 @@ void draw_h_progressbar(gauge_t *g);
 void draw_simpletext_a(gauge_t *g);
 void draw_bin(gauge_t *g);
 void draw_errstr(gauge_t *g);
+void draw_shift(gauge_t *g);
 void gauge_blank(gauge_t *g);
 void draw_statusbar();
 
@@ -120,6 +128,11 @@ void *consoleif_init(void *aldl_in) {
   /* get initial screen size */
   getmaxyx(stdscr,w_height,w_width);
 
+  /* some globals */
+  index_rpm = get_index_by_name(aldl,"RPM");
+  index_map = get_index_by_name(aldl,"MAP");
+  index_speed = get_index_by_name(aldl,"SPEED");
+
   cons_wait_for_connection();
 
   int x;
@@ -145,6 +158,9 @@ void *consoleif_init(void *aldl_in) {
           break;
         case GAUGE_ERRSTR:
           draw_errstr(gauge);
+          break;
+        case GAUGE_SHIFT:
+          draw_shift(gauge);
           break;
         default:
           break;
@@ -247,6 +263,32 @@ void draw_errstr(gauge_t *g) {
     };
   };
   if(errfound == 0) mvprintw(g->y,g->x,"NO ERRORS");
+};
+
+void draw_shift(gauge_t *g) {
+  aldl_define_t *rpmdef = &aldl->def[index_rpm];
+  aldl_define_t *speeddef = &aldl->def[index_speed];
+  aldl_data_t *rpmdata = &rec->data[index_rpm];
+  aldl_data_t *speeddata = &rec->data[index_speed];
+  gauge_blank(g);
+
+  int gear;
+  float drive_ratio = speeddata / rpmdata;
+  float diff = 99999;
+  float t;
+  int closest_gear = 0;
+  for(gear=1;gear<=N_GEARS;gear++) {
+    /* get unsigned difference */
+    if(drive_ratio <= geartable[gear]) {
+      t = geartable[gear] - drive_ratio;
+    } else {
+      t = drive_ratio - geartable[gear];
+    };
+    if(t < diff) {
+      diff = t;
+      closest_gear = gear;
+    };
+  };
 };
 
 void draw_simpletext_a(gauge_t *g) {
@@ -407,6 +449,15 @@ consoleif_conf_t *consoleif_load_config(aldl_conf_t *aldl) {
       gauge->gaugetype = GAUGE_BIN;
     } else if(faststrcmp(gtypestr,"ERRSTR") == 1) {
       gauge->gaugetype = GAUGE_ERRSTR;
+    } else if(faststrcmp(gtypestr,"SHIFT") == 1) {
+      gauge->gaugetype = GAUGE_SHIFT;
+      int gear = 1;
+      char *gearstring = malloc(20);
+      for(gear=1;gear<=N_GEARS;gear++) {
+        sprintf(gearstring,"GEAR%i",gear);
+        geartable[gear] = configopt_float_fatal(config,gearstring);
+      };
+      free(gearstring);
     } else {
       fatalerror(ERROR_CONFIG,"consoleif: gauge %i bad type %s",n,gtypestr);
     };
