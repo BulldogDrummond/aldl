@@ -32,25 +32,34 @@ datalogger_conf_t *datalogger_load_config(aldl_conf_t *aldl);
 void *datalogger_init(void *aldl_in) {
   unsigned int n_records = 0; /* number of record counter */
   unsigned long last_timestamp = 0;
+  int x = 0; /* tmp */
   float pps; /* packet per second rate */
   aldl_conf_t *aldl = (aldl_conf_t *)aldl_in;
 
   /* grab config data */
   datalogger_conf_t *conf = datalogger_load_config(aldl);
 
-  /* create config file */
-  datalogger_make_file(conf,aldl);
+  /* calculate appropriate linebuffer size */
+  size_t linebufsize = 0;
+  for(x=0;x<aldl->n_defs;x++) {
+    if(aldl->def[x].log == 1 || conf->log_all == 1) {
+      if(aldl->def[x].type == ALDL_BOOL) {
+        linebufsize += 3; /* 3 bytes for a bool */
+      } else {
+        linebufsize += 64; /* 64 bytes for anything else */
+      };
+    };
+  };
+
+  char *linebuf = smalloc(linebufsize);
+  char *cursor = linebuf; /* ptr to working byte in line buffer */
 
   /* wait for buffered connection */
   pause_until_buffered(aldl);
 
-  /* FIXME this just logs all the time.  that's stupid. */
+  /* create logfile */
+  datalogger_make_file(conf,aldl);
 
-  /* bigass buffer, should calculate this better  */
-  char *linebuf = smalloc(aldl->n_defs * 128);
-  char *cursor = linebuf;
-
-  int x; /* tmp counter */
   cursor += sprintf(cursor,"TIMESTAMP(ms)"); /* string cursor */
 
   /* write csv header */
