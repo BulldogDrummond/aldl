@@ -69,11 +69,18 @@ int aldl_waitforchatter(aldl_commdef_t *c) {
   #ifdef ALDL_VERBOSE
     printf("waiting for idle chatter to confirm key is on..\n");
   #endif
+  #ifdef GIVEUPWAITING
+  int giveupcount = 0;
+  #endif
   int c_delay = 10;
   while(skip_bytes(1,c_delay) == 0) {
     msleep(c_delay);
     #ifdef NICE_RECONNECT
     if(c_delay < NICE_RECON_MAXDELAY) c_delay += 50;
+    #endif
+    #ifdef GIVEUPWAITING
+    giveupcount++;
+    if(giveupcount > GIVEUPWAITING) exit(0);
     #endif
   };
   #ifdef ALDL_VERBOSE

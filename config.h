@@ -67,7 +67,13 @@
 #define NICE_RECONNECT
 
 /* max delay in milliseconds */
-#define NICE_RECON_MAXDELAY 500
+#define NICE_RECON_MAXDELAY 1000
+
+/* when waiting for idle chatter, give up after this many iterations.  this is
+   times 10 milliseconds of wait time if NICE_RECONNECT isn't set, and becomes
+   variable if it is.  undef this to wait forever.  this has no effect if the
+   wait for idle chatter routine is disabled. */
+#define GIVEUPWAITING 20000
 
 /* this is added to actual message length, incl. header and checksum, to
    determine packet length byte (byte 2 of most aldl messages).  so far, no
