@@ -65,21 +65,6 @@ char faststrcmp_list(char *str, char *list) {
   return 0;
 };
 
-byte hextobyte(char *str) {
-  #ifdef RETARDED
-  retardptr(str,"hextobyte");
-  #endif
-  return (int)strtol(str,NULL,16);
-};
-
-int getbit(byte p, int bpos, int flip) {
-  return flip ^ ( p >> bpos & 0x01 );
-};
-
-unsigned int sixteenbit(byte *p) {
-  return (unsigned int)((*p<<8)|*(p+1));
-};
-
 byte checksum_generate(byte *buf, int len) {
   #ifdef RETARDED
   retardptr(buf,"checksum buf");
@@ -113,10 +98,6 @@ int cmp_bytestring(byte *h, int hsize, byte *n, int nsize) {
     cursor++;
   };
   return 0;
-};
-
-void msleep(int ms) {
-  usleep(ms * 1000); /* just use usleep and convert from ms in unix */
 };
 
 void printhexstring(byte *str, int length) {

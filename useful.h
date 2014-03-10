@@ -36,13 +36,10 @@ inline int faststrcmp(char *a, char *b);
 char faststrcmp_list(char *str, char *list);
 
 /* convert a 0xFF format string to a 'byte'... */
-byte hextobyte(char *str);
-
-/* turn two 8 bit bytes into a 16 bit int */
-unsigned int sixteenbit(byte *p);
+#define hextobyte(STR) (int)strtol(STR,NULL,16)
 
 /* get a single bit from a byte.  xor with flip. */
-int getbit(byte p, int bpos, int flip);
+#define getbit(P,BPOS,FLIP) (int)FLIP^(P>>BPOS&0x01)
 
 /* generate a checksum byte */
 byte checksum_generate(byte *buf, int len);
@@ -57,7 +54,7 @@ int cmp_bytestring(byte *h, int hsize, byte *n, int nsize);
 void printhexstring(byte *str, int length);
 
 /* sleep for ms milliseconds */
-void msleep(int ms);
+#define msleep(...) usleep(__VA_ARGS__ * 1000)
 
 /* ensure number remains within a boundary */
 int clamp_int(int min, int max, int in);

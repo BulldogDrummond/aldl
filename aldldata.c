@@ -180,7 +180,8 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   unsigned int x; /* converted value */
   switch(def->size) {
     case 16:
-      x = sixteenbit(data);
+      /* turn two 8 bit bytes into a 16 bit int */
+      x = (unsigned int)((*data<<8)|*(data+1));
       break;
     case 8: /* direct conversion */
     default:
@@ -203,7 +204,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
       break;
     case ALDL_BOOL:
       if(aldl->comm->byteorder == 1) {
-        out->i = getbit(x,7 - def->binary,def->invert);
+        out->i = getbit(x,(7 - def->binary),def->invert);
       } else {
         out->i = getbit(x,def->binary,def->invert);
       };

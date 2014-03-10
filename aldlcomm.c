@@ -35,9 +35,6 @@ inline int skip_bytes(int bytes, int timeout);
    timeout. */
 int listen_bytes(byte *str, int len, int max, int timeout);
 
-/* sleep for ms milliseconds */
-inline void msleep(int ms);
-
 /************ FUNCTIONS **********************/
 
 int aldl_reconnect(aldl_commdef_t *c) {
