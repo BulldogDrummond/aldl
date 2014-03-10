@@ -140,7 +140,7 @@ int serial_write(byte *str, int len) {
   return 0;
 }
 
-inline int serial_read(byte *str, int len) {
+int serial_read(byte *str, int len) {
   #ifdef RETARDED
     /* check for null string or 0 length */
     if(str == NULL || len == 0) {
