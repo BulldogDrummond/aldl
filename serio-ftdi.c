@@ -76,9 +76,7 @@ int serial_init(char *port) {
   if(res<-5) ftdifatal(2,res); /* fatal open errors */
   while(res<0) { /* device is probably just disconnected */
     ftdierror(2,res); /* print non-fatal error */
-    #ifdef SERIAL_VERBOSE
     fprintf(stderr,"FTDI Device @ %s isn't connected.  Retrying...\n",port);
-    #endif
     sleep(FTDI_RETRY_DELAY);
     res = ftdi_usb_open_string(ftdi,port);
   };
