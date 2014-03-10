@@ -117,11 +117,12 @@ typedef struct aldl_commdef {
 } aldl_commdef_t;
 
 typedef struct aldl_stats {
-  unsigned int packetchecksumfail;
-  unsigned int packetheaderfail;
-  unsigned int packetrecvtimeout;
-  unsigned int failcounter;
-  float packetspersecond;
+  unsigned int packetchecksumfail; /* packets that failed checksum */
+  unsigned int packetheaderfail; /* packets that had a bunk header */
+  unsigned int packetrecvtimeout; /* packet too slow, had to retry */
+  unsigned int failcounter; /* this counts number of failed pkts in a row,
+                               not the total amount of failures! */
+  float packetspersecond; /* this must be enabled with TRACK_PKTRATE */
 } aldl_stats_t;
 
 /* an info structure defining aldl communications and data mgmt */
