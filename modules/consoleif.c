@@ -193,7 +193,9 @@ void print_centered_string(char *str) {
 void draw_statusbar() {
   lock_stats();
   float pps = aldl->stats->packetspersecond;
-  unsigned int failcounter = aldl->stats->failcounter;
+  unsigned int failcounter = aldl->stats->packetheaderfail +
+                            aldl->stats->packetchecksumfail +
+                            aldl->stats->packetrecvtimeout;
   unlock_stats();
   if(w_width < 40) { /* small statusbar */
     mvprintw(w_height - 1,0,"%u R=%.1f ERR=%u  ",
