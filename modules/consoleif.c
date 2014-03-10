@@ -94,7 +94,6 @@ void draw_h_progressbar(gauge_t *g);
 void draw_simpletext_a(gauge_t *g);
 void draw_bin(gauge_t *g);
 void draw_errstr(gauge_t *g);
-void draw_shift(gauge_t *g);
 void gauge_blank(gauge_t *g);
 void draw_statusbar();
 
@@ -159,9 +158,6 @@ void *consoleif_init(void *aldl_in) {
         case GAUGE_ERRSTR:
           draw_errstr(gauge);
           break;
-        case GAUGE_SHIFT:
-          draw_shift(gauge);
-          break;
         default:
           break;
       };
@@ -220,12 +216,15 @@ void statusmessage(char *str) {
 
 void cons_wait_for_connection() {
   aldl_state_t s = ALDL_LOADING;
-  aldl_state_t s_cache = ALDL_LOADING; /* cache to avoid redraws */
-  while(s > 10) {
+  aldl_state_t s_cache = ALDL_CONNECTED; /* cache to avoid redraws */
+  while(s > 10) { /* messages >10 are non-connected */
     s = get_connstate(aldl);
-    if(s != s_cache) statusmessage(get_state_string(s));
-    s_cache = s;
-    usleep(100000);
+    if(s != s_cache) { /* status message has changed */
+      statusmessage(get_state_string(s)); /* disp. msg */
+      s_cache = s; /* reset cache */
+    } else {
+      usleep(10000); /* checking conn state too fast is bad */
+    };
   };
 
   statusmessage("Buffering...");
@@ -263,32 +262,6 @@ void draw_errstr(gauge_t *g) {
     };
   };
   if(errfound == 0) mvprintw(g->y,g->x,"NO ERRORS");
-};
-
-void draw_shift(gauge_t *g) {
-  aldl_define_t *rpmdef = &aldl->def[index_rpm];
-  aldl_define_t *speeddef = &aldl->def[index_speed];
-  aldl_data_t *rpmdata = &rec->data[index_rpm];
-  aldl_data_t *speeddata = &rec->data[index_speed];
-  gauge_blank(g);
-
-//  int gear;
-//  float drive_ratio = speeddata / rpmdata;
-//  float diff = 99999;
-//  float t;
-//  int closest_gear = 0;
-//  for(gear=1;gear<=N_GEARS;gear++) {
-//    /* get unsigned difference */
-//    if(drive_ratio <= geartable[gear]) {
-//      t = geartable[gear] - drive_ratio;
-//    } else {
-//      t = drive_ratio - geartable[gear];
-//    };
-//    if(t < diff) {
- //     diff = t;
-//      closest_gear = gear;
- //   };
-// };
 };
 
 void draw_simpletext_a(gauge_t *g) {
