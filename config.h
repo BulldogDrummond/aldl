@@ -119,6 +119,17 @@
 #define FTDI_ATTEMPT_RECOVERY
 #define FTDI_MAXFAIL 3
 
+/* ------- DUMMY DRIVER CONFIG ----------------------*/
+
+/* simulate random corruption in dummy packets */
+#define DUMMY_CORRUPTION_ENABLE
+
+/* 0-100, rough percentage of corrupted packets */
+#define DUMMY_CORRPUTION_RATE 3
+
+/* 0-100, strength of corruption */
+#define DUMMY_CORRUPTION_AMOUNT 3
+
 /* ------- MISC CONSTANTS ---------------------------*/
 
 /* bad chars that can't be used in things such as unit of measure strings or

@@ -33,6 +33,14 @@ void gen_pkt() {
   databuff[2]=0x01;
   for(x=3;x<63;x++) databuff[x] = ( (byte)rand() % 256 ) - 1;
   databuff[63] = checksum_generate(databuff,63);
+  #ifdef DUMMY_CORRUPTION_ENABLE
+  /* insert random bullshit sometimes */
+  if( ( (byte)rand() % 100 ) < DUMMY_CORRPUTION_RATE ) {
+    for(x=0;x<=DUMMY_CORRUPTION_AMOUNT;x++) {
+      databuff[(byte)rand() % 60] = ( (byte)rand() % 256 ) - 1;
+    };
+  };
+  #endif
 };
 
 int serial_init(char *port) {
