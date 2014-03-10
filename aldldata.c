@@ -294,11 +294,23 @@ aldl_record_t *next_record(aldl_record_t *rec) {
 };
 
 void pause_until_connected(aldl_conf_t *aldl) {
-  while(get_connstate(aldl) > 10) usleep(100);
+  while(get_connstate(aldl) > 10) {
+    #ifdef AGGRESSIVE
+      usleep(100);
+    #else
+      msleep(100);
+    #endif
+  };
 };
 
 void pause_until_buffered(aldl_conf_t *aldl) {
-  while(aldl->ready ==0) usleep(50);
+  while(aldl->ready ==0) {
+    #ifdef AGGRESSIVE
+      usleep(100);
+    #else
+      msleep(100); 
+    #endif
+  };
 };
 
 int get_index_by_name(aldl_conf_t *aldl, char *name) {
