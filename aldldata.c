@@ -327,6 +327,8 @@ char *get_state_string(aldl_state_t s) {
       return "Quit";
     case ALDL_PAUSE:
       return "Paused";
+    case ALDL_SERIALERROR:
+      return "Serial ERR";
     default:
       return "Undefined";
   };

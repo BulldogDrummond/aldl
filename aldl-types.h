@@ -19,6 +19,7 @@ typedef enum aldl_state {
   ALDL_DESYNC = 13,
   ALDL_ERROR = 14,
   ALDL_LAGGY = 15,
+  ALDL_SERIALERROR = 16,
   /* states > 50 reserved for special states */
   ALDL_QUIT = 51,
   ALDL_PAUSE = 52
