@@ -68,7 +68,6 @@ typedef struct _anl_conf_t {
   /* valid row specifier */
   int valid_min_time; /* minimum timestamp */
   int valid_min_temp; /* minimum temperature */
-  int valid_cl,valid_blm,valid_wot;
   /* blm analyzer */
   int blm_on; /* activate the blm analyzer */
   int blm_n_cells; /* number of blm cells */
@@ -77,7 +76,8 @@ typedef struct _anl_conf_t {
   int knock_on; /* activate knock counter */
   int min_knock;
   /* wb analyzer */
-  int wb_on,wb_counts,wb_min,wb_max,wb_comp;
+  int wb_on,wb_counts;
+  float wb_min,wb_max,wb_comp;
   /* column identifiers */ 
   int col_timestamp, col_rpm, col_temp, col_lblm, col_rblm, col_cell;
   int col_map, col_maf, col_cl, col_blm, col_wot, col_knock, col_wb;
@@ -118,16 +118,22 @@ int map_cell_offset(int value);
 int maf_cell_offset(int value);
 
 int main(int argc, char **argv) {
-  printf("**** aldlio offline log analyzer %s ****\n\n",ANL_VERSION);
-  printf("(c)2014 Steve Haslin\n");
+  printf("**** aldl-analyzer: CSV Log Analyzer %s ****\n",ANL_VERSION);
+  printf("(c)2014 Steve Haslin\n\n");
 
   /* load config */
   anl_load_conf(ANL_CONFIGFILE);
 
+  /* print config specs */
+  printf("Global Config:\n");
+  printf("Ignoring timestamps < %i\n", anl_conf->valid_min_time);
+  printf("Ignoring temperature < %i\n",anl_conf->valid_min_temp);
+  printf("\n");
+
   prep_anl();
 
   /* load files ... */
-  if(argc < 2) err("no files specified...");
+  if(argc < 2) err("No files specified...");
   int x;
   char *log;
   printf("Loading files...\n");
@@ -273,7 +279,10 @@ void log_knock(char *line) {
 };
 
 void print_results_knock() {
-  printf("\n**** KNOCK Analysis PER EVENT ****\n\n");
+  printf("\n**** Knock Increment vs RPM vs MAP ****\n");
+  printf("(Records with count incr. < %i ignored)\n",anl_conf->blm_min_count);
+
+  printf("(This is a total of RECORDS with knock count, NOT ECM counts\n\n");
   int maprow = 0;
   int rpmrow = 0;
   for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
@@ -366,7 +375,8 @@ void print_results_blm() {
   float overall_blm_avg = 0;
   float overall_blm_count = 0;
 
-  printf("\n**** BLM Analysis ****\n");
+  printf("\n**** BLM CELL vs TRIM, MAF, MAP, RPM RANGE/AVG ****\n");
+  printf("(Igoring records with records < %i)\n",anl_conf->blm_min_count);
 
   for(x=0;x<anl_conf->blm_n_cells;x++) {
     cdata = &anl_blm[x];
@@ -470,7 +480,11 @@ void print_results_wb() {
   int rpmrow = 0;
   int mafrow = 0;
 
-  printf("\n**** WB Analysis, VE ****\n\n");
+  printf("\n**** Wideband AFR AVERAGE vs RPM vs MAP ****\n");
+  printf("(Igoring cells with counts < %i)\n",anl_conf->wb_counts);
+  printf("(Ignoring wideband AFR < %f and > %f)\n",
+           anl_conf->wb_min,anl_conf->wb_max);
+  printf("(Adding compensation of %f)\n\n",anl_conf->wb_comp);
   for(maprow=0;maprow<MAP_GRIDSIZE;maprow++) {
     printf(" %4i ",maprow * GRID_MAP_INTERVAL);
   };
@@ -488,7 +502,7 @@ void print_results_wb() {
     printf("\n");
   };
 
-  printf("\n**** WB Analysis, MAF ****\n\n");
+  printf("\n**** Wideband AFR AVERAGE vs MAF AFGS ****\n\n");
   for(mafrow=0;mafrow<MAF_GRIDSIZE;mafrow++) {
     if(anl_wbmaf->t[mafrow].count == 0) {
        anl_wbmaf->t[mafrow].avg = 0;
@@ -499,12 +513,12 @@ void print_results_wb() {
           anl_wbmaf->t[mafrow].avg, anl_wbmaf->t[mafrow].count);
   };
 
-  printf("\n**** WB Analysis, POWER ENRICH ****\n\n");
+  printf("\n**** Wideband AFR (Average) vs RPM during PE ACTIVE ****\n\n");
   for(rpmrow=0;rpmrow<RPM_GRIDSIZE;rpmrow++) {
     if(anl_wbwot->t[rpmrow].count == 0) {
        anl_wbwot->t[rpmrow].avg = 0;
     };
-    printf("RPM %3i - %3i    ",rpmrow * GRID_RPM_INTERVAL,
+    printf("RPM %4i - %4i    ",rpmrow * GRID_RPM_INTERVAL,
         GRID_RPM_INTERVAL * (rpmrow +1));
     printf("   %4.1f    %i Counts\n",
           anl_wbwot->t[rpmrow].avg, anl_wbwot->t[rpmrow].count);
