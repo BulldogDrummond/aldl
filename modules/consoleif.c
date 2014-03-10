@@ -272,23 +272,23 @@ void draw_shift(gauge_t *g) {
   aldl_data_t *speeddata = &rec->data[index_speed];
   gauge_blank(g);
 
-  int gear;
-  float drive_ratio = speeddata / rpmdata;
-  float diff = 99999;
-  float t;
-  int closest_gear = 0;
-  for(gear=1;gear<=N_GEARS;gear++) {
-    /* get unsigned difference */
-    if(drive_ratio <= geartable[gear]) {
-      t = geartable[gear] - drive_ratio;
-    } else {
-      t = drive_ratio - geartable[gear];
-    };
-    if(t < diff) {
-      diff = t;
-      closest_gear = gear;
-    };
-  };
+//  int gear;
+//  float drive_ratio = speeddata / rpmdata;
+//  float diff = 99999;
+//  float t;
+//  int closest_gear = 0;
+//  for(gear=1;gear<=N_GEARS;gear++) {
+//    /* get unsigned difference */
+//    if(drive_ratio <= geartable[gear]) {
+//      t = geartable[gear] - drive_ratio;
+//    } else {
+//      t = drive_ratio - geartable[gear];
+//    };
+//    if(t < diff) {
+ //     diff = t;
+//      closest_gear = gear;
+ //   };
+// };
 };
 
 void draw_simpletext_a(gauge_t *g) {
