@@ -6,6 +6,9 @@
    it might introduce more overhead, though ... */
 #define USEFUL_BETTERCLOCK
 
+/* define to check malloc return values */
+#undef MALLOC_ERRCHECK
+
 /* clock source for USEFUL_BETTERCLOCK mode. */
 #define _CLOCKSOURCE CLOCK_MONOTONIC
 
@@ -17,8 +20,13 @@ typedef struct timespec timespec_t;
 typedef struct timeval timespec_t;
 #endif
 
-/* a safe malloc that checks the return value and bails */
-void *smalloc(size_t size);
+#ifdef MALLOC_ERRCHECK
+  /* a safe malloc that checks the return value and bails */
+  void *smalloc(size_t size);
+#else
+  /* just macro malloc */
+  #define smalloc(SIZE) malloc(SIZE)
+#endif
 
 /* get current time */
 timespec_t get_time();
