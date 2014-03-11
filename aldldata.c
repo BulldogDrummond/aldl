@@ -28,6 +28,11 @@ pthread_mutex_t *aldllock;
 
 timespec_t firstrecordtime; /* timestamp used to calc. relative time */
 
+/* primary memory pool for record storage */
+aldl_record_t *recordbuffer; /* circular pool for records */
+aldl_data_t *databuffer; /* circular pool for data */
+unsigned int indexbuffer; /* index for both of above */
+
 /* --------- local function decl. ---------------- */
 
 /* update the value in the record from definition n */
@@ -45,6 +50,9 @@ aldl_record_t *aldl_fill_record(aldl_conf_t *aldl, aldl_record_t *rec);
 /* set and unset locks, wrapper with error checking for pthread funcs */
 inline void set_lock(aldl_lock_t lock_number);
 inline void unset_lock(aldl_lock_t lock_number);
+
+/* allocate memory pool */
+void aldl_alloc_pool(aldl_conf_t *aldl);
 
 /* --------------------------------------------------------- */
 
@@ -88,22 +96,6 @@ aldl_record_t *process_data(aldl_conf_t *aldl) {
   return rec;
 };
 
-aldl_record_t *oldest_record(aldl_conf_t *aldl) {
-  aldl_record_t *last = aldl->r;
-  while(last->prev != NULL) last = last->prev;
-  return last;
-};
-
-void remove_record(aldl_record_t *rec) {
-  #ifdef DEBUGSTRUCT
-  if(rec->next == NULL) fatalerror(ERROR_NULL,"remove only record");
-  if(rec->prev != NULL) fatalerror(ERROR_NULL,"remove wrong record");
-  #endif
-  rec->next->prev = NULL; /* delink from linked list */
-  free(rec->data);
-  free(rec);
-};
-
 void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
   rec->next = NULL; /* terminate linked list */
   rec->prev = aldl->r; /* previous link */
@@ -113,7 +105,8 @@ void link_record(aldl_record_t *rec, aldl_conf_t *aldl) {
   unset_lock(LOCK_RECORDPTR);
 };
 
-void aldl_init_record(aldl_conf_t *aldl) {
+void aldl_data_init(aldl_conf_t *aldl) {
+  aldl_alloc_pool(aldl);
   aldl_record_t *rec = aldl_create_record(aldl);
   set_lock(LOCK_RECORDPTR);
   rec->next = NULL;
@@ -124,8 +117,16 @@ void aldl_init_record(aldl_conf_t *aldl) {
 };
 
 aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
-  /* allocate record memory */
-  aldl_record_t *rec = smalloc(sizeof(aldl_record_t));
+  /* get memory pool addresses */
+  aldl_record_t *rec = &recordbuffer[indexbuffer];
+  rec->data = &databuffer[indexbuffer * aldl->n_defs];
+
+  /* advance pool index */
+  if(indexbuffer > aldl->bufsize - 2) { /* end of buffer */
+    indexbuffer = 0; /* return to beginning */
+  } else {
+    indexbuffer++;
+  };
 
   /* timestamp record */
   rec->t = get_elapsed_ms(firstrecordtime);
@@ -134,9 +135,6 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   /* handle wraparound if we're 100 seconds before time limit */
   if(rec->t > ULONG_MAX - 100000) firstrecordtime = get_time();
   #endif
-
-  /* allocate data memory */
-  rec->data = smalloc(sizeof(aldl_data_t) * aldl->n_defs);
 
   return rec;
 };
@@ -347,3 +345,8 @@ char *get_state_string(aldl_state_t s) {
   };
 };
 
+void aldl_alloc_pool(aldl_conf_t *aldl) {
+  databuffer = smalloc(sizeof(aldl_data_t) * aldl->n_defs * aldl->bufsize);
+  recordbuffer = smalloc(sizeof(aldl_record_t) * aldl->bufsize);
+  indexbuffer = 0; /* start at ptr 0 */
+};
