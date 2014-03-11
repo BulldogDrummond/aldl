@@ -207,20 +207,14 @@ void *aldl_acq(void *aldl_in) {
     /* process the packet */
     process_data(aldl);
 
-    /* buffering logic for removal of records.  the buffer is fairly static,
-       so once the buffer is full, one record will always be removed for each
-       record added. */
-    if(buffered < aldl->bufsize) { /* buffer not full, dont remove records */
-      #ifdef DEBUGSTRUCT
-      printf("filling buffer %i of %i\n",buffered,aldl->bufsize);
-      #endif
-      buffered++;
-    } else { /* buffer is full, delete oldest record */
-      remove_record(oldest_record(aldl));
-    };
-
     /* set readiness bit */
-    if(buffered >= aldl->bufstart) aldl->ready = 1;
+    if(aldl->ready == 0) {
+      if(buffered >= aldl->bufstart) {
+        aldl->ready = 1;
+      } else {
+        buffered++;
+      };
+    };
   };
   return NULL;
 }
