@@ -346,7 +346,19 @@ char *get_state_string(aldl_state_t s) {
 };
 
 void aldl_alloc_pool(aldl_conf_t *aldl) {
-  databuffer = smalloc(sizeof(aldl_data_t) * aldl->n_defs * aldl->bufsize);
-  recordbuffer = smalloc(sizeof(aldl_record_t) * aldl->bufsize);
+  /* get sizes */
+  size_t databuffer_size = sizeof(aldl_data_t) * aldl->n_defs * aldl->bufsize;
+  size_t recordbuffer_size = sizeof(aldl_record_t) * aldl->bufsize;
+
+  /* alloc */
+  databuffer = smalloc(databuffer_size);
+  recordbuffer = smalloc(recordbuffer_size);
   indexbuffer = 0; /* start at ptr 0 */
+
+  /* optional print sizes */
+  #ifdef DEBUGMEM
+  printf("aldldata.c Circular Buffer: BUF=%u Recs, DATA=%uKb REC=%uKb\n",
+          aldl->bufsize, (unsigned int)databuffer_size/1024,
+         (unsigned int)recordbuffer_size/1024);
+  #endif
 };
