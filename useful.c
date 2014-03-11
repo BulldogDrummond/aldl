@@ -106,6 +106,7 @@ void printhexstring(byte *str, int length) {
   printf("\n");
 };
 
+#ifdef MALLOC_ERRCHECK
 void *smalloc(size_t size) {
   void *m = malloc(size); 
   if(m == NULL) {
@@ -114,6 +115,7 @@ void *smalloc(size_t size) {
   };
   return m;
 };
+#endif
 
 int clamp_int(int min, int max, int in) {
   if(in > max) return max;
