@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
   aldl_sanity_check(aldl); /* sanity check the data from above */
   parse_cmdline(argc,argv,aldl); /* parse cmd line opts */
   modules_verify(aldl); /* check for bad module combos */
-  aldl_init_record(aldl); /* create init record so linked list isnt busted */
+  aldl_data_init(aldl); /* init aldl data structs */
   set_connstate(ALDL_LOADING,aldl); /* init connection state */
   serial_init(aldl->serialstr); /* init i/o driver */
 
