@@ -173,8 +173,6 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* location for output of data, matches definition array index ... */
   aldl_data_t *out = &r->data[n];
 
-  /* FIXME doesn't deal with signed input */
-
   unsigned int x; /* converted value */
   switch(def->size) {
     case 16:
@@ -182,7 +180,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
       x = (unsigned int)((*data<<8)|*(data+1));
       break;
     case 8: /* direct conversion */
-    default:
+    default: /* no other types supported, default to 8 bit */
       x = (unsigned int)*data;
   };
 
