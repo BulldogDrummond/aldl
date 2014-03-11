@@ -61,7 +61,6 @@ typedef struct aldl_define {
   byte packet; /* selects which packet unique id the data comes from */
   byte offset; /* offset within packet in bytes */
   byte size;   /* size in bits.  8,16,32 only... */
-  byte sig;    /* 1 if signed */
   /* binary stuff only */
   byte binary; /* offset in bits.  only works for 1 bit fields */
   byte invert; /* invert (0 means no) */
