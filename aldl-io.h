@@ -20,26 +20,18 @@ byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm);
 
 int serial_init(char *port); /* initalize the serial handler */
 
-/* set up lock structures */
-void init_locks();
-
-/* creates a dummy record so the linked list isn't broken when we want to start
-   using it, call once at the beginning before acq starts */
-void aldl_init_record(aldl_conf_t *aldl);
-
 /* buffer management --------------------------------------*/
 
 /* WARNING: only the acquisition loop should use these functions */
 
+/* initial configuration of the data structures used for record storage ... */
+void aldl_init_record(aldl_conf_t *aldl);
+
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
 
-/* remove a record from the linked list and deallocate */
-void remove_record(aldl_record_t *rec);
-
-/* return a pointer to the oldest record in the linked list; this is for
-   garbage collection in acquisition event loops, so don't use it. */
-aldl_record_t *oldest_record(aldl_conf_t *aldl);
+/* set up lock structures */
+void init_locks();
 
 /* record selection ---------------------------------------*/
 
