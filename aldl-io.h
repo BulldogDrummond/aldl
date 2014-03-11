@@ -25,7 +25,7 @@ int serial_init(char *port); /* initalize the serial handler */
 /* WARNING: only the acquisition loop should use these functions */
 
 /* initial configuration of the data structures used for record storage ... */
-void aldl_init_record(aldl_conf_t *aldl);
+void aldl_data_init(aldl_conf_t *aldl);
 
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
