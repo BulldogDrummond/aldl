@@ -38,7 +38,9 @@
 
 /* --------- GLOBAL FEATURE CONFIG -----------------*/
 
-/* support multiple packets, required by some definition files */
+/* support multiple packets, required by some definition files,
+   undefining this avoids a small amount of overhead and works
+   for most ECMs */
 #undef ALDL_MULTIPACKET
 
 /* --------- TIMING CONSTANTS ------------------------*/
