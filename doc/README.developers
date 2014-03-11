@@ -91,8 +91,8 @@ RULES FOR PLUGIN DEVELOPERS:
   must use newest_record() to allow frame skipping, in which case your routine
   can take t * bufsize time with no problems.
 
-  Results are UNDEFINED BEHAVIOR if you try to retrieve data from the last
-  record, no locking is done on deletion, as it is assumed any routine that
-  operates so slowly is a display routine, that will want frame skipping
-  anyway.
-
+  If you hit a buffer underrun, current behavior is to point to another record
+  somewhere.  The data will be out of sequence and inaccurate but technically
+  valid.  The buffer is circular, and if this point is written, locking issues
+  may result.  This means underrunning (bufsize) is safe, but (bufsize*2) is
+  fairly sketchy.
