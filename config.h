@@ -1,4 +1,4 @@
-#define VERSION "ALDL-IO v0.8a"
+#define VERSION "ALDL-IO v0.8b"
 /* ----------- FILE CONFIG ----------------------------*/
 
 /* path to the root config file */
