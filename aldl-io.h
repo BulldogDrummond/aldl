@@ -83,7 +83,7 @@ void serial_close(); /* close the serial port */
 byte checksum_generate(byte *buf, int len);
 
 /* generate a msg length byte */
-byte calc_msglength(byte len);
+#define calc_msglength(LEN) (byte)(LEN + MSGLENGTH_MAGICNUMBER)
 
 /* test checksum byte of buf, 1 if ok */
 int checksum_test(byte *buf, int len);

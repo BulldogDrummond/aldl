@@ -227,6 +227,3 @@ byte *generate_mode(byte mode, aldl_commdef_t *comm) {
   return tmp;
 };
 
-byte calc_msglength(byte len) {
-  return len + MSGLENGTH_MAGICNUMBER;
-};
