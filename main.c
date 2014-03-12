@@ -58,6 +58,7 @@ int main(int argc, char **argv) {
   init_locks(); /* initialize locking mechanisms */
   aldl_conf_t *aldl = aldl_setup(); /* alloc everything and parse conf */
   aldl_sanity_check(aldl); /* sanity check the data from above */
+  alloc_commbuf(); /* allocate communications static buffer */
   parse_cmdline(argc,argv,aldl); /* parse cmd line opts */
   modules_verify(aldl); /* check for bad module combos */
   aldl_data_init(aldl); /* init aldl data structs */
