@@ -19,6 +19,10 @@
   see aldldata.c.
 ****************************************************/
 
+/* global vars -------*/
+
+byte *commbuf;
+
 /* local functions -----*/
 
 int aldl_shutup(); /* repeatedly attempt to make the ecm shut up */
@@ -162,31 +166,33 @@ inline int read_bytes(byte *str, int bytes, int timeout) {
 }
 
 inline int skip_bytes(int bytes, int timeout) {
-  byte *buf = smalloc(bytes);
-  int bytes_read = read_bytes(buf,bytes,timeout);
+  if(bytes > ALDL_COMMBUFFER) {
+    fatalerror(ERROR_RANGE,"can't skip %i bytes, commbuf too small\n",bytes);
+  };
+  /* read into commbuf and then forget about it */
+  int bytes_read = read_bytes(commbuf,bytes,timeout);
   #ifdef SERIAL_VERBOSE
   printf("SKIP_BYTES: Discarded %i bytes.\n",bytes_read);
   #endif
-  free(buf);
   return bytes_read;
 }
 
 int listen_bytes(byte *str, int len, int max, int timeout) {
+  if(max > ALDL_COMMBUFFER) {
+    fatalerror(ERROR_RANGE,"can't listen %i bytes, commbuf too small\n",max);
+  };
   int chars_read = 0; /* total chars read into buffer */
   int chars_in = 0; /* chars added to buffer */
   timespec_t timestamp = get_time(); /* timestamp beginning of op */
-  byte *buf = smalloc(max); /* buffer for incoming data */
-  memset(buf,0,max);
   #ifdef SERIAL_VERBOSE
   printf("LISTEN: ");
   printhexstring(str,len);
   #endif
   while(chars_read < max) {
-    chars_in = serial_read(buf + chars_read,max - chars_read);
+    chars_in = serial_read(commbuf + chars_read,max - chars_read);
     if(chars_in > 0) {
       chars_read += chars_in; /* mv cursor */
-      if(cmp_bytestring(buf,chars_read,str,len) == 1) {
-        free(buf);
+      if(cmp_bytestring(commbuf,chars_read,str,len) == 1) {
         return 1;
       };
     };
@@ -199,16 +205,14 @@ int listen_bytes(byte *str, int len, int max, int timeout) {
         #ifdef SERIAL_VERBOSE
         printf("LISTEN TIMEOUT\n");
         #endif
-        free(buf);
         return 0;
       };
     };
   };
   #ifdef SERIAL_VERBOSE
   printf("STRING NOT FOUND, GOT: ");
-  printhexstring(buf,chars_read);
+  printhexstring(commbuf,chars_read);
   #endif
-  free(buf);
   return 0; /* got max chars with no result */
 }
 
@@ -236,3 +240,6 @@ byte *generate_mode(byte mode, aldl_commdef_t *comm) {
   return tmp;
 };
 
+void alloc_commbuf() {
+  commbuf = smalloc(sizeof(byte) * ALDL_COMMBUFFER);
+};
