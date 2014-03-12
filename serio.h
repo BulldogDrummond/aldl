@@ -28,5 +28,8 @@ void serial_purge_tx(); /* tx only */
 /* device search helper */
 void serial_help_devs();
 
+/* get serial status 1=OK */
+int serial_get_status();
+
 #endif
 

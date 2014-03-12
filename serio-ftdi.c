@@ -201,6 +201,7 @@ inline int ftdierror_counter(int loc,int errno) {
 
 inline void ftdi_recovery() {
   #ifdef FTDI_ATTEMPT_RECOVERY
+  ftdistatus=0;
     #ifdef SERIAL_VERBOSE
     fprintf(stderr,"FTDI DRIVER: Triggered recovery mode...\n");
     #endif
@@ -232,4 +233,8 @@ void serial_help_devs() {
 
   ftdi_list_free(&devlist);
   ftdi_deinit(ftdi);
+};
+
+int serial_get_status() {
+  return ftdistatus;
 };
