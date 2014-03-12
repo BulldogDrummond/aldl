@@ -31,6 +31,7 @@ void *aldl_acq(void *aldl_in) {
   int pktfail = 0; /* marker for a failed packet in event loop */
   int npkt = 0; /* array index of packet to operate on */
   int buffered = 0;
+  int serialdowntime = 0;
   aldl->ready = 0;
 
   /* sanity checks */
@@ -93,7 +94,21 @@ void *aldl_acq(void *aldl_in) {
     PKTRETRY:
 
     /* handle pause condition */
-    while(get_connstate(aldl) == ALDL_PAUSE) usleep(5000);
+    while(get_connstate(aldl) == ALDL_PAUSE) msleep(250);
+
+    /* handle serial error */
+    if(serial_get_status() != 1) {
+      set_connstate(ALDL_SERIALERROR,aldl);
+      while (serial_get_status() != 1) {
+        /* keep track of how long we're down, since we're outside of lagcheck
+           loop. */
+        msleep(250);
+        serialdowntime += 250;
+      };
+      if(serialdowntime < aldl->comm->shutup_time) { /* assume comm ok */
+        set_connstate(ALDL_CONNECTED,aldl);
+      };
+    };
 
     /* this would seem an appropriate time to maintain the connection if it
        drops, or if it never existed ... if not, time for a delay */
