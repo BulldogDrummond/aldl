@@ -48,8 +48,10 @@
    for most ECMs */
 #undef ALDL_MULTIPACKET
 
-/* maximum size of listen/skip buffer.  leave it alone unless this
-   thing ends up going on some kind of embedded system. */
+/* maximum size of listen/skip buffer.   if a listen or skip attempt is larger
+   than this value, an emergency realloc is done, which is a waste of time, but
+   fairly safe.  set this larger than any possible listen/skip req. to trade
+   memory for cpu time. */
 #define ALDL_COMMBUFFER 2048
 
 /* --------- TIMING CONSTANTS ------------------------*/
