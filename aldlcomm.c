@@ -167,7 +167,12 @@ inline int read_bytes(byte *str, int bytes, int timeout) {
 
 inline int skip_bytes(int bytes, int timeout) {
   if(bytes > ALDL_COMMBUFFER) {
-    fatalerror(ERROR_RANGE,"can't skip %i bytes, commbuf too small\n",bytes);
+    /* realloc just to save ourselves */
+    commbuf = realloc(commbuf,sizeof(byte) * bytes);
+    #ifdef DEBUGMEM
+    nonfatalerror(ERROR_MEMORY,"skip_bytes %i required emergency realloc\n",
+                                bytes);
+    #endif
   };
   /* read into commbuf and then forget about it */
   int bytes_read = read_bytes(commbuf,bytes,timeout);
@@ -179,7 +184,12 @@ inline int skip_bytes(int bytes, int timeout) {
 
 int listen_bytes(byte *str, int len, int max, int timeout) {
   if(max > ALDL_COMMBUFFER) {
-    fatalerror(ERROR_RANGE,"can't listen %i bytes, commbuf too small\n",max);
+    /* realloc just to save ourselves */
+    commbuf = realloc(commbuf,sizeof(byte) * max);
+    #ifdef DEBUGMEM
+    nonfatalerror(ERROR_MEMORY,"skip_bytes %i required emergency realloc\n",
+                                bytes);
+    #endif
   };
   int chars_read = 0; /* total chars read into buffer */
   int chars_in = 0; /* chars added to buffer */
