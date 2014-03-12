@@ -48,6 +48,10 @@
    for most ECMs */
 #undef ALDL_MULTIPACKET
 
+/* maximum size of listen/skip buffer.  leave it alone unless this
+   thing ends up going on some kind of embedded system. */
+#define ALDL_COMMBUFFER 2048
+
 /* --------- TIMING CONSTANTS ------------------------*/
 
 /* define for more aggressive timing behavior in an attempt to increase packet
