@@ -92,7 +92,7 @@ RULES FOR PLUGIN DEVELOPERS:
   can take t * bufsize time with no problems.
 
   If you hit a buffer underrun, current behavior is to point to another record
-  somewhere.  The data will be out of sequence and inaccurate but technically
-  valid.  The buffer is circular, and if this point is written, locking issues
-  may result.  This means underrunning (bufsize) is safe, but (bufsize*2) is
-  fairly sketchy.
+  "somewhere".  The data will be out of sequence but technically valid.  To
+  detect an underrun, checking for timestamp could be useful, as an underrun
+  will almost certainly result in a timestamp decrementing.
+
