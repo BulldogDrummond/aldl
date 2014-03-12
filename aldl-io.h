@@ -12,9 +12,11 @@
 
 int aldl_reconnect(); /* go into diagnostic mode, returns 1 on success */
 
-byte *aldl_get_packet(aldl_packetdef_t *p); /* get packet data */
+/* fills the data section of the packet def with data, or sets it to zero if
+   fail, and returns NULL */
+byte *aldl_get_packet(aldl_packetdef_t *p);
 
-/* generate request strings */
+/* generate request strings, returns allocated memory (free when finished) */
 byte *generate_request(byte mode, byte message, aldl_commdef_t *comm);
 byte *generate_mode(byte mode, aldl_commdef_t *comm);
 
@@ -27,6 +29,9 @@ byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm);
 
 /* initial configuration of the data structures used for record storage ... */
 void aldl_data_init(aldl_conf_t *aldl);
+
+/* allocate communications static buffer, call in main once and leave it */
+void alloc_commbuf();
 
 /* process data from all packets, create a record, and link it to the list */
 aldl_record_t *process_data(aldl_conf_t *aldl);
