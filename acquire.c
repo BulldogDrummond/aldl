@@ -11,6 +11,7 @@
 #include "aldl-io.h"
 #include "acquire.h"
 #include "useful.h"
+#include "serio.h"
 
 /************ SCOPE *********************************
   This object contains one event loop, that drives

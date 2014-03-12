@@ -112,6 +112,6 @@ void serial_help_devs() {
   fatalerror(ERROR_GENERAL,"this serial driver has no devices......");
 };
 
-void serial_get_status() {
-  return 1;
+int serial_get_status() {
+  return 0;
 };
