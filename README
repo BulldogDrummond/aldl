@@ -76,41 +76,56 @@ check out config.h before compile if you're interested in 'tweaking' anything.
 
 ## contents
 
-main.c: sets up initial structures and spawns some threads, to get things going
-        facilitates loading of modules and main config data, etc.
+acquire.c:
+  This object contains one event loop, that drives
+  the data aquisition thread.  Maintaining connection
+  statefulness and retrieving all data is done here.
 
-acquire.c: an object that runs an event loop full of functions from aldl-io,
-           maintaining connection state and constructing a linked list buffer
-           of parsed and verified aldl data.
+aldlcomm.c:
+  Most ALDL communications protocol functions are
+  contained in this object.  Serial handlers that
+  are not interface-specific are also contained here.
+  No actual parsing of request replies are here,
+  see aldldata.c.
 
-error.c: a global error handling object.
+aldldata.c:
+  This object contains all of the functions used for
+  structuring and parsing the ALDL data structures,
+  including locking and serializing of record retr.
 
-aldl-io.h: all public functions are exported here.  this also explicitly
-           includes aldl-types.h.
+error.c:
+  Error handing routines.
 
-aldl-types.h: defines all public data structures used in this library.
+loadconfig.c:
+  This object contains configuration file loading
+  routines, all based around two symbols, the equals
+  sign and the double quote.
 
-aldldata.c: provides functions for data management, including construction of
-            the linked list of records, parsing and conversion of raw data, and
-            thread-safe read/write of critical data.
+main.c:
+  Initialize everything, and spawn all threads.
 
-aldlcomm.c: provides communication protocols for dealing with the ECM, including
-            sending and generating requests, retrieving raw packets of data,
-            and verifying them.
+serio-dummy.c:
+  A dummy serial handler object that pretends to be
+  a fake LT1 (EE) ECM and just send random garbage
+  (00-FF) as a datastream.
 
-useful.c: generic useful functions that are used by many different objects.
+serio-ftdi.c:
+  Primary serial driver, uses libftdi for raw usb
+  access to ftdi serial adaptors.  Reccommended.
 
-loadconfig.c: a stupid but useful configuration file routine that is bound to
-              the equals sign.  includes routines for parsing the main config
-              files directly, but has enough of an api to be used by modules.
+useful.c:
+  Useful but generic functions.
 
-serio-ftdi.c: an object that allows serial communications using the libftdi
-              userland driver (via libusb).  this is the reccommended and only
-              currently supported interface.
+aldl-io.h:
+  Include this file.  All useful functions are
+  declared here.
 
-serio-dummy.c: a really stupid fake serial driver for debugging, that pretends
-               to be an LT1 ecm.  seriously, it's really stupid, doesn't even
-               check input, just spits out data in a serialized operation scope
+aldl-types.h:
+  All structure formats and enumerations that are
+  useful are contained in this file.
+
+config.h:
+  Static #define's that apply to the entire program.
 
 modules/*: various output modules which can be executed by main.c to actually
            do stuff with the data, incl. display and logging.

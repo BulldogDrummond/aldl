@@ -6,6 +6,10 @@
 #include "error.h"
 #include "aldl-io.h"
 
+/************ SCOPE *********************************
+  Error handing routines.
+****************************************************/
+
 /* list of error code to string, array index matches enumerated values in
    error_t.  these will have ERROR printed AFTER them, so GENERAL will come
    out as GENERAL ERROR. */

@@ -1,7 +1,10 @@
 #ifndef ALDLTYPES_H
 #define ALDLTYPES_H
 
-/* --------- datatypes ----------------------------------------*/
+/************ SCOPE *********************************
+  All structure formats and enumerations that are
+  useful are contained in this file.
+****************************************************/
 
 /* output data type enumeration */
 

@@ -15,6 +15,12 @@
 #include "aldl-io.h"
 #include "useful.h"
 
+/************ SCOPE *********************************
+  This object contains all of the functions used for
+  structuring and parsing the ALDL data structures,
+  including locking and serializing of record retr.
+****************************************************/
+
 /* -------- globalstuffs ------------------ */
 
 /* locking */
@@ -121,7 +127,7 @@ aldl_record_t *aldl_create_record(aldl_conf_t *aldl) {
   aldl_record_t *rec = &recordbuffer[indexbuffer];
   rec->data = &databuffer[indexbuffer * aldl->n_defs];
 
-  /* advance pool index */
+  /* advance pool index (for next time around) */
   if(indexbuffer > aldl->bufsize - 2) { /* end of buffer */
     indexbuffer = 0; /* return to beginning */
   } else {
@@ -173,7 +179,10 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
   /* location for output of data, matches definition array index ... */
   aldl_data_t *out = &r->data[n];
 
-  unsigned int x; /* converted value */
+  /* location for input of data */
+  unsigned int x;
+
+  /* convert input bit size into unsigned integer */
   switch(def->size) {
     case 16:
       /* turn two 8 bit bytes into a 16 bit int */
@@ -184,7 +193,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
       x = (unsigned int)*data;
   };
 
-  /* get value, this does need more work ... */
+  /* apply any math or whatever and output as desired type */
   switch(def->type) {
     case ALDL_INT:
       out->i = ( (int)x * def->multiplier.i ) + def->adder.i;
@@ -199,7 +208,7 @@ aldl_data_t *aldl_parse_def(aldl_conf_t *aldl, aldl_record_t *r, int n) {
       };
       break;
     case ALDL_BOOL:
-      if(aldl->comm->byteorder == 1) {
+      if(aldl->comm->byteorder == 1) { /* deal with MSB or LSB */
         out->i = getbit(x,(7 - def->binary),def->invert);
       } else {
         out->i = getbit(x,def->binary,def->invert);

@@ -4,7 +4,9 @@
 
 #include "aldl-types.h"
 
-/* these are generic driver-specific abstractions only. */
+/************ SCOPE *********************************
+  Each serial module must contain these functions.
+****************************************************/
 
 /* write buffer *str to the serial port, up to len bytes */
 int serial_write(byte *str, int len);

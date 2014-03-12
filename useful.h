@@ -1,6 +1,10 @@
 #ifndef _USEFUL_H
 #define _USEFUL_H
 
+/************ SCOPE *********************************
+  Useful but generic functions.
+****************************************************/
+
 /* this uses clock_gettime instead of gettimeofday, which rounds nanosecond
    clock instead of microsecond, and isnt affected by time jumps.  i think that
    it might introduce more overhead, though ... */

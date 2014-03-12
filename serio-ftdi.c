@@ -16,6 +16,11 @@
 #include "config.h"
 #include "useful.h"
 
+/************ SCOPE *********************************
+  Primary serial driver, uses libftdi for raw usb
+  access to ftdi serial adaptors.  Reccommended.
+****************************************************/
+
 /****************GLOBALSn'STRUCTURES*****************************/
 
 /* global ftdi context pointer */

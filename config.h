@@ -1,4 +1,9 @@
 #define VERSION "ALDL-IO v0.8b"
+
+/************ SCOPE *********************************
+  Static #define's that apply to the entire program.
+****************************************************/
+
 /* ----------- FILE CONFIG ----------------------------*/
 
 /* path to the root config file */

@@ -13,6 +13,12 @@
 #include "aldl-io.h"
 #include "useful.h"
 
+/************ SCOPE *********************************
+  This object contains configuration file loading
+  routines, all based around two symbols, the equals
+  sign and the double quote.
+****************************************************/
+
 /* ------- GLOBAL----------------------- */
 
 aldl_conf_t *aldl; /* aldl data structure */

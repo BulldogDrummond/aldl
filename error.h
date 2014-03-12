@@ -1,6 +1,10 @@
 #ifndef _ERROR_H
 #define _ERROR_H
 
+/************ SCOPE *********************************
+  Error handling routines.
+****************************************************/
+
 #define N_ERRORCODES 13
 
 typedef enum _error {

@@ -13,6 +13,12 @@
 #include "error.h"
 #include "config.h"
 
+/************ SCOPE *********************************
+  A dummy serial handler object that pretends to be
+  a fake LT1 (EE) ECM and just send random garbage
+  (00-FF) as a datastream.
+****************************************************/
+
 /****************GLOBALSn'STRUCTURES*****************************/
 
 unsigned char *databuff;

@@ -3,6 +3,11 @@
 
 #include "aldl-types.h"
 
+/************ SCOPE *********************************
+  Include this file.  All useful functions are
+  declared here.
+****************************************************/
+
 /* diagnostic comms ------------------------------*/
 
 int aldl_reconnect(); /* go into diagnostic mode, returns 1 on success */

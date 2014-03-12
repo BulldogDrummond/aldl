@@ -3,6 +3,12 @@
 
 #include "aldl-types.h"
 
+/************ SCOPE *********************************
+  This object contains configuration file loading
+  routines, all based around two symbols, the equals
+  sign and the double quote.
+****************************************************/
+
 #define MAX_PARAMETERS 65535
 
 /* a struture with array index matched parameters and values from a cfg file */

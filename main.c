@@ -17,6 +17,10 @@
 
 #include "modules/modules.h"
 
+/************ SCOPE *********************************
+  Initialize everything, and spawn all threads.
+****************************************************/
+
 /* ----- typedefs ------------*/
 
 typedef struct _aldl_threads_t {

@@ -11,7 +11,16 @@
 #include "aldl-io.h"
 #include "useful.h"
 
+/************ SCOPE *********************************
+  Most ALDL communications protocol functions are
+  contained in this object.  Serial handlers that
+  are not interface-specific are also contained here.
+  No actual parsing of request replies are here,
+  see aldldata.c.
+****************************************************/
+
 /* local functions -----*/
+
 int aldl_shutup(); /* repeatedly attempt to make the ecm shut up */
 
 int aldl_waitforchatter(); /* waits forever for a byte, then bails */

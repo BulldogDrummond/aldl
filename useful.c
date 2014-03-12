@@ -7,6 +7,10 @@
 #include "useful.h"
 #include "error.h"
 
+/************ SCOPE *********************************
+  Useful but generic functions.
+****************************************************/
+
 timespec_t get_time() {
   timespec_t currenttime;
   #ifdef USEFUL_BETTERCLOCK
