@@ -8,6 +8,9 @@
   Each serial module must contain these functions.
 ****************************************************/
 
+/* initalize the serial handler */
+int serial_init(char *port);
+
 /* write buffer *str to the serial port, up to len bytes */
 int serial_write(byte *str, int len);
 

@@ -21,10 +21,6 @@ byte *generate_mode(byte mode, aldl_commdef_t *comm);
 /* use generate_request to fill a packet mode str */
 byte *generate_pktcommand(aldl_packetdef_t *packet, aldl_commdef_t *comm);
 
-/* serial comms-----------------------------------*/
-
-int serial_init(char *port); /* initalize the serial handler */
-
 /* buffer management --------------------------------------*/
 
 /* WARNING: only the acquisition loop should use these functions */
