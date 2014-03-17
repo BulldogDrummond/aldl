@@ -113,5 +113,5 @@ void serial_help_devs() {
 };
 
 int serial_get_status() {
-  return 0;
+  return 1;
 };
