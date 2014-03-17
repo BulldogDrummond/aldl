@@ -396,7 +396,12 @@ void dfile_strip_quotes(dfile_t *d) {
     if(d->v[x][0] == '"') {
       d->v[x]++;
       c = d->v[x];
-      while(*c != '"') c++;
+      while(*c != '"') {
+         if(*c == EOF) {
+           fatalerror(ERROR_CONFIG,"Unterminated quote in config file");
+         };
+         c++;
+      };
       c[0] = 0;
     };
   };
@@ -423,10 +428,12 @@ dfile_t *dfile(char *data) {
       out->v[out->n] = c + 1;
       c[0] = 0;
       cx = c + 1;
+      /* find parameter value */
       while(is_whitespace(*cx) != 1) {
         if(*cx == '"') { /* skip quoted string */
           cx++;
           while(cx[0] != '"') {
+            if(cx[1] == 0) fatalerror(ERROR_CONFIG,"Unterminated quote in config");
             if(cx == data + len) continue;
             cx++;
           };
@@ -437,10 +444,13 @@ dfile_t *dfile(char *data) {
       cz = cx; /* rememeber end point */
       /* find starting point */
       cx = c - 1;
+      /* find parameter name */
       while(is_whitespace(*cx) != 1) {
         if(*cx == '"') { /* skip quoted string */
           cx--;
+          if(cx < data) fatalerror(ERROR_CONFIG,"Unterminated quote in config");
           while(cx[0] != '"') {
+            if(cx == data) fatalerror(ERROR_CONFIG,"Unterminated quote in config"); 
             if(cx == data + len) continue;
             cx--;
           };
@@ -492,7 +502,7 @@ char *dfile_shrink(dfile_t *d) {
 
 
 inline int is_whitespace(char ch) {
-  if(ch == 0 || ch == ' ' || ch == '\n') return 1;
+  if(ch == 0 || ch == ' ' || ch == '\n' || ch == '=') return 1;
   return 0;
 };
 
