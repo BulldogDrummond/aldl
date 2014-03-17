@@ -33,6 +33,9 @@ install: aldl-ftdi aldl-dummy
 	@echo no automatic updates of configs are done.  please see
 	@echo examples/ if this was an existing installation, and
 	@echo attempt to merge these changes manually...
+	@echo the default log directory is /var/log/aldl, you must make that
+	@echo directory and make it user writeable, or change the path in the
+	@echo config....
 	@echo Install complete, see configs in $(CONFIGDIR) before running
 
 aldl-ftdi: main.c serio-ftdi.o config.h aldl-io.h aldl-types.h modules_ $(OBJS)
